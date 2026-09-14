@@ -7,31 +7,39 @@
     
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Lora:ital,wght@0,400;0,500;0,600;1,400&display=swap" rel="stylesheet">
+    
+    <!-- Modern typography matching Dashboard -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Lora:ital,wght@0,400;0,500;0,600;1,400&display=swap" rel="stylesheet">
     
     <script>
         tailwind.config = { 
             theme: { 
                 extend: { 
                     fontFamily: { 
-                        sans: ['Inter', 'sans-serif'],
+                        sans: ['"Plus Jakarta Sans"', 'sans-serif'],
                         serif: ['Lora', 'serif']
                     }, 
                     colors: { 
-                        brand: { light: '#34d399', DEFAULT: '#059669', dark: '#047857' },
-                        surface: { 50: '#f8fafc', 100: '#f1f5f9', 200: '#e2e8f0', 300: '#cbd5e1', 400: '#94a3b8', 500: '#64748b', 600: '#475569', 700: '#334155', 800: '#1e293b', 900: '#0f172a' }
+                        brand: { 50: '#f0fdf4', 100: '#dcfce7', 200: '#bbf7d0', 300: '#86efac', 400: '#4ade80', 500: '#22c55e', 600: '#16a34a', 700: '#15803d', 800: '#166534', 900: '#14532d', DEFAULT: '#10b981' }, 
+                        surface: { 50: '#f8fafc', 100: '#f1f5f9', 200: '#e2e8f0', 300: '#cbd5e1', 400: '#94a3b8', 500: '#64748b', 600: '#475569', 700: '#334155', 800: '#1e293b', 900: '#0f172a' } 
                     },
                     boxShadow: {
-                        'soft': '0 10px 40px -10px rgba(0,0,0,0.08)',
-                        'card': '0 4px 6px -1px rgba(0,0,0,0.05), 0 2px 4px -2px rgba(0,0,0,0.02)',
+                        'glass': '0 8px 32px 0 rgba(31, 38, 135, 0.07)',
+                        'float': '0 10px 40px -10px rgba(0,0,0,0.12)',
+                        'card': '0 2px 12px rgba(0,0,0,0.03)',
+                        'soft-inner': 'inset 0 2px 4px 0 rgba(0, 0, 0, 0.02)',
                     },
                     animation: {
-                        'fade-in': 'fadeIn 0.5s ease-out forwards',
+                        'fade-in': 'fadeIn 0.6s ease-out forwards',
                         'slide-up': 'slideUp 0.6s cubic-bezier(0.16, 1, 0.3, 1) forwards',
+                        'scale-in': 'scaleIn 0.4s cubic-bezier(0.16, 1, 0.3, 1) forwards',
                     },
                     keyframes: {
                         fadeIn: { '0%': { opacity: '0' }, '100%': { opacity: '1' } },
-                        slideUp: { '0%': { transform: 'translateY(20px)', opacity: '0' }, '100%': { transform: 'translateY(0)', opacity: '1' } }
+                        slideUp: { '0%': { transform: 'translateY(24px)', opacity: '0' }, '100%': { transform: 'translateY(0)', opacity: '1' } },
+                        scaleIn: { '0%': { transform: 'scale(0.95)', opacity: '0' }, '100%': { transform: 'scale(1)', opacity: '1' } }
                     }
                 } 
             } 
@@ -46,120 +54,147 @@
             -moz-osx-font-smoothing: grayscale;
             user-select: none;
             -webkit-user-select: none;
+            overscroll-behavior-y: none;
         }
 
-        /* Refined scrollbar */
-        ::-webkit-scrollbar { width: 6px; height: 6px; }
+        /* Clean Scrollbar */
+        ::-webkit-scrollbar { width: 5px; height: 5px; }
         ::-webkit-scrollbar-track { background: transparent; }
-        ::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 8px; }
+        ::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 10px; }
         ::-webkit-scrollbar-thumb:hover { background: #94a3b8; }
+        .hide-scrollbar::-webkit-scrollbar { display: none; }
+        .hide-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
 
-        /* Modern Sidebar Link */
+        /* Modern Sidebar Link (Dashboard Exact Match) */
         .sidebar-link { 
-            transition: all 0.2s ease; 
-            border-radius: 0.75rem; 
-            margin-bottom: 0.5rem;
+            transition: all 0.25s ease; 
+            border-radius: 0.875rem; 
+            margin-bottom: 0.25rem;
             position: relative;
-            overflow: hidden;
         }
-        .sidebar-link:hover { 
-            background: #f1f5f9; 
-            color: #0f172a;
-        }
+        .sidebar-link:hover { background: #f1f5f9; color: #0f172a; }
         .sidebar-link.active {
-            background: #ecfdf5; 
-            color: #059669; 
+            background: #f0fdf4; 
+            color: #16a34a; 
             font-weight: 600;
-            box-shadow: inset 3px 0 0 #059669;
         }
-        .sidebar-link.active i {
-            color: #059669;
+        .sidebar-link.active i { color: #16a34a; }
+        .sidebar-link.active::before {
+            content: '';
+            position: absolute;
+            left: -12px;
+            top: 50%;
+            transform: translateY(-50%);
+            height: 60%;
+            width: 4px;
+            background: #16a34a;
+            border-radius: 0 4px 4px 0;
         }
 
-        /* Panel Styling */
+        /* Pro Card Design (Dashboard Exact Match) */
         .panel {
             background-color: #ffffff;
-            border: 1px solid #e2e8f0;
-            border-radius: 1.25rem;
-            box-shadow: 0 4px 6px -1px rgba(0,0,0,0.02);
-            transition: box-shadow 0.3s ease, border-color 0.3s ease;
+            border: 1px solid rgba(226, 232, 240, 0.8);
+            border-radius: 1.5rem;
+            box-shadow: 0 4px 20px -2px rgba(0,0,0,0.02);
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        /* Glassmorphism utils */
+        .glass {
+            background: rgba(255, 255, 255, 0.75);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            border: 1px solid rgba(255, 255, 255, 0.3);
         }
 
         /* Syllabus Tree Node */
         .tree-node { transition: all 0.2s ease; border-radius: 0.75rem; }
         .tree-node:hover { background: #f8fafc; }
         .tree-node.active-node {
-            background: #ecfdf5; color: #059669; font-weight: 600;
-            border: 1px solid #a7f3d0;
+            background: #f0fdf4; color: #16a34a; font-weight: 600;
+            border: 1px solid #bbf7d0;
         }
 
-        /* --- REAL EYE STRAIN REDUCTION THEMES (Functional Ergonomics) --- */
+        /* --- PRO EYE CARE THEMES (Functional Ergonomics) --- */
         .reader-paper { 
-            transition: background-color 0.4s ease, color 0.4s ease; 
+            transition: background-color 0.4s ease, color 0.4s ease, border-color 0.4s ease; 
             border-radius: 1.25rem;
         }
         
         /* 1. Crisp Daylight Minimal */
         .theme-light { background-color: #ffffff; color: #334155; border: 1px solid #e2e8f0; }
+        .theme-light h1, .theme-light h2, .theme-light h3 { color: #0f172a; }
+        .theme-light iframe { filter: none; transition: filter 0.4s ease; }
         
-        /* 2. Warm Sepia / Parchment (Blocks harsh blue spectrum glare) */
-        .theme-sepia { background-color: #F4ECD8; color: #3E3224; border: 1px solid #E2D5B8; }
-        .theme-sepia h1, .theme-sepia h2, .theme-sepia h3 { color: #251D14; }
+        /* 2. Warm Sepia (Reduces blue light glare) */
+        .theme-sepia { background-color: #FBF0D9; color: #5F4B32; border: 1px solid #EADAB8; }
+        .theme-sepia h1, .theme-sepia h2, .theme-sepia h3 { color: #3E2D1A; }
+        .theme-sepia blockquote { background: rgba(95, 75, 50, 0.05); border-left-color: #8C704D; }
+        .theme-sepia iframe { filter: sepia(0.45) brightness(0.95) contrast(0.9); transition: filter 0.4s ease; }
         
-        /* 3. Soft Sage Eco-Calm (Earthy agronomy tone, scientifically proven to relax accommodation reflex) */
-        .theme-sage { background-color: #E8F0EC; color: #2B3E34; border: 1px solid #CBDCD3; }
-        .theme-sage h1, .theme-sage h2, .theme-sage h3 { color: #19261F; }
+        /* 3. Soft Sage (Relaxes ciliary muscle accommodation) */
+        .theme-sage { background-color: #E6EFE9; color: #2C4C3B; border: 1px solid #C4D9CD; }
+        .theme-sage h1, .theme-sage h2, .theme-sage h3 { color: #152B20; }
+        .theme-sage blockquote { background: rgba(44, 76, 59, 0.05); border-left-color: #4A7C62; }
+        .theme-sage iframe { filter: sepia(0.2) hue-rotate(80deg) brightness(0.95) contrast(0.95); transition: filter 0.4s ease; }
 
-        /* 4. True Night Slate (Low-luminance dark mode avoiding pure black halation) */
-        .theme-dark { background-color: #1e293b; color: #e2e8f0; border: 1px solid #334155; }
-        .theme-dark h1, .theme-dark h2, .theme-dark h3 { color: #ffffff; }
+        /* 4. True Night Slate (OLED friendly) */
+        .theme-dark { background-color: #0f172a; color: #94a3b8; border: 1px solid #1e293b; }
+        .theme-dark h1, .theme-dark h2, .theme-dark h3 { color: #f8fafc; }
+        .theme-dark blockquote { background: rgba(255,255,255,0.03); border-left-color: #38bdf8; }
+        /* Magic PDF Dark Mode: Inverts white to dark, preserves images roughly by rotating hue back */
+        .theme-dark iframe { filter: invert(0.92) hue-rotate(180deg) brightness(0.95) contrast(1.05); transition: filter 0.4s ease; }
 
-        /* Academic Typography */
+        /* Pro Academic Typography */
         .rich-content {
             font-family: 'Lora', serif;
-            font-size: 1.125rem;
+            font-size: 1.15rem;
             line-height: 1.85;
-            max-width: 72ch;
+            max-width: 70ch;
             margin: 0 auto;
         }
         .rich-content h1, .rich-content h2, .rich-content h3 { 
-            font-family: 'Inter', sans-serif;
+            font-family: 'Plus Jakarta Sans', sans-serif;
             font-weight: 700; 
-            margin-top: 2.5rem; margin-bottom: 1rem; line-height: 1.3; 
+            margin-top: 3rem; margin-bottom: 1.25rem; line-height: 1.3; 
+            letter-spacing: -0.02em;
         }
-        .rich-content h1 { font-size: 2.1rem; border-bottom: 2px solid currentColor; padding-bottom: 0.5rem; opacity: 0.9; }
+        .rich-content h1 { font-size: 2.25rem; border-bottom: 1px solid currentColor; padding-bottom: 0.75rem; opacity: 0.95; }
         .rich-content h2 { font-size: 1.5rem; }
         .rich-content p { margin-bottom: 1.5rem; }
+        .rich-content ul { list-style-type: disc; padding-left: 1.5rem; margin-bottom: 1.5rem; }
+        .rich-content li { margin-bottom: 0.5rem; }
         .rich-content blockquote {
-            border-left: 4px solid #059669;
-            padding: 1.25rem 1.5rem;
-            margin: 2rem 0;
+            border-left: 4px solid #10b981;
+            padding: 1.5rem;
+            margin: 2.5rem 0;
             font-style: italic;
-            background: rgba(5, 150, 105, 0.05);
-            border-radius: 0 0.75rem 0.75rem 0;
+            background: rgba(16, 185, 129, 0.05);
+            border-radius: 0 1rem 1rem 0;
         }
 
         /* Dynamic Security Watermark Overlay */
         .watermark-overlay {
             position: absolute;
-            top: 0; left: 0; width: 100%; height: 100%;
+            inset: 0;
             pointer-events: none;
-            z-index: 50;
+            z-index: 40;
             overflow: hidden;
             display: flex;
             flex-wrap: wrap;
             align-content: space-around;
             justify-content: space-around;
-            opacity: 0.035;
+            opacity: 0.025; 
         }
         .watermark-text {
-            font-size: 13px;
-            font-weight: 700;
+            font-size: 14px;
+            font-weight: 800;
             color: #000;
-            transform: rotate(-30deg);
+            transform: rotate(-35deg);
             white-space: nowrap;
             user-select: none;
-            padding: 50px;
+            padding: 60px;
         }
 
         /* Privacy Blur on Tab Switch / Screenshot Attempt */
@@ -168,6 +203,7 @@
             inset: 0;
             background: rgba(15, 23, 42, 0.95);
             backdrop-filter: blur(24px);
+            -webkit-backdrop-filter: blur(24px);
             z-index: 9999;
             display: flex;
             flex-direction: column;
@@ -175,197 +211,248 @@
             justify-content: center;
             opacity: 0;
             pointer-events: none;
-            transition: opacity 0.2s ease;
+            transition: opacity 0.3s ease;
         }
         #privacy-blur-layer.active { opacity: 1; pointer-events: auto; }
         
         .pb-safe { padding-bottom: env(safe-area-inset-bottom, 1rem); }
+        .pt-safe { padding-top: env(safe-area-inset-top, 1rem); }
+        .pb-safe-offset { padding-bottom: calc(env(safe-area-inset-bottom, 1rem) + 0.5rem); }
     </style>
 </head>
-<body class="w-full h-screen flex overflow-hidden selection:bg-brand selection:text-white text-[15px]">
+
+<body class="w-full h-screen flex overflow-hidden selection:bg-brand-500 selection:text-white text-[15px]">
 
     <div id="privacy-blur-layer">
-        <div class="w-16 h-16 bg-brand/20 text-brand-light rounded-2xl flex items-center justify-center text-2xl mb-4 border border-brand/30">
+        <div class="w-20 h-20 bg-brand-50 text-brand-600 rounded-3xl flex items-center justify-center text-3xl mb-5 border border-brand-200 shadow-lg">
             <i class="fa-solid fa-shield-halved"></i>
         </div>
-        <h2 class="text-xl font-bold text-white mb-1">Protected Research Document</h2>
-        <p class="text-surface-400 text-sm font-medium">Content hidden to protect scholarly intellectual property.</p>
+        <h2 class="text-2xl font-bold text-white mb-2 tracking-tight">Protected Material</h2>
+        <p class="text-surface-400 text-[15px] font-medium">Content hidden to protect scholarly intellectual property.</p>
     </div>
 
-    <!-- Desktop Sidebar matching Dashboard -->
-    <aside class="w-[280px] flex-col hidden lg:flex shrink-0 z-30 bg-white border-r border-surface-200 shadow-[4px_0_24px_rgba(0,0,0,0.02)]">
+    <aside class="w-[280px] hidden lg:flex flex-col shrink-0 z-30 bg-white border-r border-surface-200">
         <div class="h-full flex flex-col overflow-hidden">
-            <div class="h-24 flex items-center px-8 gap-4 z-10 border-b border-surface-50">
-                <div class="w-11 h-11 rounded-xl bg-surface-50 flex items-center justify-center border border-surface-200 overflow-hidden shadow-sm shrink-0">
+            <!-- Brand -->
+            <div class="h-20 flex items-center px-6 gap-3 z-10 pt-safe">
+                <div class="w-10 h-10 rounded-xl flex items-center justify-center overflow-hidden shrink-0 shadow-sm">
                     <img src="https://res.cloudinary.com/dzuxwvamy/image/upload/v1783935221/WhatsApp_Image_2026-07-08_at_6.25.14_PM_aiuvde.jpg" alt="Logo" class="w-full h-full object-cover">
                 </div>
                 <div class="flex flex-col justify-center min-w-0">
                     <span class="text-surface-900 font-bold tracking-tight text-[16px] truncate">Geeky Researcher</span>
-                    <span class="text-brand text-[12px] font-semibold tracking-wide uppercase mt-0.5">Scholar Portal</span>
+                    <span class="text-brand-600 text-[11px] font-bold tracking-wider uppercase">Scholar Portal</span>
                 </div>
             </div>
 
-            <nav class="flex-1 overflow-y-auto px-5 py-6 space-y-8 z-10">
+            <!-- Navigation -->
+            <nav class="flex-1 overflow-y-auto px-4 py-8 space-y-6 z-10 hide-scrollbar">
                 <div>
-                    <p class="px-3 text-[11px] font-bold text-surface-400 uppercase tracking-wider mb-3">Academic Core</p>
+                    <p class="px-4 text-[11px] font-bold text-surface-400 uppercase tracking-widest mb-3">Learn</p>
                     <a href="dashboard.html" class="sidebar-link flex items-center gap-3 px-4 py-3 text-surface-600">
-                        <i class="fa-solid fa-house w-5 text-center text-[16px] text-surface-400 transition-colors"></i> 
-                        <span>Overview</span>
+                        <i class="fa-solid fa-border-all w-5 text-[18px] text-surface-400 transition-colors"></i> 
+                        <span class="font-medium text-[15px]">Overview</span>
                     </a>
                     <a href="chapters.html" class="sidebar-link active flex items-center gap-3 px-4 py-3 text-surface-600">
-                        <i class="fa-solid fa-book-bookmark w-5 text-center text-[16px] text-surface-400 transition-colors"></i> 
-                        <span>Study Materials</span>
+                        <i class="fa-solid fa-book-open w-5 text-[18px] text-surface-400 transition-colors"></i> 
+                        <span class="font-medium text-[15px]">Study Materials</span>
                     </a>
                     <a href="media-viewer.html" class="sidebar-link flex items-center gap-3 px-4 py-3 text-surface-600">
-                        <i class="fa-solid fa-clapperboard w-5 text-center text-[16px] text-surface-400 transition-colors"></i> 
-                        <span>Video Lectures</span>
+                        <i class="fa-solid fa-circle-play w-5 text-[18px] text-surface-400 transition-colors"></i> 
+                        <span class="font-medium text-[15px]">Video Lectures</span>
                     </a>
                 </div>
                 
                 <div>
-                    <p class="px-3 text-[11px] font-bold text-surface-400 uppercase tracking-wider mb-3">Evaluation</p>
+                    <p class="px-4 text-[11px] font-bold text-surface-400 uppercase tracking-widest mb-3">Evaluate</p>
                     <a href="assessment.html" class="sidebar-link flex items-center gap-3 px-4 py-3 text-surface-600">
-                        <i class="fa-solid fa-file-signature w-5 text-center text-[16px] text-surface-400 transition-colors"></i> 
-                        <span>Assessments</span>
+                        <i class="fa-solid fa-pen-ruler w-5 text-[18px] text-surface-400 transition-colors"></i> 
+                        <span class="font-medium text-[15px]">Assessments</span>
                     </a>
                 </div>
             </nav>
 
-            <div class="p-5 z-10 border-t border-surface-100 bg-surface-50">
-                <div class="rounded-xl p-3 flex items-center gap-3 bg-white border border-surface-200 hover:border-surface-300 shadow-sm transition-all cursor-pointer group">
-                    <div id="sidebar-avatar" class="w-10 h-10 bg-gradient-to-br from-surface-700 to-surface-900 text-white rounded-lg flex items-center justify-center font-bold text-sm shrink-0 shadow-inner">S</div>
+            <!-- User Widget Profile -->
+            <div class="p-4 z-10 pb-safe">
+                <div class="rounded-2xl p-3 flex items-center gap-3 bg-surface-50 border border-surface-200 hover:border-surface-300 hover:bg-surface-100 transition-all cursor-pointer group">
+                    <div id="sidebar-avatar" class="w-10 h-10 bg-surface-800 text-white rounded-xl flex items-center justify-center font-bold text-sm shrink-0 shadow-sm">S</div>
                     <div class="flex-1 min-w-0">
-                        <p id="sidebar-name" class="text-[14px] font-semibold text-surface-900 truncate">Student Name</p>
-                        <p class="text-[12px] text-surface-500 truncate font-medium" id="sidebar-level">Level</p>
+                        <p id="sidebar-name" class="text-[14px] font-bold text-surface-900 truncate">Student Name</p>
+                        <p class="text-[12px] text-surface-500 truncate font-medium" id="sidebar-plan-label">Plan Active</p>
                     </div>
-                    <button onclick="logout()" class="w-8 h-8 rounded-lg flex items-center justify-center text-surface-400 opacity-0 group-hover:opacity-100 hover:text-rose-600 hover:bg-rose-50 transition-all shrink-0" title="Logout">
-                        <i class="fa-solid fa-right-from-bracket text-[14px]"></i>
+                    <button onclick="logout()" class="w-8 h-8 rounded-full flex items-center justify-center text-surface-400 opacity-0 group-hover:opacity-100 hover:text-rose-500 hover:bg-rose-50 transition-all shrink-0" title="Logout">
+                        <i class="fa-solid fa-power-off text-[14px]"></i>
                     </button>
                 </div>
             </div>
         </div>
     </aside>
 
-    <main id="main-container" class="flex-1 flex flex-col md:flex-row h-full relative overflow-hidden pb-20 lg:pb-0 bg-surface-50">
+    <main class="flex-1 flex flex-col h-full relative overflow-hidden bg-surface-50/50">
         
-        <!-- Syllabus Tree Sidebar -->
-        <div id="syllabus-sidebar" class="w-full md:w-[320px] flex flex-col h-[40%] md:h-full shrink-0 z-10 p-4 pt-6">
-            <div class="panel h-full flex flex-col overflow-hidden bg-white">
-                <div class="px-6 py-5 border-b border-surface-200 shrink-0 bg-surface-50/50 flex justify-between items-center">
-                    <h3 class="font-bold text-surface-900 text-[15px] flex items-center tracking-tight">
-                        <i class="fa-solid fa-layer-group text-brand mr-2"></i> Course Syllabus
+        <!-- Mobile/Desktop Header (Dashboard Exact Match) -->
+        <header class="h-16 md:h-20 w-full z-20 px-4 md:px-8 flex justify-between items-center glass sticky top-0 border-b border-surface-200/50 pt-safe">
+            <!-- Mobile Brand -->
+            <div class="flex items-center gap-3 lg:hidden">
+                <div class="w-8 h-8 rounded-lg overflow-hidden shadow-sm">
+                    <img src="https://res.cloudinary.com/dzuxwvamy/image/upload/v1783935221/WhatsApp_Image_2026-07-08_at_6.25.14_PM_aiuvde.jpg" class="w-full h-full object-cover">
+                </div>
+                <span class="text-surface-900 font-bold tracking-tight text-[15px]">Geeky Researcher</span>
+            </div>
+            
+            <!-- Desktop Breadcrumbs -->
+            <div class="hidden lg:flex items-center gap-2 text-[14px] font-medium text-surface-400">
+                <a href="dashboard.html" class="hover:text-surface-900 transition-colors">Dashboard</a>
+                <span class="text-surface-300 mx-1">/</span>
+                <span class="text-surface-900">Study Materials</span>
+            </div>
+            
+            <!-- Actions -->
+            <div class="flex items-center gap-3 ml-auto">
+                <div class="hidden md:flex items-center bg-white/60 border border-surface-200 rounded-full px-4 py-2 w-72 focus-within:ring-2 focus-within:ring-brand-500/20 focus-within:bg-white transition-all shadow-sm">
+                    <i class="fa-solid fa-magnifying-glass text-surface-400 text-[14px]"></i>
+                    <input type="text" placeholder="Search modules..." class="bg-transparent border-none outline-none text-[14px] ml-2 w-full text-surface-700 placeholder:text-surface-400 font-medium">
+                </div>
+                
+                <!-- Notification -->
+                <button class="w-10 h-10 flex items-center justify-center text-surface-600 hover:text-surface-900 bg-white border border-surface-200 rounded-full shadow-sm transition-all hover:shadow relative">
+                    <i class="fa-regular fa-bell text-[16px]"></i>
+                </button>
+
+                <!-- Mobile Logout Toggle -->
+                <button onclick="logout()" class="lg:hidden w-10 h-10 flex items-center justify-center text-surface-600 hover:text-rose-600 bg-white border border-surface-200 rounded-full shadow-sm transition-colors">
+                    <i class="fa-solid fa-arrow-right-from-bracket text-[15px]"></i>
+                </button>
+            </div>
+        </header>
+
+        <!-- Bento-Box Split Workspace for Curriculum & Reader -->
+        <div class="flex-1 flex flex-col lg:flex-row gap-4 p-4 md:p-6 overflow-hidden pb-32 lg:pb-6">
+            
+            <div class="panel w-full lg:w-[340px] flex flex-col h-[35%] lg:h-full shrink-0 overflow-hidden shadow-card">
+                <div class="px-5 py-4 border-b border-surface-100 flex justify-between items-center bg-surface-50/50">
+                    <h3 class="font-bold text-surface-900 text-[15px] tracking-tight">
+                        Course Syllabus
                     </h3>
-                    <span class="text-[11px] font-semibold bg-emerald-50 text-brand px-2.5 py-0.5 rounded-full border border-emerald-100"><i class="fa-solid fa-shield-halved mr-1"></i> Secured</span>
+                    <span class="text-[10px] font-bold bg-brand-50 text-brand-600 px-2 py-1 rounded border border-brand-100 shadow-sm" title="Secure Environment"><i class="fa-solid fa-shield-halved"></i> Protected</span>
                 </div>
 
-                <div id="tree-container" class="flex-1 overflow-y-auto p-4 space-y-1">
+                <div id="tree-container" class="flex-1 overflow-y-auto p-4 space-y-1 bg-white hide-scrollbar">
                     <div class="text-center text-surface-400 py-12 text-sm font-medium flex flex-col items-center">
-                        <i class="fa-solid fa-circle-notch fa-spin text-2xl text-brand mb-3"></i> 
-                        Loading syllabus modules...
+                        <i class="fa-solid fa-circle-notch fa-spin text-2xl text-brand-500 mb-3"></i> 
+                        Loading syllabus...
                     </div>
                 </div>
             </div>
-        </div>
 
-        <!-- Secure Document Reader Area (Target for isolated Fullscreen Reader) -->
-        <div id="reader-panel-wrapper" class="flex-1 h-[60%] md:h-full flex flex-col relative p-4 pl-0 bg-surface-50">
-            <div class="panel h-full flex flex-col overflow-hidden relative bg-white">
+            <div id="reader-panel-wrapper" class="panel flex-1 flex flex-col h-[65%] lg:h-full relative overflow-hidden shadow-card bg-white">
                 
-                <!-- Reader Header -->
-                <div class="absolute top-0 left-0 w-full z-20 bg-white/90 backdrop-blur-xl border-b border-surface-200 px-6 h-16 flex items-center justify-between">
-                    <div class="flex items-center gap-3 text-surface-500 text-[14px] font-semibold truncate max-w-[40%]" id="reader-breadcrumbs">
-                        <i class="fa-solid fa-book-bookmark text-brand"></i> Select a module to begin
+                <!-- Floating Reader Controls (Glassmorphism inside the panel) -->
+                <div class="absolute top-4 inset-x-4 lg:inset-x-6 z-30 flex items-center justify-between pointer-events-none">
+                    
+                    <!-- Breadcrumb Status -->
+                    <div class="bg-white/90 backdrop-blur-xl border border-surface-200 shadow-sm rounded-xl px-4 py-2.5 flex items-center gap-2.5 text-surface-600 text-[13px] font-semibold truncate max-w-[40%] pointer-events-auto">
+                        <i class="fa-solid fa-book-open-reader text-brand-500"></i> 
+                        <span id="reader-breadcrumbs" class="truncate">Select a module...</span>
                     </div>
                     
-                    <div class="flex items-center gap-2.5">
-                        <!-- Fullscreen Toggle Button (Only Readable Area) -->
-                        <button type="button" onclick="toggleFullScreen()" id="fullscreen-btn" class="flex items-center gap-2 px-3.5 py-2 rounded-xl bg-surface-50 border border-surface-200 text-surface-700 hover:border-surface-300 transition-all text-[13px] font-semibold shadow-sm" title="Toggle Fullscreen Reader">
-                            <i class="fa-solid fa-expand text-brand" id="fullscreen-icon"></i> 
-                            <span class="hidden sm:inline" id="fullscreen-text">Full Screen</span>
-                        </button>
-
-                        <!-- Functional Eye Strain Reduction Theme Switcher -->
+                    <!-- Theme & Tools -->
+                    <div class="flex items-center gap-2 pointer-events-auto">
+                        <!-- Eye Care Theme Switcher -->
                         <div class="relative dropdown-wrapper">
-                            <button type="button" onclick="toggleThemeMenu(event)" class="flex items-center gap-2 px-3.5 py-2 rounded-xl bg-surface-50 border border-surface-200 text-surface-700 hover:border-surface-300 transition-all text-[13px] font-semibold shadow-sm">
-                                <i class="fa-solid fa-eye text-brand" id="current-theme-icon"></i> 
-                                <span class="hidden sm:inline">Eye Care Mode</span>
+                            <button type="button" onclick="toggleThemeMenu(event)" class="w-10 h-10 lg:w-auto lg:px-4 flex items-center justify-center gap-2 rounded-xl bg-white/90 backdrop-blur-xl border border-surface-200 text-surface-600 hover:text-surface-900 hover:bg-white shadow-sm transition-all" title="Eye Care Modes">
+                                <i class="fa-solid fa-eye text-brand-500" id="current-theme-icon"></i> 
+                                <span class="hidden lg:inline text-[13px] font-semibold">Eye Care</span>
                             </button>
-                            <div id="theme-menu" class="hidden absolute right-0 mt-2 w-56 bg-white border border-surface-200 rounded-2xl shadow-xl overflow-hidden py-1 z-50">
-                                <div class="px-4 py-2 border-b border-surface-100 bg-surface-50 text-[11px] font-bold text-surface-400 uppercase tracking-wider">Ergonomic Palettes</div>
-                                <button type="button" onclick="setTheme('light')" class="w-full flex items-center gap-3 px-4 py-2.5 text-left text-[13px] font-semibold text-surface-700 hover:bg-surface-50">
-                                    <i class="fa-solid fa-sun w-4 text-surface-400"></i> Crisp Daylight
+                            
+                            <div id="theme-menu" class="hidden absolute right-0 mt-2 w-56 bg-white border border-surface-200 rounded-2xl shadow-float overflow-hidden py-1.5 z-50 transform origin-top-right transition-all">
+                                <div class="px-4 py-2 mb-1 border-b border-surface-100 bg-surface-50 text-[10px] font-bold text-surface-400 uppercase tracking-widest">Reading Environment</div>
+                                <button type="button" onclick="setTheme('light')" class="w-full flex items-center gap-3 px-4 py-2.5 text-left text-[13px] font-semibold text-surface-700 hover:bg-surface-50 transition-colors">
+                                    <div class="w-6 h-6 rounded-md bg-surface-100 flex items-center justify-center border border-surface-200"><i class="fa-solid fa-sun text-[12px] text-surface-500"></i></div> 
+                                    Daylight
                                 </button>
-                                <button type="button" onclick="setTheme('sepia')" class="w-full flex items-center gap-3 px-4 py-2.5 text-left text-[13px] font-semibold text-surface-700 hover:bg-surface-50">
-                                    <i class="fa-solid fa-book-bookmark w-4 text-amber-600"></i> Warm Sepia (Anti-Glare)
+                                <button type="button" onclick="setTheme('sepia')" class="w-full flex items-center gap-3 px-4 py-2.5 text-left text-[13px] font-semibold text-surface-700 hover:bg-surface-50 transition-colors">
+                                    <div class="w-6 h-6 rounded-md bg-amber-100 flex items-center justify-center border border-amber-200"><i class="fa-solid fa-book-bookmark text-[12px] text-amber-700"></i></div> 
+                                    Warm Sepia
                                 </button>
-                                <button type="button" onclick="setTheme('sage')" class="w-full flex items-center gap-3 px-4 py-2.5 text-left text-[13px] font-semibold text-surface-700 hover:bg-surface-50">
-                                    <i class="fa-solid fa-leaf w-4 text-emerald-600"></i> Soft Sage Eco-Calm
+                                <button type="button" onclick="setTheme('sage')" class="w-full flex items-center gap-3 px-4 py-2.5 text-left text-[13px] font-semibold text-surface-700 hover:bg-surface-50 transition-colors">
+                                    <div class="w-6 h-6 rounded-md bg-emerald-100 flex items-center justify-center border border-emerald-200"><i class="fa-solid fa-leaf text-[12px] text-emerald-700"></i></div> 
+                                    Soft Sage
                                 </button>
-                                <button type="button" onclick="setTheme('dark')" class="w-full flex items-center gap-3 px-4 py-2.5 text-left text-[13px] font-semibold text-surface-700 hover:bg-surface-50">
-                                    <i class="fa-solid fa-moon w-4 text-indigo-400"></i> True Night Slate
+                                <button type="button" onclick="setTheme('dark')" class="w-full flex items-center gap-3 px-4 py-2.5 text-left text-[13px] font-semibold text-surface-700 hover:bg-surface-50 transition-colors">
+                                    <div class="w-6 h-6 rounded-md bg-slate-800 flex items-center justify-center border border-slate-700"><i class="fa-solid fa-moon text-[12px] text-slate-300"></i></div> 
+                                    Night Slate
                                 </button>
                             </div>
                         </div>
 
-                        <!-- Secure Download Button -->
-                        <button id="download-btn" onclick="downloadCurrentDocument()" class="hidden items-center gap-2 px-4 py-2 rounded-xl bg-brand hover:bg-brand-dark text-white text-[13px] font-semibold shadow-sm transition-all cursor-pointer">
-                            <i class="fa-solid fa-download"></i> <span class="hidden sm:inline">Download PDF</span>
+                        <!-- Fullscreen Toggle -->
+                        <button type="button" onclick="toggleFullScreen()" id="fullscreen-btn" class="w-10 h-10 lg:w-auto lg:px-4 flex items-center justify-center gap-2 rounded-xl bg-white/90 backdrop-blur-xl border border-surface-200 text-surface-600 hover:text-surface-900 hover:bg-white shadow-sm transition-all" title="Toggle Fullscreen">
+                            <i class="fa-solid fa-expand text-brand-500" id="fullscreen-icon"></i> 
+                            <span class="hidden lg:inline text-[13px] font-semibold" id="fullscreen-text">Expand</span>
                         </button>
                     </div>
                 </div>
 
                 <!-- Sticky Reading Progress -->
-                <div class="absolute top-16 left-0 w-full h-[3px] bg-surface-100 z-20">
-                    <div id="reading-progress" class="h-full bg-brand w-0 transition-all duration-150 rounded-r-full"></div>
+                <div class="absolute top-0 left-0 w-full h-[3px] bg-transparent z-40">
+                    <div id="reading-progress" class="h-full bg-brand-500 w-0 transition-all duration-150 rounded-r-full shadow-[0_0_8px_#22c55e]"></div>
                 </div>
 
-                <!-- Scrollable Reader Viewport -->
-                <div id="reader-viewport" class="flex-1 overflow-y-auto w-full relative pt-24 pb-24 px-6 md:px-12 bg-surface-50/50">
+                <div id="reader-viewport" class="flex-1 overflow-y-auto w-full relative pt-24 pb-32 px-4 lg:px-12 scroll-smooth bg-surface-50/30 hide-scrollbar">
+                    
                     <!-- Dynamic Security Watermark Layer -->
                     <div id="watermark-container" class="watermark-overlay"></div>
 
                     <!-- The Reading Paper Container -->
-                    <div id="content-reader" class="reader-paper theme-light p-8 md:p-12 lg:p-16 w-full min-h-[85%] max-w-5xl mx-auto relative shadow-card">
-                        <div class="flex h-full items-center justify-center flex-col py-24 text-center opacity-80">
-                            <div class="w-16 h-16 bg-surface-50 border border-surface-200 rounded-2xl flex items-center justify-center mb-5">
-                                <i class="fa-solid fa-book-open text-2xl text-surface-400"></i>
+                    <div id="content-reader" class="reader-paper theme-light p-6 md:p-12 lg:p-16 w-full min-h-[85%] max-w-4xl mx-auto relative shadow-card">
+                        
+                        <!-- Empty State -->
+                        <div class="flex h-full min-h-[50vh] items-center justify-center flex-col py-12 text-center">
+                            <div class="w-20 h-20 bg-surface-50 border border-surface-200 rounded-full flex items-center justify-center mb-6 shadow-sm">
+                                <i class="fa-regular fa-folder-open text-3xl text-surface-300"></i>
                             </div>
-                            <h2 class="text-xl font-bold text-surface-900 mb-2">Secure Scholar Reader</h2>
-                            <p class="text-[14px] text-surface-500 max-w-sm leading-relaxed font-medium">
-                                Choose any curriculum item from the left syllabus explorer to load study materials.
+                            <h2 class="text-xl font-bold text-surface-900 mb-2 tracking-tight">Select Study Material</h2>
+                            <p class="text-[15px] text-surface-500 max-w-sm leading-relaxed font-medium">
+                                Choose any curriculum module or document from the left syllabus explorer to begin reading.
                             </p>
                         </div>
+                        
                     </div>
                 </div>
             </div>
         </div>
     </main>
 
-    <!-- Mobile Navigation Bar -->
-    <nav class="lg:hidden fixed bottom-0 left-0 w-full z-50 bg-white/95 backdrop-blur-md border-t border-surface-200 flex justify-around items-center px-4 py-2 pb-safe shadow-[0_-10px_40px_rgba(0,0,0,0.08)]">
-        <a href="dashboard.html" class="flex flex-col items-center justify-center w-16 h-12 text-surface-400 hover:text-surface-700">
-            <i class="fa-solid fa-house text-[20px] mb-1"></i>
-            <span class="text-[10px] font-semibold">Home</span>
-        </a>
-        <a href="chapters.html" class="flex flex-col items-center justify-center w-16 h-12 text-brand">
-            <i class="fa-solid fa-book-bookmark text-[20px] mb-1"></i>
-            <span class="text-[10px] font-semibold">Modules</span>
-        </a>
-        <a href="media-viewer.html" class="flex flex-col items-center justify-center w-16 h-12 text-surface-400 hover:text-surface-700">
-            <i class="fa-solid fa-clapperboard text-[20px] mb-1"></i>
-            <span class="text-[10px] font-semibold">Videos</span>
-        </a>
-        <a href="assessment.html" class="flex flex-col items-center justify-center w-16 h-12 text-surface-400 hover:text-surface-700">
-            <i class="fa-solid fa-file-signature text-[20px] mb-1"></i>
-            <span class="text-[10px] font-semibold">Tests</span>
-        </a>
-    </nav>
+    <div class="lg:hidden fixed bottom-4 left-4 right-4 z-50">
+        <nav class="bg-white/90 backdrop-blur-xl border border-surface-200/60 shadow-glass rounded-2xl flex justify-around items-center px-2 py-2 pb-safe-offset transition-transform duration-300 relative overflow-hidden">
+            <a href="dashboard.html" class="flex flex-col items-center justify-center w-16 h-14 text-surface-400 hover:text-surface-800 transition-colors relative group">
+                <div class="absolute inset-0 bg-surface-100 rounded-xl transition-opacity opacity-0 group-hover:opacity-100"></div>
+                <i class="fa-solid fa-border-all text-[20px] mb-1 relative z-10"></i>
+                <span class="text-[10px] font-bold relative z-10">Home</span>
+            </a>
+            <!-- Active Indicator Background -->
+            <a href="chapters.html" class="flex flex-col items-center justify-center w-16 h-14 relative group">
+                <div class="absolute inset-0 bg-brand-50 rounded-xl transition-opacity opacity-100"></div>
+                <i class="fa-solid fa-book-open text-[20px] mb-1 text-brand-600 relative z-10"></i>
+                <span class="text-[10px] font-bold text-brand-700 relative z-10">Study</span>
+            </a>
+            <a href="media-viewer.html" class="flex flex-col items-center justify-center w-16 h-14 text-surface-400 hover:text-surface-800 transition-colors relative group">
+                <div class="absolute inset-0 bg-surface-100 rounded-xl transition-opacity opacity-0 group-hover:opacity-100"></div>
+                <i class="fa-solid fa-circle-play text-[20px] mb-1 relative z-10"></i>
+                <span class="text-[10px] font-bold relative z-10">Watch</span>
+            </a>
+            <a href="assessment.html" class="flex flex-col items-center justify-center w-16 h-14 text-surface-400 hover:text-surface-800 transition-colors relative group">
+                <div class="absolute inset-0 bg-surface-100 rounded-xl transition-opacity opacity-0 group-hover:opacity-100"></div>
+                <i class="fa-solid fa-pen-ruler text-[20px] mb-1 relative z-10"></i>
+                <span class="text-[10px] font-bold relative z-10">Test</span>
+            </a>
+        </nav>
+    </div>
 
     <script>
         const API_BASE_URL = '/api';
         let token = localStorage.getItem('token');
         let allContent = [];
-        let activeItemUrl = null;
 
         if (!token) {
             token = "mock_token_for_preview";
@@ -375,13 +462,29 @@
 
         // --- Anti-Piracy & Screenshot Deterrence ---
         document.addEventListener('contextmenu', e => e.preventDefault());
+        
+        document.addEventListener('copy', (e) => {
+            e.preventDefault();
+            if (e.clipboardData) {
+                e.clipboardData.setData('text/plain', 'Content protected by Geeky Researcher Portal.');
+            }
+            triggerPrivacyWarning();
+        });
+
         document.addEventListener('keydown', e => {
             if (e.key === 'F12' || 
                 (e.ctrlKey && e.shiftKey && (e.key === 'I' || e.key === 'C' || e.key === 'J')) || 
-                (e.ctrlKey && (e.key === 'u' || e.key === 's' || e.key === 'p'))) {
+                (e.ctrlKey && (e.key === 'u' || e.key === 's' || e.key === 'p' || e.key === 'c'))) {
                 e.preventDefault();
                 triggerPrivacyWarning();
                 return false;
+            }
+        });
+        
+        document.addEventListener('keyup', (e) => {
+            if (e.key === 'PrintScreen' || e.keyCode === 44) {
+                try { navigator.clipboard.writeText(''); } catch(err) {} 
+                triggerPrivacyWarning();
             }
         });
 
@@ -437,19 +540,32 @@
             const text = document.getElementById('fullscreen-text');
 
             if (document.fullscreenElement) {
-                icon.className = 'fa-solid fa-compress text-brand';
-                text.textContent = 'Exit Full Screen';
+                icon.className = 'fa-solid fa-compress text-brand-500';
+                text.textContent = 'Exit';
             } else {
-                icon.className = 'fa-solid fa-expand text-brand';
-                text.textContent = 'Full Screen';
+                icon.className = 'fa-solid fa-expand text-brand-500';
+                text.textContent = 'Expand';
             }
         });
 
-        // Theme Switcher for Eye Strain Reduction
+        // Theme Switcher for Eye Strain Reduction (Applies to text AND PDF via CSS filters)
         function toggleThemeMenu(e) {
             e.stopPropagation();
-            document.getElementById('theme-menu').classList.toggle('hidden');
+            const menu = document.getElementById('theme-menu');
+            if (menu.classList.contains('hidden')) {
+                menu.classList.remove('hidden');
+                menu.style.opacity = 0;
+                menu.style.transform = 'translateY(-10px) scale(0.95)';
+                requestAnimationFrame(() => {
+                    menu.style.transition = 'all 0.2s cubic-bezier(0.16, 1, 0.3, 1)';
+                    menu.style.opacity = 1;
+                    menu.style.transform = 'translateY(0) scale(1)';
+                });
+            } else {
+                menu.classList.add('hidden');
+            }
         }
+        
         window.addEventListener('click', () => {
             document.getElementById('theme-menu')?.classList.add('hidden');
         });
@@ -462,12 +578,12 @@
         }
 
         document.addEventListener('DOMContentLoaded', () => {
-            let user = { name: 'Scholar', level: 'Portal' };
+            let user = { name: 'Scholar', level: 'Portal', paymentPlan: '100' };
             try { user = JSON.parse(localStorage.getItem('user')) || user; } catch(e) {}
 
-            document.getElementById('sidebar-level').textContent = user.level || 'Portal';
             document.getElementById('sidebar-name').textContent = user.name || 'Student';
             document.getElementById('sidebar-avatar').textContent = (user.name || 'S')[0].toUpperCase();
+            document.getElementById('sidebar-plan-label').textContent = `Access Active: ${user.paymentPlan || 100}%`;
             
             const savedTheme = localStorage.getItem('reader-theme') || 'light';
             setTheme(savedTheme);
@@ -486,12 +602,12 @@
                 allContent = data.filter(c => c.type !== 'video');
                 if (allContent.length === 0) throw new Error("Empty curriculum");
             } catch (error) {
-                // Agricultural Postgraduate Research Mock Curriculum
+                // Mock Data provided for seamless preview rendering
                 allContent = [
-                    { id: '1', title: 'Module 1: Advanced Crop Physiology & Climate Resilience', type: 'chapter', parentId: null },
-                    { id: '2', title: 'Drought Tolerance Mechanisms in C4 Cereals', type: 'document', parentId: '1', textContent: '<h1>Drought Tolerance in C4 Cereals</h1><p>Agricultural research in postgraduate studies increasingly emphasizes molecular physiological responses to severe water stress. C4 cereal crops such as sorghum and pearl millet exhibit extraordinary osmotic adjustments.</p><h2>Key Physiological Traits</h2><ul><li>Enhanced root exudation profiles under moisture deficit conditions.</li><li>Upregulation of dehydrin-like proteins in leaf meristems.</li><li>Stomatal conductance optimization via abscisic acid (ABA) signaling networks.</li></ul><blockquote>"Understanding cellular water potential is foundational to engineering next-generation climate-resilient cultivars for arid farming regions."</blockquote>' },
-                    { id: '3', title: 'Module 2: Precision Soil Microbiome Analytics', type: 'chapter', parentId: null },
-                    { id: '4', title: 'Rhizosphere Metagenomics Documentation', type: 'document', parentId: '3', mediaUrl: 'https://www.w3.org/WAI/ER/tests/xhtml/testfiles/resources/pdf/dummy.pdf' }
+                    { id: '1', title: 'Module 1: Advanced Crop Physiology', type: 'chapter', parentId: null },
+                    { id: '2', title: 'Drought Tolerance Mechanisms', type: 'document', parentId: '1', textContent: '<h1>Drought Tolerance in C4 Cereals</h1><p>Agricultural research in postgraduate studies increasingly emphasizes molecular physiological responses to severe water stress. C4 cereal crops such as sorghum and pearl millet exhibit extraordinary osmotic adjustments.</p><h2>Key Physiological Traits</h2><ul><li>Enhanced root exudation profiles under moisture deficit conditions.</li><li>Upregulation of dehydrin-like proteins in leaf meristems.</li><li>Stomatal conductance optimization via abscisic acid (ABA) signaling networks.</li></ul><blockquote>"Understanding cellular water potential is foundational to engineering next-generation climate-resilient cultivars for arid farming regions."</blockquote>' },
+                    { id: '3', title: 'Module 2: Precision Soil Microbiome', type: 'chapter', parentId: null },
+                    { id: '4', title: 'Rhizosphere Metagenomics', type: 'document', parentId: '3', mediaUrl: 'https://www.w3.org/WAI/ER/tests/xhtml/testfiles/resources/pdf/dummy.pdf' }
                 ];
             }
 
@@ -500,6 +616,7 @@
             treeContainer.innerHTML = buildTreeHTML(rootNodes);
         }
 
+        // Updated HTML injection with refined Tailwind classes for Pro UX while retaining identical functionality
         function buildTreeHTML(nodes) {
             if (!nodes || nodes.length === 0) return '';
             let html = '';
@@ -509,25 +626,28 @@
                     html += `
                         <div class="mb-1">
                             <div class="tree-node group flex items-stretch cursor-pointer">
-                                <div onclick="toggleFolder(this); event.stopPropagation();" class="px-3 py-3 text-surface-400 hover:text-brand flex items-center justify-center w-8">
-                                    <i class="fa-solid fa-chevron-down text-[10px] transition-transform duration-200"></i>
+                                <div onclick="toggleFolder(this); event.stopPropagation();" class="px-2 py-3 text-surface-400 hover:text-surface-800 flex items-center justify-center w-8">
+                                    <i class="fa-solid fa-chevron-down text-[11px] transition-transform duration-200"></i>
                                 </div>
-                                <div onclick="readContent('${child.id}', this.parentElement)" class="flex-1 pr-3 py-3 text-[13.5px] font-semibold text-surface-700 flex items-center">
-                                    <i class="fa-solid fa-folder text-brand/70 mr-3 text-base"></i> 
+                                <div onclick="readContent('${child.id}', this.parentElement)" class="flex-1 pr-3 py-3 text-[14px] font-semibold text-surface-700 flex items-center group-hover:text-surface-900 transition-colors">
+                                    <i class="fa-solid fa-folder-closed text-brand-500/80 mr-3 text-base"></i> 
                                     <span class="truncate">${child.title}</span>
                                 </div>
                             </div>
-                            <div class="tree-children hidden ml-[20px] border-l-2 border-surface-200 pl-3 mt-1 space-y-1">
+                            <div class="tree-children hidden ml-[22px] border-l border-surface-200 pl-3 mt-1 space-y-0.5">
                                 ${buildTreeHTML(children)}
                             </div>
                         </div>
                     `;
                 } else {
-                    const icon = (child.type === 'document' && child.s3Key) || child.mediaUrl ? 'fa-file-pdf text-rose-500' : 'fa-file-lines text-surface-400';
+                    const icon = (child.type === 'document' && child.s3Key) || child.mediaUrl ? 'fa-file-pdf text-teal-600' : 'fa-file-lines text-surface-500';
+                    const iconBg = (child.type === 'document' && child.s3Key) || child.mediaUrl ? 'bg-teal-50 border border-teal-100' : 'bg-surface-50 border border-surface-200';
                     html += `
-                        <div onclick="readContent('${child.id}', this)" class="tree-node cursor-pointer px-4 py-3 text-[13px] font-semibold text-surface-600 flex items-center group">
-                            <i class="fa-solid ${icon} mr-3 text-base w-5 text-center"></i>
-                            <span class="truncate flex-1">${child.title}</span>
+                        <div onclick="readContent('${child.id}', this)" class="tree-node cursor-pointer px-3 py-2.5 text-[13.5px] font-medium text-surface-600 flex items-center group transition-colors mt-0.5">
+                            <div class="w-7 h-7 rounded-lg ${iconBg} flex items-center justify-center mr-3 shrink-0 shadow-sm">
+                                <i class="fa-solid ${icon} text-[13px]"></i>
+                            </div>
+                            <span class="truncate flex-1 group-hover:text-surface-900">${child.title}</span>
                         </div>
                     `;
                 }
@@ -539,6 +659,18 @@
             const childrenContainer = iconElement.parentElement.nextElementSibling;
             childrenContainer.classList.toggle('hidden');
             iconElement.querySelector('i').classList.toggle('-rotate-90');
+            
+            // Toggle icon visual
+            const folderIcon = iconElement.nextElementSibling.querySelector('.fa-folder-closed, .fa-folder-open');
+            if(folderIcon) {
+                if(childrenContainer.classList.contains('hidden')) {
+                    folderIcon.classList.remove('fa-folder-open');
+                    folderIcon.classList.add('fa-folder-closed');
+                } else {
+                    folderIcon.classList.remove('fa-folder-closed');
+                    folderIcon.classList.add('fa-folder-open');
+                }
+            }
         }
 
         function readContent(id, element) {
@@ -548,64 +680,44 @@
             const item = allContent.find(c => c.id === id);
             if (!item) return;
 
-            document.getElementById('reader-breadcrumbs').innerHTML = `
-                <i class="fa-solid fa-book-bookmark text-brand mr-2"></i> <span class="text-surface-900 font-semibold">${item.title}</span>
-            `;
-
-            const downloadBtn = document.getElementById('download-btn');
+            document.getElementById('reader-breadcrumbs').innerHTML = item.title;
             const reader = document.getElementById('content-reader');
             let contentHtml = '';
             
+            // NOTE: Download logic has been completely removed as requested.
+            
             if (item.mediaUrl) {
-                activeItemUrl = item.mediaUrl;
-                downloadBtn.classList.remove('hidden');
-                downloadBtn.classList.add('flex');
-
                 contentHtml = `
-                    <div class="mt-8 border border-surface-200 rounded-xl overflow-hidden shadow-sm h-[600px] md:h-[750px] bg-surface-50 flex flex-col relative">
-                        <div class="p-3 bg-white border-b border-surface-200 flex justify-between items-center">
-                            <span class="font-semibold text-surface-800 text-[13px] flex items-center"><i class="fa-solid fa-shield-halved text-brand mr-2"></i> Secure Document Viewer</span>
-                            <span class="text-[11px] text-surface-400">Protected Material</span>
+                    <div class="mt-8 border border-surface-200 rounded-2xl overflow-hidden shadow-sm h-[600px] md:h-[800px] bg-white flex flex-col relative">
+                        <div class="p-3 bg-surface-50 border-b border-surface-200 flex justify-between items-center z-10 shadow-soft-inner">
+                            <span class="font-bold text-surface-800 text-[13px] flex items-center"><i class="fa-solid fa-shield-halved text-brand-600 mr-2"></i> Secure PDF Viewer</span>
+                            <span class="text-[10px] font-bold tracking-wider uppercase text-surface-500 bg-white px-2.5 py-1 rounded-md border border-surface-200 shadow-sm">Protected Material</span>
                         </div>
-                        <iframe src="${item.mediaUrl}#toolbar=0&navpanes=0&scrollbar=0" class="w-full flex-1 border-none bg-white select-none pointer-events-auto" title="${item.title}"></iframe>
+                        <iframe src="${item.mediaUrl}#toolbar=0&navpanes=0&scrollbar=0" class="w-full flex-1 border-none bg-white select-none pointer-events-auto z-0" title="${item.title}"></iframe>
                     </div>
                 `;
             } else {
-                activeItemUrl = null;
-                downloadBtn.classList.add('hidden');
-                downloadBtn.classList.remove('flex');
-
                 contentHtml = item.textContent && item.textContent.trim() !== '' ? 
                     `<div class="rich-content animate-fade-in">${item.textContent}</div>` : 
-                    `<div class="mt-8 p-6 bg-surface-50 text-surface-500 rounded-xl border border-dashed border-surface-300 text-center py-16">
-                        <i class="fa-regular fa-folder-open text-3xl text-surface-300 mb-3"></i>
-                        <p class="font-semibold text-surface-700 text-[15px] mb-1">Section Container</p>
-                        <p class="text-xs text-surface-400">Expand this folder in the syllabus tree to access sub-modules.</p>
+                    `<div class="mt-8 p-8 bg-surface-50/50 text-surface-500 rounded-2xl border-2 border-dashed border-surface-200 text-center py-20">
+                        <div class="w-16 h-16 mx-auto bg-white rounded-full flex items-center justify-center mb-4 shadow-sm border border-surface-100">
+                            <i class="fa-solid fa-folder-tree text-2xl text-surface-400"></i>
+                        </div>
+                        <p class="font-bold text-surface-700 text-[16px] mb-2">Section Container</p>
+                        <p class="text-[14px] font-medium text-surface-400 max-w-xs mx-auto">Expand this folder in the syllabus sidebar to access readable sub-modules.</p>
                     </div>`;
             }
 
             reader.innerHTML = `
-                <div class="mb-8 font-sans">
-                    <span class="inline-flex items-center px-3 py-1 bg-brand/10 text-brand text-[10px] font-bold tracking-wider uppercase rounded-full mb-4">${item.type}</span>
-                    <h1 class="text-3xl md:text-4xl font-bold tracking-tight leading-tight">${item.title}</h1>
+                <div class="mb-8 font-sans animate-fade-in">
+                    <span class="inline-flex items-center px-3 py-1.5 bg-brand-50 border border-brand-100 text-brand-700 text-[10px] font-bold tracking-widest uppercase rounded-full mb-4 shadow-sm">${item.type}</span>
+                    <h1 class="text-3xl md:text-4xl font-extrabold tracking-tight leading-tight text-inherit">${item.title}</h1>
                 </div>
                 ${contentHtml}
             `;
             
             document.getElementById('reader-viewport').scrollTop = 0;
             document.getElementById('reading-progress').style.width = '0%';
-        }
-
-        // Secure Download Handler
-        function downloadCurrentDocument() {
-            if (!activeItemUrl) return;
-            const a = document.createElement('a');
-            a.href = activeItemUrl;
-            a.target = '_blank';
-            a.download = 'GeekyResearcher_StudyMaterial.pdf';
-            document.body.appendChild(a);
-            a.click();
-            document.body.removeChild(a);
         }
 
         function initReadingProgress() {
