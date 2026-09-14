@@ -1,0 +1,567 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <title>Geeky Researcher | Video Lectures</title>
+    
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    
+    <script>
+        tailwind.config = { 
+            theme: { 
+                extend: { 
+                    fontFamily: { sans: ['Inter', 'sans-serif'] }, 
+                    colors: { 
+                        brand: { light: '#34d399', DEFAULT: '#059669', dark: '#047857' },
+                        surface: { 50: '#f8fafc', 100: '#f1f5f9', 200: '#e2e8f0', 300: '#cbd5e1', 400: '#94a3b8', 500: '#64748b', 600: '#475569', 700: '#334155', 800: '#1e293b', 900: '#0f172a' }
+                    },
+                    boxShadow: {
+                        'soft': '0 10px 40px -10px rgba(0,0,0,0.08)',
+                        'card': '0 4px 6px -1px rgba(0,0,0,0.05), 0 2px 4px -2px rgba(0,0,0,0.02)',
+                    },
+                    animation: {
+                        'fade-in': 'fadeIn 0.5s ease-out forwards',
+                        'slide-up': 'slideUp 0.6s cubic-bezier(0.16, 1, 0.3, 1) forwards',
+                    },
+                    keyframes: {
+                        fadeIn: { '0%': { opacity: '0' }, '100%': { opacity: '1' } },
+                        slideUp: { '0%': { transform: 'translateY(20px)', opacity: '0' }, '100%': { transform: 'translateY(0)', opacity: '1' } }
+                    }
+                } 
+            } 
+        }
+    </script>
+    
+    <style>
+        body { 
+            background-color: #f8fafc; 
+            color: #334155; 
+            -webkit-font-smoothing: antialiased;
+            -moz-osx-font-smoothing: grayscale;
+        }
+
+        /* Refined scrollbar */
+        ::-webkit-scrollbar { width: 6px; height: 6px; }
+        ::-webkit-scrollbar-track { background: transparent; }
+        ::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 8px; }
+        ::-webkit-scrollbar-thumb:hover { background: #94a3b8; }
+
+        /* Modern Sidebar Link */
+        .sidebar-link { 
+            transition: all 0.2s ease; 
+            border-radius: 0.75rem; 
+            margin-bottom: 0.5rem;
+            position: relative;
+            overflow: hidden;
+        }
+        .sidebar-link:hover { 
+            background: #f1f5f9; 
+            color: #0f172a;
+        }
+        .sidebar-link.active {
+            background: #ecfdf5; 
+            color: #059669; 
+            font-weight: 600;
+            box-shadow: inset 3px 0 0 #059669;
+        }
+        .sidebar-link.active i {
+            color: #059669;
+        }
+        
+        .pb-safe { padding-bottom: env(safe-area-inset-bottom, 1rem); }
+        
+        /* Clean Card Design */
+        .panel {
+            background-color: #ffffff;
+            border: 1px solid #e2e8f0;
+            border-radius: 1.25rem;
+            box-shadow: 0 4px 6px -1px rgba(0,0,0,0.02);
+            transition: box-shadow 0.3s ease, border-color 0.3s ease;
+        }
+        .panel:hover {
+            box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.05);
+            border-color: #cbd5e1;
+        }
+
+        /* Tree Structure */
+        .tree-node { transition: all 0.2s ease; border-radius: 0.75rem; }
+        .tree-node:hover { background: #f8fafc; }
+        .tree-node.active-node {
+            background: #ecfdf5; color: #059669; font-weight: 600;
+            border: 1px solid #a7f3d0;
+        }
+
+        /* Video Player Specific Styles */
+        .video-container-wrapper {
+            background: #0f172a;
+            border-radius: 1.25rem;
+            overflow: hidden;
+            position: relative;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+            border: 4px solid #ffffff;
+        }
+
+        /* Eye Care Theme Engine for Workspace */
+        .workspace-theme { transition: background-color 0.4s ease, color 0.4s ease; }
+        .workspace-light { background-color: #ffffff; color: #334155; border: 1px solid #e2e8f0; }
+        .workspace-eyecare { background-color: #F4ECD8 !important; color: #3E3224 !important; border: 1px solid #E2D5B8 !important; }
+        .workspace-eyecare .panel { background-color: #F4ECD8 !important; color: #3E3224 !important; border: 1px solid #E2D5B8 !important; }
+        .workspace-eyecare h1, .workspace-eyecare h2, .workspace-eyecare h3, .workspace-eyecare span { color: #251D14 !important; }
+        
+        .workspace-dark { background-color: #1e293b !important; color: #e2e8f0 !important; border: 1px solid #334155 !important; }
+        .workspace-dark .panel { background-color: #1e293b !important; color: #ffffff !important; border: 1px solid #334155 !important; }
+        .workspace-dark h1, .workspace-dark h2, .workspace-dark h3, .workspace-dark span { color: #ffffff !important; }
+
+        .workspace-dynamic {
+            animation: dynamic-soothe 60s infinite alternate ease-in-out !important;
+            color: #334155;
+            border: 1px solid #e2e8f0;
+        }
+        @keyframes dynamic-soothe {
+            0% { background-color: #F4ECD8; } 
+            33% { background-color: #E8F0EC; } 
+            66% { background-color: #EDF2F7; } 
+            100% { background-color: #F4ECD8; } 
+        }
+
+        /* Rich Content for Transcripts */
+        .rich-content { font-family: 'Inter', sans-serif; font-size: 1.05rem; line-height: 1.7; color: inherit; }
+        .rich-content h2, .rich-content h3 { font-weight: 700; margin-top: 1.5rem; margin-bottom: 0.75rem; }
+        .rich-content p { margin-bottom: 1rem; }
+        .rich-content ul { list-style-type: disc; margin-left: 1.5rem; margin-bottom: 1rem; }
+
+        /* Dropdown Animation */
+        .dropdown-content { transform-origin: top right; transform: scale(0.95); opacity: 0; visibility: hidden; transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1); }
+        .dropdown-wrapper:hover .dropdown-content, .dropdown-content.show { transform: scale(1); opacity: 1; visibility: visible; }
+    </style>
+</head>
+<body class="w-full h-screen flex overflow-hidden selection:bg-brand selection:text-white text-[15px]">
+
+    <!-- Desktop Sidebar -->
+    <aside class="w-[280px] flex-col hidden lg:flex shrink-0 z-30 bg-white border-r border-surface-200 shadow-[4px_0_24px_rgba(0,0,0,0.02)]">
+        <div class="h-full flex flex-col overflow-hidden">
+            <div class="h-24 flex items-center px-8 gap-4 z-10 border-b border-surface-50">
+                <div class="w-11 h-11 rounded-xl bg-surface-50 flex items-center justify-center border border-surface-200 overflow-hidden shadow-sm shrink-0">
+                    <img src="https://res.cloudinary.com/dzuxwvamy/image/upload/v1783935221/WhatsApp_Image_2026-07-08_at_6.25.14_PM_aiuvde.jpg" alt="Logo" class="w-full h-full object-cover">
+                </div>
+                <div class="flex flex-col justify-center min-w-0">
+                    <span class="text-surface-900 font-bold tracking-tight text-[16px] truncate">Geeky Researcher</span>
+                    <span class="text-brand text-[12px] font-semibold tracking-wide uppercase mt-0.5">Scholar Portal</span>
+                </div>
+            </div>
+
+            <nav class="flex-1 overflow-y-auto px-5 py-6 space-y-8 z-10">
+                <div>
+                    <p class="px-3 text-[11px] font-bold text-surface-400 uppercase tracking-wider mb-3">Academic Core</p>
+                    <a href="dashboard.html" class="sidebar-link flex items-center gap-3 px-4 py-3 text-surface-600">
+                        <i class="fa-solid fa-house w-5 text-center text-[16px] text-surface-400 transition-colors"></i> 
+                        <span>Overview</span>
+                    </a>
+                    <a href="chapters.html" class="sidebar-link flex items-center gap-3 px-4 py-3 text-surface-600">
+                        <i class="fa-solid fa-book-bookmark w-5 text-center text-[16px] text-surface-400 transition-colors"></i> 
+                        <span>Study Materials</span>
+                    </a>
+                    <a href="media-viewer.html" class="sidebar-link active flex items-center gap-3 px-4 py-3 text-surface-600">
+                        <i class="fa-solid fa-clapperboard w-5 text-center text-[16px] text-surface-400 transition-colors"></i> 
+                        <span>Video Lectures</span>
+                    </a>
+                </div>
+                
+                <div>
+                    <p class="px-3 text-[11px] font-bold text-surface-400 uppercase tracking-wider mb-3">Evaluation</p>
+                    <a href="assessment.html" class="sidebar-link flex items-center gap-3 px-4 py-3 text-surface-600">
+                        <i class="fa-solid fa-file-signature w-5 text-center text-[16px] text-surface-400 transition-colors"></i> 
+                        <span>Assessments</span>
+                    </a>
+                </div>
+            </nav>
+
+            <div class="p-5 z-10 border-t border-surface-100 bg-surface-50">
+                <div class="rounded-xl p-3 flex items-center gap-3 bg-white border border-surface-200 hover:border-surface-300 shadow-sm transition-all cursor-pointer group">
+                    <div id="sidebar-avatar" class="w-10 h-10 bg-gradient-to-br from-surface-700 to-surface-900 text-white rounded-lg flex items-center justify-center font-bold text-sm shrink-0 shadow-inner">S</div>
+                    <div class="flex-1 min-w-0">
+                        <p id="sidebar-name" class="text-[14px] font-semibold text-surface-900 truncate">Student Name</p>
+                        <p class="text-[12px] text-surface-500 truncate font-medium" id="sidebar-level">Level</p>
+                    </div>
+                    <button onclick="logout()" class="w-8 h-8 rounded-lg flex items-center justify-center text-surface-400 opacity-0 group-hover:opacity-100 hover:text-rose-600 hover:bg-rose-50 transition-all shrink-0" title="Logout">
+                        <i class="fa-solid fa-right-from-bracket text-[14px]"></i>
+                    </button>
+                </div>
+            </div>
+        </div>
+    </aside>
+
+    <main class="flex-1 flex flex-col lg:flex-row h-full relative overflow-hidden bg-surface-50">
+        
+        <!-- Mobile Header -->
+        <header class="h-20 absolute top-0 left-0 w-full z-30 px-6 flex justify-between items-center pointer-events-none lg:hidden bg-surface-50/90 backdrop-blur-md border-b border-surface-200">
+            <div class="flex items-center gap-3 pointer-events-auto">
+                <button onclick="toggleMobileDrawer()" class="w-10 h-10 rounded-xl bg-white shadow-sm flex items-center justify-center text-surface-700 border border-surface-200">
+                    <i class="fa-solid fa-bars-staggered"></i>
+                </button>
+                <span class="font-bold text-surface-900 text-[15px]">Video Library</span>
+            </div>
+            
+            <div class="pointer-events-auto relative dropdown-wrapper">
+                <button class="w-10 h-10 rounded-xl bg-white shadow-sm flex items-center justify-center text-brand border border-surface-200">
+                    <i class="fa-solid fa-eye" id="mobile-theme-icon"></i>
+                </button>
+                <div class="dropdown-content absolute right-0 mt-2 w-52 bg-white border border-surface-200 rounded-2xl shadow-xl overflow-hidden py-1 z-50">
+                    <button onclick="setTheme('light')" class="w-full px-4 py-2.5 text-left text-[13px] font-semibold text-surface-700 hover:bg-surface-50">Crisp Daylight</button>
+                    <button onclick="setTheme('eyecare')" class="w-full px-4 py-2.5 text-left text-[13px] font-semibold text-surface-700 hover:bg-surface-50">Warm Sepia</button>
+                    <button onclick="setTheme('dynamic')" class="w-full px-4 py-2.5 text-left text-[13px] font-semibold text-surface-700 hover:bg-surface-50">Dynamic Anti-Strain</button>
+                    <button onclick="setTheme('dark')" class="w-full px-4 py-2.5 text-left text-[13px] font-semibold text-surface-700 hover:bg-surface-50">True Night Slate</button>
+                </div>
+            </div>
+        </header>
+
+        <!-- Video Hierarchy Tree Sidebar (Desktop + Mobile Drawer) -->
+        <div id="sidebar-drawer" class="fixed inset-y-0 left-0 z-40 w-80 transform -translate-x-full lg:translate-x-0 lg:relative lg:w-[320px] flex flex-col h-full shrink-0 p-4 pt-24 lg:pt-4 transition-transform duration-300 bg-surface-50 lg:bg-transparent">
+            <div class="panel h-full flex flex-col overflow-hidden shadow-2xl lg:shadow-card bg-white">
+                <div class="px-6 py-5 border-b border-surface-200 shrink-0 bg-surface-50/50 flex justify-between items-center">
+                    <h3 class="font-bold text-surface-900 text-[15px] flex items-center tracking-tight">
+                        <i class="fa-solid fa-photo-film text-brand mr-2"></i> Repository
+                    </h3>
+                    <button onclick="toggleMobileDrawer()" class="lg:hidden text-surface-400 hover:text-surface-700">
+                        <i class="fa-solid fa-times text-lg"></i>
+                    </button>
+                </div>
+
+                <div id="tree-container" class="flex-1 overflow-y-auto p-4 space-y-1">
+                    <div class="text-center text-surface-400 py-12 text-sm font-medium flex flex-col items-center">
+                        <i class="fa-solid fa-circle-notch fa-spin text-2xl text-brand mb-3"></i> 
+                        Loading recordings...
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Media Workspace Panel -->
+        <div class="flex-1 h-full flex flex-col relative p-4 lg:pl-0 pt-24 lg:pt-4 overflow-hidden">
+            <!-- Workspace container reacting to Eye Care / Anti-Strain theme -->
+            <div id="media-workspace" class="workspace-theme workspace-light h-full rounded-2xl flex flex-col overflow-hidden relative border border-surface-200 shadow-card">
+                
+                <!-- Header with Eye Care Switcher -->
+                <div class="hidden lg:flex w-full bg-white/90 backdrop-blur-md border-b border-surface-200 px-8 py-4 items-center justify-between shrink-0 z-20">
+                    <div class="flex items-center gap-3 text-surface-600 text-[14px] font-semibold truncate max-w-full" id="video-breadcrumbs">
+                        <i class="fa-solid fa-circle-play text-brand"></i> Select a lecture to begin
+                    </div>
+
+                    <div class="relative dropdown-wrapper">
+                        <button type="button" class="flex items-center gap-2 px-4 py-2 rounded-xl bg-white border border-surface-200 text-surface-700 hover:border-surface-300 transition-all text-[13px] font-semibold shadow-sm">
+                            <i class="fa-solid fa-eye text-brand" id="current-theme-icon"></i> 
+                            <span>Comfort Mode</span>
+                        </button>
+                        <div class="dropdown-content absolute right-0 mt-2 w-56 bg-white border border-surface-200 rounded-xl shadow-xl overflow-hidden py-1 z-50">
+                            <div class="px-4 py-2.5 border-b border-surface-100 mb-1 bg-surface-50 text-[11px] font-bold text-surface-400 uppercase tracking-wider">Anti-Strain Themes</div>
+                            <button onclick="setTheme('light')" class="w-full flex items-center gap-3 px-4 py-2.5 text-left text-[13px] font-semibold text-surface-700 hover:bg-surface-50"><i class="fa-solid fa-sun text-surface-400 w-4"></i> Crisp Daylight</button>
+                            <button onclick="setTheme('eyecare')" class="w-full flex items-center gap-3 px-4 py-2.5 text-left text-[13px] font-semibold text-surface-700 hover:bg-surface-50"><i class="fa-solid fa-leaf text-amber-600 w-4"></i> Warm Sepia (Eye Care)</button>
+                            <button onclick="setTheme('dynamic')" class="w-full flex items-center gap-3 px-4 py-2.5 text-left text-[13px] font-semibold text-surface-700 hover:bg-surface-50"><i class="fa-solid fa-fan text-teal-500 w-4"></i> Dynamic Anti-Strain</button>
+                            <button onclick="setTheme('dark')" class="w-full flex items-center gap-3 px-4 py-2.5 text-left text-[13px] font-semibold text-surface-700 hover:bg-surface-50"><i class="fa-solid fa-moon text-indigo-400 w-4"></i> True Night Slate</button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Scrollable Viewer Content -->
+                <div class="flex-1 overflow-y-auto w-full p-6 sm:p-10">
+                    <div class="max-w-4xl mx-auto flex flex-col gap-6">
+                        
+                        <!-- Video Player Wrapper -->
+                        <div class="video-container-wrapper shrink-0 aspect-video flex items-center justify-center bg-surface-900 group relative">
+                            <div class="absolute top-4 left-4 z-20 bg-black/60 text-white px-3 py-1 rounded-lg text-[10px] font-bold tracking-widest uppercase border border-white/10 flex items-center backdrop-blur-md opacity-0 group-hover:opacity-100 transition-opacity">
+                                <i class="fa-solid fa-shield-halved mr-2 text-brand-light"></i> Secure Stream
+                            </div>
+
+                            <div id="video-placeholder" class="text-surface-400 flex flex-col items-center p-8 text-center">
+                                <div class="w-20 h-20 bg-surface-800 rounded-2xl flex items-center justify-center mb-5 shadow-inner">
+                                    <i class="fa-solid fa-photo-film text-3xl text-surface-500"></i>
+                                </div>
+                                <h2 class="text-xl font-bold text-surface-200 mb-2">No Video Selected</h2>
+                                <p class="text-[13px] font-medium max-w-xs text-surface-400">Choose a recorded lecture from the repository to start watching.</p>
+                            </div>
+                            
+                            <video id="main-video-player" class="w-full h-full object-contain hidden" controls controlsList="nodownload"></video>
+                        </div>
+
+                        <!-- Advanced Video Controls Bar -->
+                        <div id="video-extras" class="panel rounded-xl p-4 shadow-sm flex flex-wrap items-center justify-between gap-4 hidden bg-white">
+                            <div class="flex items-center gap-2">
+                                <span class="text-[12px] font-bold text-surface-400 uppercase tracking-wider mr-1"><i class="fa-solid fa-gauge-high mr-1.5 text-brand"></i> Speed:</span>
+                                <button onclick="setSpeed(0.75)" class="speed-btn px-3 py-1 rounded-lg text-xs font-semibold bg-surface-100 hover:bg-surface-200 text-surface-700 transition">0.75x</button>
+                                <button onclick="setSpeed(1)" class="speed-btn px-3 py-1 rounded-lg text-xs font-semibold bg-brand text-white transition">1.0x</button>
+                                <button onclick="setSpeed(1.25)" class="speed-btn px-3 py-1 rounded-lg text-xs font-semibold bg-surface-100 hover:bg-surface-200 text-surface-700 transition">1.25x</button>
+                                <button onclick="setSpeed(1.5)" class="speed-btn px-3 py-1 rounded-lg text-xs font-semibold bg-surface-100 hover:bg-surface-200 text-surface-700 transition">1.5x</button>
+                                <button onclick="setSpeed(2)" class="speed-btn px-3 py-1 rounded-lg text-xs font-semibold bg-surface-100 hover:bg-surface-200 text-surface-700 transition">2.0x</button>
+                            </div>
+
+                            <div class="flex items-center gap-2">
+                                <button onclick="togglePip()" class="px-4 py-2 rounded-xl bg-surface-100 hover:bg-surface-200 text-surface-700 text-[13px] font-semibold transition flex items-center gap-2">
+                                    <i class="fa-solid fa-clone text-brand"></i> PiP
+                                </button>
+                                <button onclick="addBookmark()" class="px-4 py-2 rounded-xl bg-brand/10 hover:bg-brand/20 text-brand text-[13px] font-semibold transition flex items-center gap-2">
+                                    <i class="fa-solid fa-bookmark"></i> Bookmark
+                                </button>
+                            </div>
+                        </div>
+
+                        <!-- Notes & Transcripts Sheet -->
+                        <div id="notes-paper" class="panel rounded-xl p-6 sm:p-8 shadow-sm flex-1 relative overflow-hidden transition-all duration-300 bg-white">
+                            <div class="relative z-10">
+                                <span class="inline-flex items-center justify-center px-3 py-1 bg-brand/10 text-brand text-[10px] font-bold tracking-wider uppercase rounded-full mb-4">Video Module</span>
+                                <h1 id="video-title" class="text-2xl font-bold leading-tight tracking-tight mb-2">Lecture Details</h1>
+                                
+                                <div id="video-desc" class="mt-6 pt-6 border-t border-surface-200 hidden animate-fade-in">
+                                    <!-- Dynamic content injected here -->
+                                </div>
+                            </div>
+                        </div>
+
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <!-- Mobile Bottom Navigation -->
+    <nav class="lg:hidden fixed bottom-0 left-0 w-full z-50 bg-white/95 backdrop-blur-md border-t border-surface-200 flex justify-around items-center px-4 py-2 pb-safe shadow-[0_-10px_40px_rgba(0,0,0,0.08)]">
+        <a href="dashboard.html" class="flex flex-col items-center justify-center w-16 h-12 text-surface-400 hover:text-surface-700 transition-colors">
+            <i class="fa-solid fa-house text-[20px] mb-1"></i>
+            <span class="text-[10px] font-semibold">Home</span>
+        </a>
+        <a href="chapters.html" class="flex flex-col items-center justify-center w-16 h-12 text-surface-400 hover:text-surface-700 transition-colors">
+            <i class="fa-solid fa-book-bookmark text-[20px] mb-1"></i>
+            <span class="text-[10px] font-semibold">Modules</span>
+        </a>
+        <a href="media-viewer.html" class="flex flex-col items-center justify-center w-16 h-12 text-brand">
+            <i class="fa-solid fa-clapperboard text-[20px] mb-1"></i>
+            <span class="text-[10px] font-semibold">Videos</span>
+        </a>
+        <a href="assessment.html" class="flex flex-col items-center justify-center w-16 h-12 text-surface-400 hover:text-surface-700 transition-colors">
+            <i class="fa-solid fa-file-signature text-[20px] mb-1"></i>
+            <span class="text-[10px] font-semibold">Tests</span>
+        </a>
+    </nav>
+
+    <script>
+        const API_BASE_URL = 'http://localhost:5000/api';
+        let token = localStorage.getItem('token');
+        let allRecordings = [];
+
+        if (!token) {
+            token = "mock_token_for_preview";
+            localStorage.setItem('token', token);
+            localStorage.setItem('user', JSON.stringify({ role: 'student', name: 'Demo Student', level: 'PG Research' }));
+        }
+
+        // --- Theme Engine ---
+        function setTheme(themeName) {
+            const workspace = document.getElementById('media-workspace');
+            workspace.classList.remove('workspace-light', 'workspace-eyecare', 'workspace-dynamic', 'workspace-dark');
+            workspace.classList.add(`workspace-${themeName}`);
+            localStorage.setItem('video-reader-theme', themeName);
+            
+            const icon = document.getElementById('current-theme-icon');
+            const mobileIcon = document.getElementById('mobile-theme-icon');
+            let iconClass = 'fa-solid fa-eye text-brand';
+            if(themeName === 'dark') iconClass = 'fa-solid fa-moon text-indigo-400';
+            else if (themeName === 'eyecare') iconClass = 'fa-solid fa-leaf text-amber-600';
+            else if (themeName === 'dynamic') iconClass = 'fa-solid fa-fan text-teal-500 fa-spin-pulse';
+            
+            if(icon) icon.className = iconClass;
+            if(mobileIcon) mobileIcon.className = iconClass;
+        }
+
+        (function initTheme() {
+            const savedTheme = localStorage.getItem('video-reader-theme') || 'light';
+            document.addEventListener('DOMContentLoaded', () => setTheme(savedTheme));
+        })();
+
+        document.addEventListener('DOMContentLoaded', () => {
+            let user;
+            try { user = JSON.parse(localStorage.getItem('user')); } catch(e) {}
+            if(!user || user.role !== 'student') { user = { role: 'student', name: 'Demo Student', level: 'PG Research' }; }
+            
+            document.getElementById('sidebar-level').textContent = user.level || 'Portal';
+            document.getElementById('sidebar-name').textContent = user.name || 'Student';
+            document.getElementById('sidebar-avatar').textContent = (user.name || 'S')[0].toUpperCase();
+            
+            loadRecordings();
+        });
+
+        function toggleMobileDrawer() {
+            const drawer = document.getElementById('sidebar-drawer');
+            drawer.classList.toggle('-translate-x-full');
+        }
+
+        async function loadRecordings() {
+            const treeContainer = document.getElementById('tree-container');
+            try {
+                const response = await fetch(`${API_BASE_URL}/student/recordings`, { headers: { 'Authorization': `Bearer ${token}` } });
+                if (!response.ok) throw new Error("Fetch failed");
+                allRecordings = await response.json();
+                if (allRecordings.length === 0) throw new Error("Empty");
+            } catch (error) { 
+                allRecordings = [
+                    { id: 'v1', title: 'Module 1: Advanced Research Design', type: 'folder', parentId: null },
+                    { id: 'v2', title: 'Lecture 1.1: Quantitative Hypotheses', type: 'video', parentId: 'v1', mediaUrl: 'https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4', notes: '<h2>Quantitative Methodologies</h2><p>In this lecture, we examine strict parameter establishment and statistical power calculation.</p><ul><li>Null hypothesis significance testing</li><li>Confidence interval structuring</li><li>Error margins & sample sizing</li></ul>' },
+                    { id: 'v3', title: 'Lecture 1.2: Qualitative Coding', type: 'video', parentId: 'v1', mediaUrl: 'https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ElephantsDream.mp4', notes: '<p>A deep dive into thematic coding structures, inductive reasoning, and saturation points in qualitative research.</p>' }
+                ];
+            }
+
+            const allIds = new Set(allRecordings.map(c => c.id));
+            const rootNodes = allRecordings.filter(c => !c.parentId || !allIds.has(c.parentId));
+            treeContainer.innerHTML = buildTreeHTML(rootNodes);
+        }
+
+        function buildTreeHTML(nodes) {
+            if (!nodes || nodes.length === 0) return '';
+            let html = '';
+            
+            nodes.forEach(child => {
+                const isFolder = child.type === 'folder' || child.type === 'subfolder';
+                const children = allRecordings.filter(c => c.parentId === child.id);
+                const hasChildren = children.length > 0;
+
+                if (isFolder) {
+                    html += `
+                        <div class="mb-1">
+                            <div class="tree-node group flex items-stretch cursor-pointer">
+                                <div onclick="toggleFolder(this); event.stopPropagation();" class="px-3 py-3 text-surface-400 hover:text-brand flex items-center justify-center w-8">
+                                    <i class="fa-solid fa-chevron-down text-[10px] transition-transform duration-200 ${hasChildren ? '' : '-rotate-90 opacity-30'}"></i>
+                                </div>
+                                <div class="flex-1 pr-3 py-3 text-[13.5px] font-semibold text-surface-700 flex items-center">
+                                    <i class="fa-solid fa-folder text-brand/70 mr-3 text-base"></i> 
+                                    <span class="truncate">${child.title}</span>
+                                </div>
+                            </div>
+                            <div class="tree-children ml-[20px] border-l-2 border-surface-200 pl-3 mt-1 space-y-1">
+                                ${hasChildren ? buildTreeHTML(children) : ''}
+                            </div>
+                        </div>
+                    `;
+                } else if (child.type === 'video') {
+                    html += `
+                        <div onclick="playVideo('${child.id}', this)" class="tree-node cursor-pointer px-4 py-3 text-[13px] font-semibold text-surface-600 flex items-center group">
+                            <i class="fa-solid fa-play mr-3 text-base w-5 text-center play-icon text-surface-300"></i>
+                            <span class="truncate flex-1">${child.title}</span>
+                        </div>
+                    `;
+                }
+            });
+            return html;
+        }
+
+        function toggleFolder(iconElement) {
+            const childrenContainer = iconElement.parentElement.nextElementSibling;
+            if(childrenContainer) {
+                childrenContainer.classList.toggle('hidden');
+                iconElement.querySelector('i').classList.toggle('-rotate-90');
+                const folderIcon = iconElement.parentElement.querySelector('.fa-folder, .fa-folder-open');
+                if(folderIcon) {
+                    folderIcon.classList.toggle('fa-folder');
+                    folderIcon.classList.toggle('fa-folder-open');
+                }
+            }
+        }
+
+        function playVideo(id, element) {
+            document.querySelectorAll('.tree-node').forEach(el => {
+                el.classList.remove('active-node');
+                const icon = el.querySelector('.play-icon');
+                if(icon) {
+                    icon.classList.replace('fa-circle-play', 'fa-play');
+                    icon.classList.replace('text-brand', 'text-surface-300');
+                }
+            });
+            
+            element.classList.add('active-node');
+            const newIcon = element.querySelector('.play-icon');
+            if(newIcon) {
+                newIcon.classList.replace('fa-play', 'fa-circle-play');
+                newIcon.classList.replace('text-surface-300', 'text-brand');
+            }
+
+            const video = allRecordings.find(v => v.id === id);
+            if (!video) return;
+
+            document.getElementById('video-breadcrumbs').innerHTML = `
+                <i class="fa-solid fa-circle-play text-brand mr-2"></i> Now Playing: <span class="text-surface-900 font-semibold ml-1 truncate">${video.title}</span>
+            `;
+
+            const player = document.getElementById('main-video-player');
+            const placeholder = document.getElementById('video-placeholder');
+            const extras = document.getElementById('video-extras');
+            
+            if (video.mediaUrl) {
+                player.src = video.mediaUrl;
+                player.classList.remove('hidden');
+                placeholder.classList.add('hidden');
+                extras.classList.remove('hidden');
+                if(window.innerWidth < 1024) { 
+                    player.scrollIntoView({ behavior: 'smooth' }); 
+                    toggleMobileDrawer();
+                }
+                player.play().catch(e => console.log("Auto-play restricted"));
+            } else {
+                player.classList.add('hidden');
+                placeholder.classList.remove('hidden');
+                extras.classList.add('hidden');
+            }
+
+            document.getElementById('video-title').textContent = video.title;
+            const desc = document.getElementById('video-desc');
+            
+            if(video.notes && video.notes.trim() !== '') {
+                desc.innerHTML = `
+                    <h4 class="font-bold mb-3 text-[14px] flex items-center">
+                        <i class="fa-solid fa-file-lines text-brand mr-2"></i> Lecture Transcripts & Notes
+                    </h4>
+                    <div class="rich-content">${video.notes}</div>
+                `;
+                desc.classList.remove('hidden');
+            } else {
+                desc.classList.add('hidden');
+            }
+        }
+
+        function setSpeed(speed) {
+            const player = document.getElementById('main-video-player');
+            player.playbackRate = speed;
+        }
+
+        async function togglePip() {
+            const player = document.getElementById('main-video-player');
+            try {
+                if (document.pictureInPictureElement) {
+                    await document.exitPictureInPicture();
+                } else if (document.pictureInPictureEnabled) {
+                    await player.requestPictureInPicture();
+                }
+            } catch (err) { console.log(err); }
+        }
+
+        function addBookmark() {
+            const player = document.getElementById('main-video-player');
+            const time = Math.floor(player.currentTime);
+            const mins = Math.floor(time / 60);
+            const secs = time % 60;
+            
+            const modal = document.createElement('div');
+            modal.className = 'fixed inset-0 z-[150] bg-surface-900/80 backdrop-blur-sm flex items-center justify-center p-4 animate-fade-in';
+            modal.innerHTML = `
+                <div class="panel bg-white p-6 rounded-2xl max-w-sm w-full text-center shadow-2xl border border-white">
+                    <h3 class="text-base font-bold text-surface-900 mb-1">Bookmark Saved</h3>
+                    <p class="text-surface-500 text-sm mb-4">Timestamp recorded at ${mins}:${secs < 10 ? '0' : ''}${secs}.</p>
+                    <button onclick="this.closest('.fixed').remove()" class="w-full bg-brand text-white font-bold py-2.5 rounded-xl text-sm shadow-md cursor-pointer">OK</button>
+                </div>
+            `;
+            document.body.appendChild(modal);
+        }
+
+        function logout() { localStorage.clear(); window.location.href = '../login.html'; }
+    </script>
+</body>
+</html>

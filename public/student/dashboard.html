@@ -1,0 +1,638 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <title>Geeky Researcher | Scholar Portal</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    
+    <script>
+        tailwind.config = { 
+            theme: { 
+                extend: { 
+                    fontFamily: { sans: ['Inter', 'sans-serif'] }, 
+                    colors: { 
+                        brand: { light: '#34d399', DEFAULT: '#059669', dark: '#047857' }, // Emerald theme
+                        surface: { 50: '#f8fafc', 100: '#f1f5f9', 200: '#e2e8f0', 300: '#cbd5e1', 400: '#94a3b8', 500: '#64748b', 600: '#475569', 700: '#334155', 800: '#1e293b', 900: '#0f172a' } // Slate theme
+                    },
+                    boxShadow: {
+                        'soft': '0 10px 40px -10px rgba(0,0,0,0.08)',
+                        'card': '0 4px 6px -1px rgba(0,0,0,0.05), 0 2px 4px -2px rgba(0,0,0,0.02)',
+                    },
+                    animation: {
+                        'fade-in': 'fadeIn 0.5s ease-out forwards',
+                        'slide-up': 'slideUp 0.6s cubic-bezier(0.16, 1, 0.3, 1) forwards',
+                    },
+                    keyframes: {
+                        fadeIn: { '0%': { opacity: '0' }, '100%': { opacity: '1' } },
+                        slideUp: { '0%': { transform: 'translateY(20px)', opacity: '0' }, '100%': { transform: 'translateY(0)', opacity: '1' } }
+                    }
+                } 
+            } 
+        }
+    </script>
+    
+    <style>
+        body { 
+            background-color: #f8fafc; 
+            color: #334155; 
+            -webkit-font-smoothing: antialiased;
+            -moz-osx-font-smoothing: grayscale;
+        }
+
+        /* Refined scrollbar */
+        ::-webkit-scrollbar { width: 6px; height: 6px; }
+        ::-webkit-scrollbar-track { background: transparent; }
+        ::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 8px; }
+        ::-webkit-scrollbar-thumb:hover { background: #94a3b8; }
+
+        /* Modern Sidebar Link */
+        .sidebar-link { 
+            transition: all 0.2s ease; 
+            border-radius: 0.75rem; 
+            margin-bottom: 0.5rem;
+            position: relative;
+            overflow: hidden;
+        }
+        .sidebar-link:hover { 
+            background: #f1f5f9; 
+            color: #0f172a;
+        }
+        .sidebar-link.active {
+            background: #ecfdf5; /* emerald-50 */
+            color: #059669; /* brand */
+            font-weight: 600;
+            box-shadow: inset 3px 0 0 #059669;
+        }
+        .sidebar-link.active i {
+            color: #059669;
+        }
+        
+        .pb-safe { padding-bottom: env(safe-area-inset-bottom, 1rem); }
+        .modal-overlay { background: rgba(15, 23, 42, 0.6); backdrop-filter: blur(4px); -webkit-backdrop-filter: blur(4px); }
+        
+        /* Clean Card Design */
+        .panel {
+            background-color: #ffffff;
+            border: 1px solid #e2e8f0;
+            border-radius: 1.25rem;
+            box-shadow: 0 4px 6px -1px rgba(0,0,0,0.02);
+            transition: box-shadow 0.3s ease, border-color 0.3s ease, transform 0.3s ease;
+        }
+        .panel:hover {
+            box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.05);
+            border-color: #cbd5e1;
+        }
+
+        /* Toast Animations */
+        .toast-enter { transform: translateX(100%); opacity: 0; }
+        .toast-enter-active { transform: translateX(0); opacity: 1; transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1); }
+        .toast-exit-active { transform: translateX(100%); opacity: 0; transition: all 0.3s ease-in; }
+    </style>
+</head>
+<body class="w-full h-screen flex overflow-hidden selection:bg-brand selection:text-white text-[15px]">
+
+    <div id="toast-container" class="fixed top-6 right-6 z-[100] flex flex-col gap-3 pointer-events-none w-80"></div>
+
+    <!-- Desktop Sidebar -->
+    <aside class="w-[280px] flex-col hidden lg:flex shrink-0 z-30 bg-white border-r border-surface-200 shadow-[4px_0_24px_rgba(0,0,0,0.02)]">
+        <div class="h-full flex flex-col overflow-hidden">
+            <!-- Brand -->
+            <div class="h-24 flex items-center px-8 gap-4 z-10 border-b border-surface-50">
+                <div class="w-11 h-11 rounded-xl bg-surface-50 flex items-center justify-center border border-surface-200 overflow-hidden shadow-sm shrink-0">
+                    <img src="https://res.cloudinary.com/dzuxwvamy/image/upload/v1783935221/WhatsApp_Image_2026-07-08_at_6.25.14_PM_aiuvde.jpg" alt="Logo" class="w-full h-full object-cover">
+                </div>
+                <div class="flex flex-col justify-center min-w-0">
+                    <span class="text-surface-900 font-bold tracking-tight text-[16px] truncate">Geeky Researcher</span>
+                    <span class="text-brand text-[12px] font-semibold tracking-wide uppercase mt-0.5">Scholar Portal</span>
+                </div>
+            </div>
+
+            <!-- Navigation -->
+            <nav class="flex-1 overflow-y-auto px-5 py-6 space-y-8 z-10">
+                <div>
+                    <p class="px-3 text-[11px] font-bold text-surface-400 uppercase tracking-wider mb-3">Academic Core</p>
+                    <a href="dashboard.html" class="sidebar-link active flex items-center gap-3 px-4 py-3 text-surface-600">
+                        <i class="fa-solid fa-house w-5 text-center text-[16px] text-surface-400 transition-colors"></i> 
+                        <span>Overview</span>
+                    </a>
+                    <a href="chapters.html" class="sidebar-link flex items-center gap-3 px-4 py-3 text-surface-600">
+                        <i class="fa-solid fa-book-bookmark w-5 text-center text-[16px] text-surface-400 transition-colors"></i> 
+                        <span>Study Materials</span>
+                    </a>
+                    <a href="media-viewer.html" class="sidebar-link flex items-center gap-3 px-4 py-3 text-surface-600">
+                        <i class="fa-solid fa-clapperboard w-5 text-center text-[16px] text-surface-400 transition-colors"></i> 
+                        <span>Video Lectures</span>
+                    </a>
+                </div>
+                
+                <div>
+                    <p class="px-3 text-[11px] font-bold text-surface-400 uppercase tracking-wider mb-3">Evaluation</p>
+                    <a href="assessment.html" class="sidebar-link flex items-center gap-3 px-4 py-3 text-surface-600">
+                        <i class="fa-solid fa-file-signature w-5 text-center text-[16px] text-surface-400 transition-colors"></i> 
+                        <span>Assessments</span>
+                    </a>
+                </div>
+            </nav>
+
+            <!-- User Widget -->
+            <div class="p-5 z-10 border-t border-surface-100 bg-surface-50">
+                <div class="rounded-xl p-3 flex items-center gap-3 bg-white border border-surface-200 hover:border-surface-300 shadow-sm transition-all cursor-pointer group">
+                    <div id="sidebar-avatar" class="w-10 h-10 bg-gradient-to-br from-surface-700 to-surface-900 text-white rounded-lg flex items-center justify-center font-bold text-sm shrink-0 shadow-inner">S</div>
+                    <div class="flex-1 min-w-0">
+                        <p id="sidebar-name" class="text-[14px] font-semibold text-surface-900 truncate">Student Name</p>
+                        <p class="text-[12px] text-surface-500 truncate font-medium" id="sidebar-plan-label">Plan Active</p>
+                    </div>
+                    <button onclick="logout()" class="w-8 h-8 rounded-lg flex items-center justify-center text-surface-400 opacity-0 group-hover:opacity-100 hover:text-rose-600 hover:bg-rose-50 transition-all shrink-0" title="Logout">
+                        <i class="fa-solid fa-right-from-bracket text-[14px]"></i>
+                    </button>
+                </div>
+            </div>
+        </div>
+    </aside>
+
+    <!-- Main Content -->
+    <main class="flex-1 flex flex-col h-full relative overflow-hidden bg-surface-50">
+        
+        <!-- Header -->
+        <header class="h-20 w-full z-20 px-5 lg:px-10 flex justify-between items-center bg-surface-50/80 backdrop-blur-xl sticky top-0 border-b lg:border-none border-surface-200">
+            <!-- Mobile Brand -->
+            <div class="flex items-center gap-3 lg:hidden">
+                <div class="w-9 h-9 rounded-lg bg-white border border-surface-200 overflow-hidden shadow-sm">
+                    <img src="https://res.cloudinary.com/dzuxwvamy/image/upload/v1783935221/WhatsApp_Image_2026-07-08_at_6.25.14_PM_aiuvde.jpg" class="w-full h-full object-cover">
+                </div>
+                <span class="text-surface-900 font-bold tracking-tight text-[16px]">Geeky Researcher</span>
+            </div>
+            
+            <!-- Breadcrumbs -->
+            <div class="hidden lg:flex items-center gap-2 text-[14px] text-surface-500 font-medium">
+                <span class="text-surface-400"><i class="fa-solid fa-house text-[12px]"></i></span>
+                <span class="text-surface-300 mx-2">/</span>
+                <span class="text-surface-900">Overview</span>
+            </div>
+            
+            <!-- Actions -->
+            <div class="flex items-center gap-4 ml-auto">
+                <div class="hidden md:flex items-center bg-white border border-surface-200 rounded-full px-5 py-2.5 w-80 focus-within:ring-2 focus-within:ring-brand/20 focus-within:border-brand/50 transition-all shadow-sm">
+                    <i class="fa-regular fa-search text-surface-400 text-[15px]"></i>
+                    <input type="text" placeholder="Search modules or videos..." class="bg-transparent border-none outline-none text-[14px] ml-3 w-full text-surface-700 placeholder:text-surface-400 font-medium">
+                </div>
+                <!-- Top Nav Logout (Mobile friendly) -->
+                <button onclick="logout()" class="lg:hidden w-10 h-10 flex items-center justify-center text-surface-500 hover:text-rose-600 bg-white border border-surface-200 rounded-full shadow-sm transition-colors">
+                    <i class="fa-solid fa-right-from-bracket text-[15px]"></i>
+                </button>
+                <!-- Notification -->
+                <button class="w-10 h-10 flex items-center justify-center text-surface-500 hover:text-surface-900 bg-white border border-surface-200 rounded-full shadow-sm transition-colors relative">
+                    <i class="fa-regular fa-bell text-[16px]"></i>
+                    <span class="absolute top-2.5 right-2.5 w-2 h-2 bg-brand rounded-full border-2 border-white"></span>
+                </button>
+            </div>
+        </header>
+
+        <!-- Scrollable Content Area -->
+        <div class="flex-1 overflow-y-auto scroll-smooth pb-28 lg:pb-12 pt-6 px-5 lg:px-10">
+            <div class="max-w-[1200px] mx-auto space-y-8">
+                
+                <!-- Hero Section -->
+                <div class="flex flex-col lg:flex-row gap-8 items-stretch animate-fade-in">
+                    
+                    <!-- Greeting -->
+                    <div class="flex-1 flex flex-col justify-center bg-white p-8 rounded-2xl border border-surface-200 shadow-sm relative overflow-hidden">
+                        <!-- Decorative background element -->
+                        <div class="absolute right-0 top-0 w-64 h-64 bg-brand/5 rounded-full blur-3xl -mr-20 -mt-20 pointer-events-none"></div>
+                        
+                        <h1 class="text-3xl lg:text-4xl font-bold text-surface-900 tracking-tight leading-tight mb-3 relative z-10">
+                            Welcome back, <span id="welcome-name" class="text-brand">Scholar</span>
+                        </h1>
+                        <p class="text-surface-500 text-[16px] leading-relaxed max-w-xl relative z-10 font-medium">
+                            Here is your academic overview for <span id="welcome-level" class="text-surface-800 font-semibold bg-surface-100 px-2.5 py-0.5 rounded-md border border-surface-200 shadow-sm inline-block mx-1">Level</span>. Continue where you left off.
+                        </p>
+                    </div>
+
+                    <!-- Dynamic Plan Banner Injection Point -->
+                    <div id="plan-banner-container" class="lg:w-[420px] shrink-0 w-full h-full">
+                        <!-- Content dynamically injected via JS -->
+                        <div class="panel p-6 h-full flex items-center justify-center">
+                            <i class="fa-solid fa-circle-notch fa-spin text-brand text-2xl"></i>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Metrics Grid -->
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-6 animate-slide-up" style="animation-delay: 0.1s;">
+                    
+                    <div class="panel p-6 flex items-center gap-5 group hover:-translate-y-1">
+                        <div class="w-14 h-14 rounded-2xl bg-teal-50 text-teal-600 flex items-center justify-center shrink-0 border border-teal-100 group-hover:scale-110 transition-transform">
+                            <i class="fa-solid fa-file-pdf text-[24px]"></i>
+                        </div>
+                        <div>
+                            <p class="text-surface-500 text-[13px] font-bold uppercase tracking-wider mb-1">Study Materials</p>
+                            <h2 class="text-3xl font-bold text-surface-900 tracking-tight leading-none" id="stat-materials">-</h2>
+                        </div>
+                    </div>
+
+                    <div class="panel p-6 flex items-center gap-5 group hover:-translate-y-1">
+                        <div class="w-14 h-14 rounded-2xl bg-indigo-50 text-indigo-600 flex items-center justify-center shrink-0 border border-indigo-100 group-hover:scale-110 transition-transform">
+                            <i class="fa-solid fa-photo-film text-[24px]"></i>
+                        </div>
+                        <div>
+                            <p class="text-surface-500 text-[13px] font-bold uppercase tracking-wider mb-1">Video Lectures</p>
+                            <h2 class="text-3xl font-bold text-surface-900 tracking-tight leading-none" id="stat-videos">-</h2>
+                        </div>
+                    </div>
+
+                    <div class="panel p-6 flex items-center gap-5 group hover:-translate-y-1">
+                        <div class="w-14 h-14 rounded-2xl bg-rose-50 text-rose-600 flex items-center justify-center shrink-0 border border-rose-100 group-hover:scale-110 transition-transform">
+                            <i class="fa-solid fa-clipboard-list text-[24px]"></i>
+                        </div>
+                        <div>
+                            <p class="text-surface-500 text-[13px] font-bold uppercase tracking-wider mb-1">Assessments</p>
+                            <h2 class="text-3xl font-bold text-surface-900 tracking-tight leading-none" id="stat-tests">-</h2>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Recent Content Section -->
+                <div class="panel overflow-hidden animate-slide-up flex flex-col" style="animation-delay: 0.2s;">
+                    <div class="px-8 py-5 border-b border-surface-200 flex justify-between items-center bg-surface-50/50">
+                        <h3 class="text-[18px] font-bold text-surface-900">Recently Added Curriculum</h3>
+                        <a href="chapters.html" class="text-[14px] font-semibold text-brand hover:text-brand-dark transition-colors flex items-center gap-2 bg-brand/10 px-4 py-1.5 rounded-full">
+                            View Library <i class="fa-solid fa-arrow-right text-[12px]"></i>
+                        </a>
+                    </div>
+                    
+                    <div id="recent-content-list" class="flex flex-col bg-white">
+                        <!-- Loading State -->
+                        <div class="flex justify-center items-center py-16">
+                            <div class="text-surface-400 text-[15px] font-medium flex items-center gap-3">
+                                <i class="fa-solid fa-circle-notch fa-spin text-brand"></i> 
+                                Synchronizing library...
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+            </div>
+        </div>
+    </main>
+
+    <!-- Mobile Nav (App-like Bottom Bar) -->
+    <nav class="lg:hidden fixed bottom-0 left-0 w-full z-50 bg-white/95 backdrop-blur-md border-t border-surface-200 flex justify-around items-center px-2 py-2 pb-safe shadow-[0_-10px_40px_rgba(0,0,0,0.08)]">
+        <a href="dashboard.html" class="flex flex-col items-center justify-center w-16 h-14 text-brand relative">
+            <div class="absolute -top-3 w-10 h-1 bg-brand rounded-b-lg"></div>
+            <i class="fa-solid fa-house text-[20px] mb-1"></i>
+            <span class="text-[11px] font-semibold">Home</span>
+        </a>
+        <a href="chapters.html" class="flex flex-col items-center justify-center w-16 h-14 text-surface-400 hover:text-surface-800 transition-colors">
+            <i class="fa-solid fa-book-bookmark text-[20px] mb-1"></i>
+            <span class="text-[11px] font-semibold">Study</span>
+        </a>
+        <a href="media-viewer.html" class="flex flex-col items-center justify-center w-16 h-14 text-surface-400 hover:text-surface-800 transition-colors">
+            <i class="fa-solid fa-clapperboard text-[20px] mb-1"></i>
+            <span class="text-[11px] font-semibold">Watch</span>
+        </a>
+        <a href="assessment.html" class="flex flex-col items-center justify-center w-16 h-14 text-surface-400 hover:text-surface-800 transition-colors">
+            <i class="fa-solid fa-file-signature text-[20px] mb-1"></i>
+            <span class="text-[11px] font-semibold">Test</span>
+        </a>
+    </nav>
+
+    <!-- Upgrade Modal -->
+    <div id="upgradeModal" class="fixed inset-0 z-[100] modal-overlay hidden flex items-center justify-center p-4 opacity-0 transition-opacity duration-300">
+        <div class="bg-white rounded-3xl shadow-soft border border-surface-200 w-full max-w-md overflow-hidden transform scale-95 transition-transform duration-300 relative" id="upgradeModalContent">
+            
+            <div class="flex justify-between items-center px-8 py-6 border-b border-surface-100 bg-surface-50/50">
+                <h3 class="font-bold text-surface-900 text-[18px]">Activate Full License</h3>
+                <button onclick="closeUpgradeModal()" class="w-8 h-8 rounded-full bg-surface-200/50 flex items-center justify-center text-surface-500 hover:text-surface-900 hover:bg-surface-200 transition-colors">
+                    <i class="fa-solid fa-times text-[14px]"></i>
+                </button>
+            </div>
+
+            <div class="p-8">
+                <p class="text-[15px] text-surface-600 mb-6 leading-relaxed font-medium">
+                    Secure full access to the research portal, curriculum, and complete assessment modules for your designated level.
+                </p>
+                
+                <div class="bg-surface-50 p-6 rounded-2xl border border-surface-200 flex flex-col items-center justify-center mb-8">
+                    <img id="upgradeQrCode" src="" alt="UPI QR Code" class="w-48 h-48 object-contain rounded-xl bg-white p-3 border border-surface-200 shadow-sm mb-3">
+                    <span class="text-[12px] font-semibold text-surface-500 uppercase tracking-widest">Scan to Pay via UPI</span>
+                </div>
+                
+                <div class="flex justify-between items-end mb-8 bg-surface-50 px-5 py-4 rounded-xl border border-surface-100">
+                    <div class="flex flex-col">
+                        <span class="text-[12px] font-bold text-surface-400 uppercase tracking-wider mb-1">Amount Due</span>
+                        <span class="text-[14px] text-surface-700 font-medium">Bank Transfer / UPI</span>
+                    </div>
+                    <span class="font-bold text-surface-900 text-3xl tracking-tight" id="upgradeAmount">--</span>
+                </div>
+                
+                <button onclick="submitUpgrade()" id="submitUpgradeBtn" class="w-full bg-brand hover:bg-brand-dark text-white font-bold py-4 rounded-xl transition-colors flex justify-center items-center gap-2 text-[16px] shadow-lg shadow-brand/20">
+                    Verify Payment <i class="fa-solid fa-shield-check ml-1"></i>
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const API_BASE_URL = 'http://localhost:5000/api';
+        const token = localStorage.getItem('token');
+        let currentUserData = null;
+        let globalLevelDetails = null; 
+        
+        function showToast(message, type = 'error') {
+            const container = document.getElementById('toast-container');
+            const toast = document.createElement('div');
+            
+            const icon = type === 'error' ? 'fa-triangle-exclamation text-rose-500' : 
+                         (type === 'success' ? 'fa-check-circle text-brand' : 'fa-info-circle text-blue-500');
+            const border = type === 'error' ? 'border-rose-100' : (type === 'success' ? 'border-brand/20' : 'border-blue-100');
+            
+            toast.className = `bg-white rounded-2xl p-4 flex items-center gap-4 toast-enter shadow-soft border ${border}`;
+            toast.innerHTML = `
+                <div class="shrink-0 w-10 h-10 rounded-full bg-surface-50 flex items-center justify-center border border-surface-100">
+                    <i class="fa-solid ${icon} text-[18px]"></i>
+                </div>
+                <div class="flex-1 pr-2">
+                    <p class="text-[14px] font-bold text-surface-900 tracking-tight leading-none mb-1">${type.charAt(0).toUpperCase() + type.slice(1)}</p>
+                    <p class="text-[13px] text-surface-500 leading-snug font-medium">${message}</p>
+                </div>
+            `;
+            
+            container.appendChild(toast);
+            
+            requestAnimationFrame(() => {
+                toast.classList.remove('toast-enter');
+                toast.classList.add('toast-enter-active');
+            });
+            
+            setTimeout(() => { 
+                toast.classList.remove('toast-enter-active');
+                toast.classList.add('toast-exit-active');
+                setTimeout(() => toast.remove(), 300);
+            }, 4000);
+        }
+
+        const dateOptions = { year: 'numeric', month: 'short', day: 'numeric' };
+
+        if (!token) { logout(); }
+
+        document.addEventListener('DOMContentLoaded', async () => {
+            await fetchFreshUserData();
+            if(currentUserData) {
+                bindUserDataToUI();
+                await fetchLevelDetails(); 
+                renderPlanBanner();
+                loadDashboardData();
+            }
+        });
+
+        async function fetchFreshUserData() {
+            try {
+                const res = await fetch(`${API_BASE_URL}/student/me`, { headers: { 'Authorization': `Bearer ${token}` } });
+                if(res.ok) {
+                    currentUserData = await res.json();
+                } else { throw new Error('Auth failed'); }
+            } catch(e) { logout(); }
+        }
+
+        async function fetchLevelDetails() {
+            try {
+                const res = await fetch(`${API_BASE_URL}/admin/levels`);
+                if(res.ok) {
+                    const allLevels = await res.json();
+                    globalLevelDetails = allLevels.find(l => l.levelName === currentUserData.level);
+                }
+            } catch(e) {}
+        }
+
+        function bindUserDataToUI() {
+            const firstName = currentUserData.name.split(' ')[0];
+            document.getElementById('sidebar-name').textContent = currentUserData.name;
+            document.getElementById('sidebar-avatar').textContent = currentUserData.name[0].toUpperCase();
+            document.getElementById('welcome-name').textContent = firstName;
+            document.getElementById('welcome-level').textContent = currentUserData.level;
+            document.getElementById('sidebar-plan-label').textContent = `Access Active: ${currentUserData.paymentPlan}%`;
+        }
+
+        function renderPlanBanner() {
+            const container = document.getElementById('plan-banner-container');
+            const plan = currentUserData.paymentPlan || '100';
+            const expires = new Date(currentUserData.accessExpiresAt);
+            const today = new Date();
+            const daysLeft = Math.ceil((expires - today) / (1000 * 60 * 60 * 24));
+            
+            if (currentUserData.status === 'pending_upgrade') {
+                 container.innerHTML = `
+                    <div class="panel border-blue-200 bg-blue-50 p-6 h-full flex flex-col justify-center rounded-2xl w-full">
+                        <div class="flex items-center gap-5">
+                            <div class="w-12 h-12 rounded-full bg-white flex items-center justify-center shrink-0 shadow-sm border border-blue-100">
+                                <i class="fa-solid fa-spinner-third fa-spin text-2xl text-blue-600"></i>
+                            </div>
+                            <div>
+                                <h3 class="text-blue-900 font-bold text-[16px] mb-1">Verifying Transaction</h3>
+                                <p class="text-blue-700 font-medium text-[14px]">Admin is reviewing your license upgrade.</p>
+                            </div>
+                        </div>
+                    </div>`;
+                 return;
+            }
+
+            if (plan === '100') {
+                container.innerHTML = `
+                    <div class="panel bg-surface-900 border-surface-800 p-6 h-full flex flex-col justify-between relative overflow-hidden rounded-2xl shadow-soft w-full">
+                        <div class="absolute top-0 right-0 w-32 h-32 bg-brand/30 rounded-full blur-3xl -mr-10 -mt-10"></div>
+                        <div class="flex justify-between items-start mb-6 relative z-10">
+                            <div>
+                                <div class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-brand/20 text-brand-light text-[11px] font-bold tracking-wider uppercase mb-3 border border-brand/30 shadow-inner">
+                                    <span class="w-2 h-2 rounded-full bg-brand-light animate-pulse"></span> License Active
+                                </div>
+                                <h3 class="text-white font-bold text-[20px] tracking-tight">Full Access Pass</h3>
+                            </div>
+                        </div>
+                        <div class="relative z-10 bg-surface-800/80 backdrop-blur-md border border-surface-700 rounded-xl p-5 flex justify-between items-center shadow-inner">
+                            <div>
+                                <p class="text-surface-400 text-[12px] font-semibold uppercase tracking-wider mb-1">Valid Until</p>
+                                <p class="text-surface-50 font-bold text-[15px]">${expires.toLocaleDateString('en-US', dateOptions)}</p>
+                            </div>
+                            <div class="w-10 h-10 rounded-full bg-brand/20 flex items-center justify-center border border-brand/30">
+                                <i class="fa-solid fa-shield-check text-brand-light text-[18px]"></i>
+                            </div>
+                        </div>
+                    </div>`;
+            } else {
+                const isUrgent = daysLeft <= 10;
+                const borderClass = isUrgent ? 'border-rose-200 bg-rose-50' : 'border-amber-200 bg-amber-50';
+                const textClass = isUrgent ? 'text-rose-900' : 'text-amber-900';
+                const subTextClass = isUrgent ? 'text-rose-700' : 'text-amber-700';
+                const btnClass = 'bg-surface-900 hover:bg-surface-800 text-white';
+                
+                container.innerHTML = `
+                    <div class="panel ${borderClass} p-6 h-full flex flex-col justify-between relative rounded-2xl w-full">
+                        <div class="flex justify-between items-start mb-6">
+                            <div>
+                                <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-white/80 ${textClass} text-[11px] font-bold tracking-wider uppercase mb-3 border ${borderClass.split(' ')[0]} shadow-sm">
+                                    <i class="fa-regular fa-clock text-[12px]"></i> Limited Term (${plan}%)
+                                </div>
+                                <h3 class="${textClass} font-bold text-[20px] tracking-tight">Action Required</h3>
+                            </div>
+                        </div>
+                        <div class="flex items-center gap-4">
+                            <div class="bg-white border ${borderClass.split(' ')[0]} rounded-xl px-5 py-3 shrink-0 text-center shadow-sm">
+                                <p class="${textClass} font-bold text-[22px] leading-none mb-1">${daysLeft}</p>
+                                <span class="${subTextClass} text-[10px] font-bold uppercase tracking-widest">Days Left</span>
+                            </div>
+                            <button onclick="openUpgradeModal()" class="flex-1 ${btnClass} font-bold text-[15px] py-4 px-4 rounded-xl transition-all text-center shadow-sm hover:shadow-md h-full flex items-center justify-center">
+                                Upgrade License
+                            </button>
+                        </div>
+                    </div>`;
+            }
+        }
+
+        function openUpgradeModal() {
+            if(!globalLevelDetails) return showToast("Retrieving secure fee details...", "info");
+            
+            const totalFee = parseFloat(globalLevelDetails.fee);
+            const planPaid = parseInt(currentUserData.paymentPlan) / 100;
+            const remaining = totalFee - (totalFee * planPaid);
+            
+            document.getElementById('upgradeAmount').textContent = `₹${remaining.toFixed(0)}`;
+            
+            const qrImg = document.getElementById('upgradeQrCode');
+            if (globalLevelDetails.qrCodeUrl && globalLevelDetails.qrCodeUrl.trim() !== '') {
+                qrImg.src = globalLevelDetails.qrCodeUrl;
+            } else {
+                const upiUrl = `upi://pay?pa=geekyresearcher@upi&pn=GeekyResearcher&am=${remaining.toFixed(0)}&cu=INR&tn=Upgrade_${currentUserData.email}`;
+                qrImg.src = `https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=${encodeURIComponent(upiUrl)}`;
+            }
+
+            const modal = document.getElementById('upgradeModal');
+            const content = document.getElementById('upgradeModalContent');
+            
+            modal.classList.remove('hidden');
+            void modal.offsetWidth;
+            modal.classList.remove('opacity-0');
+            content.classList.remove('scale-95');
+            content.classList.add('scale-100');
+        }
+
+        function closeUpgradeModal() {
+            const modal = document.getElementById('upgradeModal');
+            const content = document.getElementById('upgradeModalContent');
+            
+            modal.classList.add('opacity-0');
+            content.classList.remove('scale-100');
+            content.classList.add('scale-95');
+            setTimeout(() => modal.classList.add('hidden'), 300);
+        }
+
+        async function submitUpgrade() {
+            const btn = document.getElementById('submitUpgradeBtn');
+            btn.innerHTML = '<i class="fa-solid fa-circle-notch fa-spin"></i> Processing...';
+            btn.disabled = true;
+
+            try {
+                const res = await fetch(`${API_BASE_URL}/student/upgrade-plan`, { method: 'POST', headers: { 'Authorization': `Bearer ${token}` } });
+                if(res.ok) {
+                    closeUpgradeModal();
+                    showToast("Transaction logged. Admin notified.", "success");
+                    await fetchFreshUserData();
+                    renderPlanBanner();
+                } else {
+                    showToast("Failed to verify transaction.", "error");
+                }
+            } catch(e) { showToast("Network communication error.", "error"); } 
+            finally {
+                btn.innerHTML = 'Verify Payment <i class="fa-solid fa-shield-check ml-1"></i>';
+                btn.disabled = false;
+            }
+        }
+
+        async function loadDashboardData() {
+            try {
+                const [contentRes, testsRes] = await Promise.all([
+                    fetch(`${API_BASE_URL}/student/content`, { headers: { 'Authorization': `Bearer ${token}` } }),
+                    fetch(`${API_BASE_URL}/student/tests`, { headers: { 'Authorization': `Bearer ${token}` } })
+                ]);
+
+                const content = await contentRes.json();
+                const tests = await testsRes.json();
+
+                const videosCount = content.filter(c => c.type === 'video').length;
+                const readingCount = content.length - videosCount;
+                
+                document.getElementById('stat-materials').textContent = readingCount;
+                document.getElementById('stat-videos').textContent = videosCount;
+                document.getElementById('stat-tests').textContent = tests.length || 0;
+
+                const listContainer = document.getElementById('recent-content-list');
+                listContainer.innerHTML = '';
+                
+                if (content.length === 0) {
+                    listContainer.innerHTML = `
+                        <div class="px-8 py-16 text-center bg-white">
+                            <div class="w-20 h-20 mx-auto bg-surface-50 rounded-full flex items-center justify-center mb-5 border border-surface-100">
+                                <i class="fa-regular fa-folder-open text-3xl text-surface-300"></i>
+                            </div>
+                            <h4 class="text-surface-900 font-bold text-[16px] mb-2">No Curriculum Found</h4>
+                            <p class="text-surface-500 text-[15px] font-medium max-w-sm mx-auto">Materials for your designated level have not been published yet.</p>
+                        </div>`;
+                    return;
+                }
+
+                const sortedContent = content.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt)).slice(0, 5);
+                
+                sortedContent.forEach((item, index) => {
+                    let icon, iconBg, iconColor, link;
+                    if (item.type === 'video') { 
+                        icon = 'fa-play';
+                        iconBg = 'bg-indigo-50 border-indigo-100';
+                        iconColor = 'text-indigo-600';
+                        link = 'media-viewer.html'; 
+                    } else if (item.type === 'document' && item.s3Key) { 
+                        icon = 'fa-file-pdf';
+                        iconBg = 'bg-teal-50 border-teal-100';
+                        iconColor = 'text-teal-600';
+                        link = 'chapters.html'; 
+                    } else { 
+                        icon = 'fa-file-lines';
+                        iconBg = 'bg-brand/10 border-brand/20';
+                        iconColor = 'text-brand';
+                        link = 'chapters.html'; 
+                    }
+
+                    const date = new Date(item.createdAt).toLocaleDateString('en-US', dateOptions);
+                    const isLast = index === sortedContent.length - 1;
+                    const borderClass = isLast ? '' : 'border-b border-surface-100';
+
+                    listContainer.innerHTML += `
+                        <a href="${link}" class="flex items-center justify-between p-5 px-8 ${borderClass} bg-white hover:bg-surface-50 transition-colors group">
+                            <div class="flex items-center gap-5 min-w-0">
+                                <div class="w-12 h-12 rounded-xl ${iconBg} ${iconColor} flex items-center justify-center border shrink-0 group-hover:scale-105 transition-transform shadow-sm">
+                                    <i class="fa-solid ${icon} text-[18px]"></i>
+                                </div>
+                                <div class="min-w-0">
+                                    <h4 class="font-bold text-surface-900 text-[16px] truncate group-hover:text-brand transition-colors mb-1.5">${item.title}</h4>
+                                    <div class="flex items-center gap-3">
+                                        <span class="text-[12px] text-surface-500 font-semibold uppercase tracking-wider">${item.type}</span>
+                                        <span class="w-1.5 h-1.5 rounded-full bg-surface-300"></span>
+                                        <span class="text-[13px] text-surface-400 font-medium">${date}</span>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="shrink-0 ml-4 opacity-0 -translate-x-4 group-hover:opacity-100 group-hover:translate-x-0 transition-all duration-300">
+                                <div class="w-8 h-8 rounded-full bg-white border border-surface-200 shadow-sm flex items-center justify-center text-surface-500">
+                                    <i class="fa-solid fa-arrow-right text-[12px]"></i>
+                                </div>
+                            </div>
+                        </a>`;
+                });
+            } catch (error) {}
+        }
+
+        function logout() { localStorage.clear(); window.location.href = '../login.html'; }
+    </script>
+</body>
+</html>

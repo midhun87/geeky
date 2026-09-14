@@ -1,0 +1,275 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Geeky Researcher | Student Directory</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <script>
+        tailwind.config = { theme: { extend: { fontFamily: { sans: ['Inter', 'sans-serif'] }, colors: { brand: { light: '#14b8a6', DEFAULT: '#0f766e', dark: '#115e59' } } } } }
+    </script>
+    <style>
+        body { background-color: #f8fafc; color: #0f172a; }
+        .admin-card { background: white; border: 1px solid #e2e8f0; border-radius: 0.5rem; box-shadow: 0 1px 3px 0 rgb(0 0 0 / 0.1), 0 1px 2px -1px rgb(0 0 0 / 0.1); }
+        .sidebar-link { display: flex; align-items: center; gap: 0.75rem; padding: 0.75rem 1rem; color: #94a3b8; border-radius: 0.375rem; font-weight: 500; transition: all 0.2s; }
+        .sidebar-link:hover { background: #1e293b; color: #f8fafc; }
+        .sidebar-link.active { background: #1e293b; color: white; border-left: 4px solid #14b8a6; }
+        
+        /* Table styles */
+        ::-webkit-scrollbar { width: 6px; height: 6px; }
+        ::-webkit-scrollbar-track { background: transparent; }
+        ::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 10px; }
+    </style>
+</head>
+<body class="antialiased overflow-hidden w-full h-screen flex">
+
+    <!-- Sidebar -->
+    <div class="w-64 bg-slate-900 flex-col hidden md:flex shrink-0 z-10 shadow-xl">
+        <div class="flex items-center gap-3 p-6 border-b border-slate-800">
+            <img src="https://res.cloudinary.com/dzuxwvamy/image/upload/v1783935221/WhatsApp_Image_2026-07-08_at_6.25.14_PM_aiuvde.jpg" class="w-10 h-10 rounded bg-white p-1 object-cover">
+            <div class="font-bold text-white leading-tight text-sm">Geeky Researcher<br><span class="text-brand-light font-normal text-xs">Admin Console</span></div>
+        </div>
+        <nav class="flex-1 space-y-1 p-4">
+            <a href="dashboard.html" class="sidebar-link"><i class="fa-solid fa-chart-line w-5 text-center"></i> Dashboard</a>
+            <a href="students.html" class="sidebar-link active"><i class="fa-solid fa-users w-5 text-center"></i> Student Directory</a>
+            <a href="approvals.html" class="sidebar-link"><i class="fa-solid fa-user-check w-5 text-center"></i> Student Approvals</a>
+            <a href="content-builder.html" class="sidebar-link"><i class="fa-solid fa-folder-plus w-5 text-center"></i> Content Builder</a>
+            <a href="test-creator.html" class="sidebar-link"><i class="fa-solid fa-vial w-5 text-center"></i> Test Creator</a>
+            <a href="reports.html" class="sidebar-link"><i class="fa-solid fa-file-invoice w-5 text-center"></i> Reports</a>
+        </nav>
+        <div class="p-4 border-t border-slate-800">
+            <button onclick="logout()" class="w-full text-left text-sm text-red-400 font-medium hover:text-red-300 py-2 transition"><i class="fa-solid fa-sign-out-alt mr-2"></i>Sign Out</button>
+        </div>
+    </div>
+
+    <!-- Main Content -->
+    <div class="flex-1 overflow-hidden flex flex-col h-full bg-slate-50">
+        
+        <!-- Header -->
+        <div class="p-6 md:p-8 shrink-0 pb-4">
+            <div class="flex justify-between items-end mb-6">
+                <div>
+                    <h2 class="text-2xl font-bold text-slate-900">Student Directory</h2>
+                    <p class="text-sm text-slate-500 mt-1">Comprehensive overview of all enrolled users, active plans, and financial insights.</p>
+                </div>
+            </div>
+
+            <!-- Stats Widgets -->
+            <div class="grid grid-cols-1 md:grid-cols-4 gap-4 mb-2">
+                <div class="admin-card p-5 border-t-4 border-t-blue-500">
+                    <p class="text-slate-500 text-[11px] font-bold uppercase tracking-wider mb-1">Total Students</p>
+                    <h3 class="text-2xl font-bold text-slate-800" id="stat-total">--</h3>
+                </div>
+                <div class="admin-card p-5 border-t-4 border-t-emerald-500">
+                    <p class="text-slate-500 text-[11px] font-bold uppercase tracking-wider mb-1">Active / Approved</p>
+                    <h3 class="text-2xl font-bold text-emerald-600" id="stat-active">--</h3>
+                </div>
+                <div class="admin-card p-5 border-t-4 border-t-red-500">
+                    <p class="text-slate-500 text-[11px] font-bold uppercase tracking-wider mb-1">Expired Access</p>
+                    <h3 class="text-2xl font-bold text-red-600" id="stat-expired">--</h3>
+                </div>
+                <div class="admin-card p-5 border-t-4 border-t-indigo-500 bg-indigo-50/30">
+                    <p class="text-indigo-600 text-[11px] font-bold uppercase tracking-wider mb-1">Revenue Realized</p>
+                    <h3 class="text-2xl font-bold text-indigo-900" id="stat-revenue">--</h3>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Table Section -->
+        <div class="flex-1 px-6 md:px-8 pb-8 overflow-hidden flex flex-col">
+            <div class="admin-card flex-1 flex flex-col overflow-hidden">
+                
+                <!-- Table Controls -->
+                <div class="px-5 py-4 border-b border-slate-200 bg-white flex justify-between items-center">
+                    <div class="relative w-72">
+                        <i class="fa-solid fa-search absolute left-3 top-1/2 transform -translate-y-1/2 text-slate-400"></i>
+                        <input type="text" id="searchInput" placeholder="Search students by name, email..." class="w-full pl-9 pr-4 py-2 text-sm border border-slate-300 rounded-md bg-slate-50 focus:bg-white focus:border-brand focus:ring-1 focus:ring-brand outline-none transition-all">
+                    </div>
+                </div>
+
+                <!-- Scrollable Table -->
+                <div class="overflow-auto flex-1 bg-white">
+                    <table class="w-full text-left text-sm text-slate-600">
+                        <thead class="bg-slate-50 border-b border-slate-200 text-slate-700 font-semibold sticky top-0 z-10">
+                            <tr>
+                                <th class="px-5 py-3">Student Details</th>
+                                <th class="px-5 py-3">Level Enrolled</th>
+                                <th class="px-5 py-3">Term Plan</th>
+                                <th class="px-5 py-3 text-right">Amount Paid</th>
+                                <th class="px-5 py-3">Current Status</th>
+                                <th class="px-5 py-3">Expiry Date</th>
+                                <th class="px-5 py-3 text-right">Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody id="directory-tbody" class="divide-y divide-slate-100">
+                            <tr><td colspan="7" class="text-center py-10 text-slate-500"><i class="fa-solid fa-circle-notch fa-spin mr-2"></i> Fetching directory...</td></tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const API_BASE_URL = 'http://localhost:5000/api';
+        const token = localStorage.getItem('token');
+        const user = JSON.parse(localStorage.getItem('user'));
+        
+        let allStudents = []; // Store globally for search filtering
+
+        if (!token || !user || user.role !== 'admin') { localStorage.clear(); window.location.href = '../login.html'; }
+
+        document.addEventListener('DOMContentLoaded', () => {
+            loadDirectory();
+            document.getElementById('searchInput').addEventListener('input', filterTable);
+        });
+
+        async function loadDirectory() {
+            const tbody = document.getElementById('directory-tbody');
+            try {
+                const response = await fetch(`${API_BASE_URL}/admin/students-directory`, { headers: { 'Authorization': `Bearer ${token}` } });
+                
+                if (!response.ok) throw new Error('Failed to fetch data');
+                
+                allStudents = await response.json();
+                
+                calculateMetrics(allStudents);
+                renderTable(allStudents);
+
+            } catch (err) { 
+                tbody.innerHTML = `<tr><td colspan="6" class="text-center py-10 text-red-500">Failed to connect to server. Please try again.</td></tr>`; 
+            }
+        }
+
+        function calculateMetrics(students) {
+            let total = students.length;
+            let active = 0;
+            let expired = 0;
+            let revenue = 0;
+
+            students.forEach(s => {
+                if (s.status === 'approved') active++;
+                if (s.status === 'expired' || s.status === 'blocked') expired++;
+                
+                // Only count revenue for money actually paid (approved or pending upgrade from an initial payment)
+                // Exclude pure 'pending_initial' since they haven't been verified yet.
+                if (s.status !== 'pending_initial' && s.status !== 'pending') {
+                    revenue += parseFloat(s.amountPaid) || 0;
+                }
+            });
+
+            document.getElementById('stat-total').textContent = total;
+            document.getElementById('stat-active').textContent = active;
+            document.getElementById('stat-expired').textContent = expired;
+            
+            // Format currency for India
+            const formattedRevenue = new Intl.NumberFormat('en-IN', { style: 'currency', currency: 'INR', maximumFractionDigits: 0 }).format(revenue);
+            document.getElementById('stat-revenue').textContent = formattedRevenue;
+        }
+
+        function renderTable(students) {
+            const tbody = document.getElementById('directory-tbody');
+            tbody.innerHTML = '';
+            
+            if(students.length === 0) {
+                tbody.innerHTML = `<tr><td colspan="6" class="text-center py-10 text-slate-500">No students found.</td></tr>`;
+                return;
+            }
+
+            students.forEach(student => {
+                
+                // 1. Format Status Badge
+                let statusBadge = '';
+                if (student.status === 'approved') {
+                    statusBadge = `<span class="bg-emerald-50 text-emerald-700 px-2.5 py-1 rounded-md text-[11px] font-bold border border-emerald-200 flex items-center gap-1 w-max"><i class="fa-solid fa-check-circle"></i> Active</span>`;
+                } else if (student.status === 'expired' || student.status === 'blocked') {
+                    const label = student.status === 'blocked' ? 'Blocked' : 'Expired';
+                    statusBadge = `<span class="bg-red-50 text-red-700 px-2.5 py-1 rounded-md text-[11px] font-bold border border-red-200 flex items-center gap-1 w-max"><i class="fa-solid fa-ban"></i> ${label}</span>`;
+                } else if (student.status === 'pending_upgrade') {
+                    statusBadge = `<span class="bg-blue-50 text-blue-700 px-2.5 py-1 rounded-md text-[11px] font-bold border border-blue-200 flex items-center gap-1 w-max"><i class="fa-solid fa-arrow-up"></i> Upgrade Pending</span>`;
+                } else {
+                    statusBadge = `<span class="bg-amber-50 text-amber-700 px-2.5 py-1 rounded-md text-[11px] font-bold border border-amber-200 flex items-center gap-1 w-max"><i class="fa-solid fa-clock"></i> Pending Initial</span>`;
+                }
+
+                // 2. Format Plan Badge
+                const isFull = student.paymentPlan === '100';
+                const planBadge = isFull 
+                    ? `<span class="font-bold text-slate-700">100% (Full)</span>`
+                    : `<span class="font-bold text-amber-600">${student.paymentPlan}% Term</span>`;
+
+                // 3. Format Date
+                const expiryDate = student.accessExpiresAt 
+                    ? new Date(student.accessExpiresAt).toLocaleDateString(undefined, { year: 'numeric', month: 'short', day: 'numeric' }) 
+                    : '<span class="text-slate-400">Not set</span>';
+
+                // 4. Format Amount Paid
+                const amountFormatted = new Intl.NumberFormat('en-IN', { style: 'currency', currency: 'INR', maximumFractionDigits: 0 }).format(student.amountPaid);
+
+                // 5. Action Button
+                const actionButton = (student.status === 'approved' || student.status === 'pending_upgrade') 
+                    ? `<button onclick="blockStudent('${student.email}', this)" class="text-red-600 bg-red-50 hover:bg-red-100 px-3 py-1.5 rounded border border-red-200 font-semibold transition-colors text-[11px] shadow-sm whitespace-nowrap"><i class="fa-solid fa-user-lock mr-1"></i> Revoke</button>`
+                    : `<span class="text-slate-400 text-[11px] italic">No actions</span>`;
+
+                tbody.innerHTML += `
+                    <tr class="hover:bg-slate-50 transition duration-150">
+                        <td class="px-5 py-3">
+                            <div class="font-bold text-slate-900">${student.name}</div>
+                            <div class="text-[11px] text-slate-500 mt-0.5">${student.email}</div>
+                            <div class="text-[11px] text-slate-400 mt-0.5 truncate max-w-[200px]"><i class="fa-regular fa-building mr-1"></i> ${student.organization}</div>
+                        </td>
+                        <td class="px-5 py-3 font-medium text-brand-dark">${student.level}</td>
+                        <td class="px-5 py-3">${planBadge}</td>
+                        <td class="px-5 py-3 text-right font-semibold text-slate-800">${amountFormatted}</td>
+                        <td class="px-5 py-3">${statusBadge}</td>
+                        <td class="px-5 py-3 text-xs text-slate-600 font-medium">${expiryDate}</td>
+                        <td class="px-5 py-3 text-right">${actionButton}</td>
+                    </tr>
+                `;
+            });
+        }
+
+        function filterTable(e) {
+            const term = e.target.value.toLowerCase();
+            const filtered = allStudents.filter(s => 
+                s.name.toLowerCase().includes(term) || 
+                s.email.toLowerCase().includes(term) ||
+                s.organization.toLowerCase().includes(term) ||
+                s.level.toLowerCase().includes(term)
+            );
+            renderTable(filtered);
+        }
+
+        async function blockStudent(email, btn) {
+            if(!confirm("Are you sure you want to instantly revoke access for this student? They will be unable to log in.")) return;
+            
+            const originalText = btn.innerHTML;
+            btn.innerHTML = `<i class="fa-solid fa-circle-notch fa-spin"></i>`;
+            btn.disabled = true;
+            
+            try {
+                const res = await fetch(`${API_BASE_URL}/admin/block-student`, { 
+                    method: 'POST', 
+                    headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
+                    body: JSON.stringify({ email })
+                });
+                
+                if(res.ok) {
+                    loadDirectory(); // Silently reloads the table to reflect the new blocked state
+                } else {
+                    alert('Failed to revoke access.');
+                    btn.innerHTML = originalText;
+                    btn.disabled = false;
+                }
+            } catch(e) {
+                alert('Network error while processing request.');
+                btn.innerHTML = originalText;
+                btn.disabled = false;
+            }
+        }
+
+        function logout() { localStorage.clear(); window.location.href = '../login.html'; }
+    </script>
+</body>
+</html>

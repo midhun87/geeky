@@ -1,0 +1,745 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Geeky Researcher | Enterprise Test Creator</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    
+    <script>
+        tailwind.config = { 
+            theme: { 
+                extend: { 
+                    fontFamily: { sans: ['Inter', 'sans-serif'] }, 
+                    colors: { brand: { light: '#14b8a6', DEFAULT: '#0f766e', dark: '#115e59' } } 
+                } 
+            } 
+        }
+    </script>
+    <style>
+        body { background-color: #f8fafc; color: #0f172a; }
+        .admin-card { background: white; border: 1px solid #e2e8f0; border-radius: 0.5rem; box-shadow: 0 1px 3px 0 rgb(0 0 0 / 0.1); }
+        .admin-input { background: white; border: 1px solid #cbd5e1; border-radius: 0.375rem; transition: all 0.2s; width: 100%; padding: 0.5rem 0.75rem; font-size: 0.875rem; color: #334155; }
+        .admin-input:focus { border-color: #0f766e; box-shadow: 0 0 0 3px rgba(15, 118, 110, 0.1); outline: none; }
+        .admin-input:disabled { background-color: #f1f5f9; cursor: not-allowed; opacity: 0.6; }
+        .admin-label { display: block; font-size: 0.875rem; font-weight: 600; color: #475569; margin-bottom: 0.5rem; }
+        
+        .btn-primary { background: #0f766e; color: white; border-radius: 0.375rem; font-weight: 500; padding: 0.6rem 1.2rem; transition: background 0.2s; border: none; cursor: pointer; display: inline-flex; align-items: center; justify-content: center; gap: 0.5rem; }
+        .btn-primary:hover { background: #115e59; }
+        
+        .btn-secondary { background: white; border: 1px solid #cbd5e1; color: #334155; border-radius: 0.375rem; font-weight: 500; padding: 0.6rem 1.2rem; transition: all 0.2s; cursor: pointer; display: inline-flex; align-items: center; justify-content: center; gap: 0.5rem; }
+        .btn-secondary:hover { background: #f1f5f9; }
+
+        .sidebar-link { display: flex; align-items: center; gap: 0.75rem; padding: 0.75rem 1rem; color: #94a3b8; border-radius: 0.375rem; font-weight: 500; transition: all 0.2s; }
+        .sidebar-link:hover { background: #1e293b; color: #f8fafc; }
+        .sidebar-link.active { background: #1e293b; color: white; border-left: 4px solid #14b8a6; }
+        
+        /* Custom Scrollbar */
+        .custom-scrollbar::-webkit-scrollbar { width: 6px; height: 6px; }
+        .custom-scrollbar::-webkit-scrollbar-track { background: transparent; }
+        .custom-scrollbar::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 10px; }
+        .custom-scrollbar::-webkit-scrollbar-thumb:hover { background: #94a3b8; }
+
+        /* Specialized Buttons */
+        .q-type-btn {
+            flex: 1; padding: 1.25rem 1rem; border: 1px dashed #cbd5e1; border-radius: 0.5rem; font-weight: 600; font-size: 0.875rem; color: #475569; transition: all 0.2s; background: white; cursor: pointer; display: flex; flex-direction: column; align-items: center; gap: 0.5rem;
+        }
+        .q-type-btn:hover { border-color: #0f766e; color: #0f766e; background: #f0fdf4; transform: translateY(-1px); box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1); }
+        .q-type-btn i { font-size: 1.5rem; }
+    </style>
+</head>
+<body class="antialiased overflow-hidden w-full h-screen flex">
+
+    <!-- Sidebar -->
+    <div class="w-64 bg-slate-900 flex-col hidden md:flex shrink-0 z-10 shadow-xl">
+        <div class="flex items-center gap-3 p-6 border-b border-slate-800">
+            <img src="https://res.cloudinary.com/dzuxwvamy/image/upload/v1783935221/WhatsApp_Image_2026-07-08_at_6.25.14_PM_aiuvde.jpg" class="w-10 h-10 rounded bg-white p-1 object-cover">
+            <div class="font-bold text-white leading-tight text-sm">Geeky Researcher<br><span class="text-brand-light font-normal text-xs">Admin Console</span></div>
+        </div>
+        <nav class="flex-1 space-y-1 p-4">
+            <a href="dashboard.html" class="sidebar-link"><i class="fa-solid fa-chart-line w-5 text-center"></i> Dashboard</a>
+            <a href="approvals.html" class="sidebar-link"><i class="fa-solid fa-user-check w-5 text-center"></i> Access Control</a>
+            <a href="content-builder.html" class="sidebar-link"><i class="fa-solid fa-folder-plus w-5 text-center"></i> Curriculum</a>
+            <a href="test-creator.html" class="sidebar-link active"><i class="fa-solid fa-vial w-5 text-center"></i> Assessments</a>
+            <a href="reports.html" class="sidebar-link"><i class="fa-solid fa-file-invoice w-5 text-center"></i> Reports</a>
+        </nav>
+        <div class="p-4 border-t border-slate-800">
+            <button onclick="logout()" class="w-full text-left text-sm text-red-400 font-medium hover:text-red-300 py-2 transition"><i class="fa-solid fa-sign-out-alt mr-2"></i> Sign Out</button>
+        </div>
+    </div>
+
+    <!-- Main Content -->
+    <div class="flex-1 overflow-hidden flex flex-col h-full bg-slate-50 relative z-0">
+        
+        <!-- View: Library -->
+        <div id="view-library" class="flex flex-col h-full p-6 md:p-8">
+            <div class="mb-6 flex flex-col md:flex-row justify-between items-start md:items-end shrink-0 gap-4">
+                <div>
+                    <h2 class="text-2xl font-bold text-slate-900">Assessment Engine</h2>
+                    <p class="text-sm text-slate-500 mt-1">Design examinations, assign targeted levels, and set specific attempt rules.</p>
+                </div>
+                <button class="btn-primary shadow-md" onclick="showEditor()">
+                    <i class="fa-solid fa-plus"></i> New Assessment
+                </button>
+            </div>
+            
+            <div class="admin-card flex-1 overflow-y-auto custom-scrollbar p-6">
+                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4" id="library-grid">
+                    <div class="col-span-full flex flex-col items-center justify-center py-20 text-slate-400">
+                        <i class="fa-solid fa-circle-notch fa-spin text-3xl mb-3"></i>
+                        <span>Loading assessments...</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- View: Editor -->
+        <div id="view-editor" class="hidden flex-col h-full overflow-hidden bg-white">
+            
+            <!-- Editor Header -->
+            <div class="border-b border-slate-200 px-6 py-4 flex justify-between items-center bg-white z-20 shrink-0">
+                <div class="flex items-center gap-4">
+                    <button onclick="hideEditor()" class="w-9 h-9 rounded border border-slate-300 hover:bg-slate-100 flex items-center justify-center transition text-slate-600">
+                        <i class="fa-solid fa-arrow-left"></i>
+                    </button>
+                    <div>
+                        <h2 class="text-lg font-bold text-slate-900" id="editor-title-display">New Assessment Protocol</h2>
+                    </div>
+                </div>
+                <div class="flex gap-3">
+                    <button class="btn-secondary" onclick="saveTest('draft')">Save Draft</button>
+                    <button class="btn-primary" onclick="saveTest('published')">Publish Live</button>
+                </div>
+            </div>
+
+            <div class="flex flex-col lg:flex-row flex-1 overflow-hidden bg-slate-50">
+                
+                <!-- LEFT: Main Questions Canvas -->
+                <div class="flex-1 overflow-y-auto custom-scrollbar p-6 lg:p-8">
+                    
+                    <!-- Title Configuration -->
+                    <div class="admin-card p-6 mb-6 border-t-4 border-t-brand">
+                        <input type="hidden" id="edit-test-id">
+                        <label class="admin-label text-brand">Assessment Title</label>
+                        <input type="text" id="testTitle" class="w-full text-xl font-bold border-none bg-transparent outline-none placeholder-slate-300" placeholder="e.g., Final Examination: Cellular Pathology">
+                    </div>
+
+                    <!-- Dynamic Questions Container -->
+                    <div id="questions-container" class="space-y-6 mb-6"></div>
+                    
+                    <!-- Append Question UI -->
+                    <div class="admin-card p-6 bg-white border-dashed border-2 flex flex-col md:flex-row gap-4 justify-center items-center">
+                        <span class="font-bold text-slate-500 mr-2 text-sm"><i class="fa-solid fa-plus mr-1"></i> Add Question:</span>
+                        <div class="flex w-full md:w-auto gap-3 flex-1">
+                            <button onclick="addQuestion('mcq')" class="q-type-btn !p-3 !flex-row">
+                                <i class="fa-regular fa-circle-dot text-brand"></i> Single Correct
+                            </button>
+                            <button onclick="addQuestion('msq')" class="q-type-btn !p-3 !flex-row">
+                                <i class="fa-solid fa-check-double text-blue-600"></i> Multiple Correct
+                            </button>
+                            <button onclick="addQuestion('fib')" class="q-type-btn !p-3 !flex-row">
+                                <i class="fa-solid fa-pen-clip text-amber-600"></i> Short Answer
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- RIGHT: Configuration Sidebar -->
+                <div class="w-full lg:w-[350px] shrink-0 overflow-y-auto custom-scrollbar border-l border-slate-200 bg-white p-6 space-y-6 shadow-[-4px_0_15px_rgba(0,0,0,0.02)]">
+                    
+                    <!-- Access & Attempts -->
+                    <div>
+                        <h3 class="font-bold text-slate-800 text-sm mb-3 pb-2 border-b border-slate-100 flex items-center gap-2">
+                            <i class="fa-solid fa-users text-brand"></i> Target Audience & Attempts
+                        </h3>
+                        <p class="text-[11px] text-slate-500 mb-3">Check levels to grant access and set max attempts per student for that level.</p>
+                        
+                        <div id="levelCheckboxes" class="space-y-2 max-h-64 overflow-y-auto custom-scrollbar pr-1">
+                            <!-- Populated dynamically via JS -->
+                        </div>
+                    </div>
+
+                    <!-- Scheduler -->
+                    <div>
+                        <h3 class="font-bold text-slate-800 text-sm mb-3 pb-2 border-b border-slate-100 flex items-center gap-2">
+                            <i class="fa-solid fa-calendar-alt text-blue-500"></i> Availability Window
+                        </h3>
+                        <p class="text-[11px] text-slate-500 mb-3">Leave blank for permanent access.</p>
+                        <div class="space-y-3">
+                            <div>
+                                <label class="text-[11px] font-bold text-slate-500 uppercase">Commences</label>
+                                <input type="datetime-local" id="testStartTime" class="admin-input !py-1.5 !text-xs mt-1">
+                            </div>
+                            <div>
+                                <label class="text-[11px] font-bold text-slate-500 uppercase">Concludes</label>
+                                <input type="datetime-local" id="testEndTime" class="admin-input !py-1.5 !text-xs mt-1">
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Exam Rules -->
+                    <div>
+                        <h3 class="font-bold text-slate-800 text-sm mb-3 pb-2 border-b border-slate-100 flex items-center gap-2">
+                            <i class="fa-solid fa-scale-balanced text-amber-500"></i> Examination Rules
+                        </h3>
+                        <div class="space-y-3">
+                            <div class="flex items-center justify-between">
+                                <label class="text-xs font-semibold text-slate-600">Duration (Mins)</label>
+                                <input type="number" id="testTimeLimit" class="admin-input !w-20 !py-1 text-center font-bold" value="60" min="1">
+                            </div>
+                            <div class="flex items-center justify-between">
+                                <label class="text-xs font-semibold text-slate-600">Passing Mark (%)</label>
+                                <input type="number" id="testPassingScore" class="admin-input !w-20 !py-1 text-center font-bold" value="50" min="1" max="100">
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Post-Exam Rules -->
+                    <div>
+                        <h3 class="font-bold text-slate-800 text-sm mb-3 pb-2 border-b border-slate-100 flex items-center gap-2">
+                            <i class="fa-solid fa-eye text-emerald-500"></i> Post-Submission
+                        </h3>
+                        <div class="space-y-2">
+                            <label class="flex items-start gap-2 cursor-pointer">
+                                <input type="checkbox" id="testReleaseResults" class="mt-0.5 text-brand" checked> 
+                                <span class="text-xs text-slate-700 font-medium leading-tight">Display score instantly after submission</span>
+                            </label>
+                            <label class="flex items-start gap-2 cursor-pointer">
+                                <input type="checkbox" id="testShowAnswers" class="mt-0.5 text-brand" checked> 
+                                <span class="text-xs text-slate-700 font-medium leading-tight">Reveal correct answer key in review</span>
+                            </label>
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const API_BASE_URL = 'http://localhost:5000/api';
+        const token = localStorage.getItem('token');
+        const user = JSON.parse(localStorage.getItem('user'));
+        let qCounter = 0; 
+        let testLibrary = [];
+        let allLevels = [];
+
+        if (!token || !user || user.role !== 'admin') { 
+            localStorage.clear(); 
+            window.location.href = '../login.html'; 
+        }
+
+        document.addEventListener('DOMContentLoaded', async () => { 
+            await fetchLevels(); 
+            await fetchLibrary(); 
+        });
+
+        /* --- Level-Based Attempts UI Logic --- */
+        async function fetchLevels() {
+            try {
+                const res = await fetch(`${API_BASE_URL}/admin/levels`, { headers: { 'Authorization': `Bearer ${token}` } });
+                allLevels = await res.json();
+                const container = document.getElementById('levelCheckboxes');
+                
+                let html = `
+                    <div class="flex items-center justify-between gap-2 p-2 bg-slate-50 border border-slate-200 rounded mb-2">
+                        <label class="flex items-center gap-2 cursor-pointer flex-1">
+                            <input type="checkbox" id="selectAllLevels" value="All Levels" class="w-4 h-4 text-brand" onchange="toggleAllLevels(this)">
+                            <span class="font-bold text-xs text-slate-800">Global Audience (All)</span>
+                        </label>
+                        <div class="flex items-center gap-1">
+                            <span class="text-[10px] text-slate-500 font-semibold uppercase">Max:</span>
+                            <input type="number" id="attempts-All Levels" class="admin-input !w-16 !py-0.5 !px-1 text-center !text-xs font-bold" value="1" min="1" disabled>
+                        </div>
+                    </div>
+                `;
+                
+                allLevels.forEach(lvl => {
+                    const safeId = lvl.levelName.replace(/\s+/g, '-');
+                    html += `
+                        <div class="flex items-center justify-between gap-2 p-2 hover:bg-slate-50 border border-transparent hover:border-slate-100 rounded transition">
+                            <label class="flex items-center gap-2 cursor-pointer flex-1">
+                                <input type="checkbox" value="${lvl.levelName}" class="level-cb w-4 h-4 text-brand" onchange="toggleLevelInput(this)">
+                                <span class="text-xs text-slate-700 font-medium">${lvl.levelName}</span>
+                            </label>
+                            <div class="flex items-center gap-1">
+                                <span class="text-[10px] text-slate-400 font-semibold uppercase">Max:</span>
+                                <input type="number" id="attempts-${safeId}" class="admin-input !w-16 !py-0.5 !px-1 text-center !text-xs font-bold" value="1" min="1" disabled>
+                            </div>
+                        </div>
+                    `;
+                });
+                container.innerHTML = html;
+            } catch(e) {
+                alert("Failed to connect to level registry.");
+            }
+        }
+
+        function toggleLevelInput(cb) {
+            const safeId = cb.value.replace(/\s+/g, '-');
+            const input = document.getElementById(`attempts-${safeId}`);
+            if(input) {
+                input.disabled = !cb.checked;
+                if(!cb.checked) input.value = 1;
+            }
+            updateAllLevelsCheckboxState();
+        }
+
+        function toggleAllLevels(selectAllCb) {
+            const checkboxes = document.querySelectorAll('.level-cb');
+            checkboxes.forEach(cb => {
+                cb.checked = selectAllCb.checked;
+                toggleLevelInput(cb);
+            });
+            const allInput = document.getElementById('attempts-All Levels');
+            if(allInput) allInput.disabled = !selectAllCb.checked;
+        }
+
+        function updateAllLevelsCheckboxState() {
+            const checkboxes = document.querySelectorAll('.level-cb');
+            const selectAllCb = document.getElementById('selectAllLevels');
+            if(selectAllCb) selectAllCb.checked = Array.from(checkboxes).every(cb => cb.checked);
+        }
+
+        function populateEditorLevels(savedLevels, savedAttempts) {
+            const checkboxes = document.querySelectorAll('.level-cb');
+            const selectAllCb = document.getElementById('selectAllLevels');
+            
+            // Reset all first
+            checkboxes.forEach(cb => { cb.checked = false; toggleLevelInput(cb); });
+            if(selectAllCb) { selectAllCb.checked = false; document.getElementById('attempts-All Levels').disabled = true; }
+
+            if (!savedLevels || savedLevels.length === 0) return;
+
+            if (savedLevels.includes('All Levels')) {
+                if(selectAllCb) {
+                    selectAllCb.checked = true;
+                    const input = document.getElementById('attempts-All Levels');
+                    input.disabled = false;
+                    input.value = (savedAttempts && savedAttempts['All Levels']) ? savedAttempts['All Levels'] : 1;
+                }
+                checkboxes.forEach(cb => {
+                    cb.checked = true;
+                    toggleLevelInput(cb);
+                    const safeId = cb.value.replace(/\s+/g, '-');
+                    const input = document.getElementById(`attempts-${safeId}`);
+                    if (input && savedAttempts && savedAttempts[cb.value]) {
+                        input.value = savedAttempts[cb.value];
+                    }
+                });
+            } else {
+                checkboxes.forEach(cb => {
+                    if (savedLevels.includes(cb.value)) {
+                        cb.checked = true;
+                        toggleLevelInput(cb);
+                        const safeId = cb.value.replace(/\s+/g, '-');
+                        const input = document.getElementById(`attempts-${safeId}`);
+                        if (input && savedAttempts && savedAttempts[cb.value]) {
+                            input.value = savedAttempts[cb.value];
+                        }
+                    }
+                });
+            }
+        }
+        /* -------------------------------------- */
+
+        async function fetchLibrary() {
+            try {
+                const res = await fetch(`${API_BASE_URL}/admin/tests`, { headers: { 'Authorization': `Bearer ${token}` } });
+                testLibrary = await res.json();
+                renderLibrary();
+            } catch (err) {
+                alert("Data sync failure.");
+            }
+        }
+
+        function renderLibrary() {
+            const grid = document.getElementById('library-grid');
+            grid.innerHTML = '';
+            
+            if(testLibrary.length === 0) { 
+                grid.innerHTML = `
+                    <div class="col-span-full flex flex-col items-center justify-center py-20 text-slate-400">
+                        <i class="fa-solid fa-box-open text-3xl mb-3"></i>
+                        <span>Repository is empty.</span>
+                    </div>`; 
+                return; 
+            }
+            
+            testLibrary.forEach(test => {
+                const qCount = test.questions ? test.questions.length : 0;
+                
+                let badge = test.status === 'published' 
+                    ? `<span class="bg-emerald-100 text-emerald-700 px-2 py-0.5 rounded text-[10px] font-bold uppercase">Published</span>`
+                    : `<span class="bg-slate-200 text-slate-600 px-2 py-0.5 rounded text-[10px] font-bold uppercase">Draft</span>`;
+                
+                let levelsDisplay = 'Unassigned';
+                if (test.levels && test.levels.length > 0) {
+                     levelsDisplay = test.levels.includes('All Levels') ? 'Global' : test.levels.join(', ');
+                }
+
+                grid.innerHTML += `
+                    <div class="admin-card p-5 hover:border-brand-light transition flex flex-col group bg-white">
+                        <div class="flex justify-between items-start mb-3">
+                            ${badge}
+                            <span class="text-[10px] font-semibold text-slate-500 truncate max-w-[100px]" title="${levelsDisplay}"><i class="fa-solid fa-users"></i> ${levelsDisplay}</span>
+                        </div>
+                        <h3 class="font-bold text-slate-800 text-base mb-3 line-clamp-2" title="${test.title}">${test.title}</h3>
+                        
+                        <div class="flex gap-3 mb-4 mt-auto">
+                            <span class="text-xs text-slate-500 bg-slate-100 px-2 py-1 rounded"><i class="fa-solid fa-list text-brand mr-1"></i> ${qCount} Items</span>
+                            <span class="text-xs text-slate-500 bg-slate-100 px-2 py-1 rounded"><i class="fa-solid fa-stopwatch text-amber-500 mr-1"></i> ${test.timeLimit || 60}m</span>
+                        </div>
+
+                        <div class="flex gap-2 pt-3 border-t border-slate-100">
+                            <button onclick="editTest('${test.id}')" class="flex-1 btn-secondary !py-1.5 !px-2 !text-xs">Edit</button>
+                            <button onclick="deleteTest('${test.id}')" class="w-8 btn-secondary !py-1.5 !px-0 !text-red-500 hover:!bg-red-50 hover:!border-red-200" title="Delete">
+                                <i class="fa-solid fa-trash-can"></i>
+                            </button>
+                        </div>
+                    </div>
+                `;
+            });
+        }
+
+        function showEditor(isNew = true) {
+            document.getElementById('view-library').classList.add('hidden');
+            document.getElementById('view-editor').classList.remove('hidden');
+            document.getElementById('view-editor').classList.add('flex');
+            
+            if(isNew) {
+                document.getElementById('edit-test-id').value = ''; 
+                document.getElementById('testTitle').value = '';
+                populateEditorLevels([], {}); 
+                
+                document.getElementById('testStartTime').value = '';
+                document.getElementById('testEndTime').value = '';
+                document.getElementById('testTimeLimit').value = '60';
+                document.getElementById('testPassingScore').value = '50';
+                document.getElementById('testReleaseResults').checked = true;
+                document.getElementById('testShowAnswers').checked = true;
+
+                document.getElementById('questions-container').innerHTML = ''; 
+                document.getElementById('editor-title-display').innerText = 'New Assessment Protocol';
+                qCounter = 0; 
+                addQuestion('mcq');
+            }
+        }
+
+        function hideEditor() {
+            document.getElementById('view-library').classList.remove('hidden'); 
+            document.getElementById('view-editor').classList.add('hidden'); 
+            document.getElementById('view-editor').classList.remove('flex');
+        }
+
+        function editTest(id) {
+            const test = testLibrary.find(t => t.id === id); 
+            if(!test) return;
+            
+            showEditor(false);
+            
+            document.getElementById('edit-test-id').value = test.id; 
+            document.getElementById('testTitle').value = test.title; 
+            
+            populateEditorLevels(test.levels || [], test.levelAttempts || {});
+            
+            const formatForInput = (isoString) => {
+                if(!isoString) return '';
+                const date = new Date(isoString);
+                date.setMinutes(date.getMinutes() - date.getTimezoneOffset());
+                return date.toISOString().slice(0,16);
+            };
+
+            document.getElementById('testStartTime').value = formatForInput(test.startTime);
+            document.getElementById('testEndTime').value = formatForInput(test.endTime);
+            document.getElementById('testTimeLimit').value = test.timeLimit || 60;
+            document.getElementById('testPassingScore').value = test.passingScore || 50;
+            document.getElementById('testReleaseResults').checked = test.releaseResults !== false;
+            document.getElementById('testShowAnswers').checked = test.showAnswersImmediately !== false;
+
+            document.getElementById('editor-title-display').innerText = 'Editing Assessment';
+            
+            document.getElementById('questions-container').innerHTML = ''; 
+            qCounter = 0;
+            test.questions.forEach(q => addQuestion(q.type, q));
+        }
+
+        function addQuestion(type, data = null) {
+            qCounter++; 
+            const id = `q_${qCounter}`; 
+            const container = document.getElementById('questions-container');
+            const div = document.createElement('div');
+            
+            let label, borderCol, icon;
+            if (type === 'mcq') { label = 'Single Correct (MCQ)'; borderCol = 'border-l-brand'; icon = 'fa-circle-dot'; } 
+            else if (type === 'msq') { label = 'Multiple Correct (MSQ)'; borderCol = 'border-l-blue-500'; icon = 'fa-check-double'; } 
+            else { label = 'Short Answer'; borderCol = 'border-l-amber-500'; icon = 'fa-pen-clip'; }
+
+            div.className = `question-block admin-card p-5 border-l-4 ${borderCol} mb-4 relative bg-white`;
+            div.dataset.type = type;
+            
+            let optionsHtml = '';
+            if (type === 'mcq' || type === 'msq') {
+                const inputType = type === 'mcq' ? 'radio' : 'checkbox';
+                let optionsLength = data && data.options ? data.options.length : 4;
+                
+                optionsHtml += `<div class="options-list space-y-3" id="options_${id}">`;
+                for(let i=0; i<optionsLength; i++) {
+                    const isChecked = data && data.correctOptions && data.correctOptions.includes(i.toString()) ? 'checked' : '';
+                    const optVal = data && data.options[i] ? data.options[i].replace(/"/g, '&quot;') : '';
+                    optionsHtml += `
+                        <div class="flex items-center gap-3 option-row">
+                            <input type="${inputType}" name="ans_${id}" value="${i}" class="w-4 h-4 text-brand cursor-pointer" ${isChecked}>
+                            <input type="text" class="opt-input admin-input flex-1" placeholder="Option ${i+1}" value="${optVal}">
+                            <button type="button" class="text-slate-400 hover:text-red-500 px-2 transition" onclick="removeOption(this)" title="Remove Option"><i class="fa-solid fa-times"></i></button>
+                        </div>`;
+                }
+                optionsHtml += `</div>
+                <div class="mt-3 flex">
+                    <button type="button" class="text-xs font-bold text-brand bg-slate-100 hover:bg-slate-200 px-3 py-1.5 rounded transition flex items-center gap-1.5" onclick="addNewOption('${id}', '${type}')">
+                        <i class="fa-solid fa-plus"></i> Add Option
+                    </button>
+                </div>`;
+            } else {
+                const ans = data && data.correctOptions && data.correctOptions[0] ? data.correctOptions[0].replace(/"/g, '&quot;') : '';
+                optionsHtml = `
+                    <div class="flex items-center gap-3">
+                        <span class="text-sm font-semibold text-slate-600">Exact Answer:</span>
+                        <input type="text" class="fib-ans admin-input flex-1 font-bold" placeholder="e.g. Mitochondria" value="${ans}">
+                    </div>
+                `;
+            }
+
+            const imgUrl = data && data.imageUrl ? data.imageUrl : '';
+            const textVal = data && data.text ? data.text.replace(/"/g, '&quot;') : '';
+            const posMarksVal = data && data.positiveMarks !== undefined ? data.positiveMarks : 3;
+            const negMarksVal = data && data.negativeMarks !== undefined ? data.negativeMarks : 1;
+
+            div.innerHTML = `
+                <div class="flex flex-col md:flex-row justify-between md:items-center gap-4 mb-4 border-b border-slate-100 pb-3">
+                    <span class="text-sm font-bold text-slate-700 uppercase flex items-center gap-2"><i class="fa-solid ${icon} text-slate-400"></i> ${label}</span>
+                    <div class="flex items-center gap-4">
+                        <div class="flex items-center gap-1.5 bg-slate-50 p-1 rounded border border-slate-200">
+                            <span class="text-xs font-bold text-emerald-600 px-1">+</span>
+                            <input type="number" class="q-pos-marks admin-input !w-14 !py-0.5 !px-1 text-center text-xs font-bold" value="${posMarksVal}" min="0" step="0.5" title="Positive Marks">
+                            <span class="text-xs font-bold text-red-500 px-1 border-l border-slate-300">-</span>
+                            <input type="number" class="q-neg-marks admin-input !w-14 !py-0.5 !px-1 text-center text-xs font-bold" value="${negMarksVal}" min="0" step="0.5" title="Negative Marks">
+                        </div>
+                        <button onclick="this.closest('.question-block').remove()" class="text-red-400 hover:text-red-600 bg-red-50 p-2 rounded transition" title="Delete Question">
+                            <i class="fa-solid fa-trash-can"></i>
+                        </button>
+                    </div>
+                </div>
+                
+                <div class="flex flex-col md:flex-row gap-4 mb-5">
+                    <div class="flex-1">
+                        <label class="admin-label">Question Text</label>
+                        <textarea class="q-text admin-input min-h-[100px] resize-y" placeholder="Enter question text here...">${textVal}</textarea>
+                    </div>
+                    <div class="shrink-0 w-full md:w-48 relative group">
+                        <label class="admin-label text-center">Reference Image</label>
+                        <div class="h-[100px] bg-slate-100 rounded border-2 border-dashed border-slate-300 flex items-center justify-center overflow-hidden relative">
+                            ${imgUrl ? `<img src="${imgUrl}" class="q-img-preview w-full h-full object-cover">` : `<span class="q-img-preview text-xs font-semibold text-slate-400">No Image</span>`}
+                            <label class="absolute inset-0 bg-slate-900/50 flex flex-col items-center justify-center opacity-0 group-hover:opacity-100 cursor-pointer transition text-white text-[10px] font-bold">
+                                <i class="fa-solid fa-upload text-sm mb-1"></i> Upload
+                                <input type="file" accept="image/*" class="hidden" onchange="uploadQuestionImage(this, this.closest('.question-block'))">
+                            </label>
+                        </div>
+                        <input type="hidden" class="q-img-url" value="${imgUrl}">
+                        ${imgUrl ? `<button class="absolute -top-2 -right-2 bg-white text-red-500 border border-red-200 rounded-full w-6 h-6 flex items-center justify-center shadow hover:bg-red-50 z-10" onclick="removeQuestionImage(this.closest('.question-block'))"><i class="fa-solid fa-times text-[10px]"></i></button>` : ''}
+                    </div>
+                </div>
+                
+                <div class="bg-slate-50 p-4 rounded border border-slate-200">
+                    <label class="admin-label mb-3">Answers</label>
+                    ${optionsHtml}
+                </div>
+            `;
+            container.appendChild(div);
+        }
+
+        // --- NEW: Add / Remove Option Handlers ---
+        window.addNewOption = function(qId, type) {
+            const list = document.getElementById(`options_${qId}`);
+            if(!list) return;
+            const inputType = type === 'mcq' ? 'radio' : 'checkbox';
+            const rowCount = list.querySelectorAll('.option-row').length;
+            
+            const newRow = document.createElement('div');
+            newRow.className = 'flex items-center gap-3 option-row';
+            newRow.innerHTML = `
+                <input type="${inputType}" name="ans_${qId}" value="${rowCount}" class="w-4 h-4 text-brand cursor-pointer">
+                <input type="text" class="opt-input admin-input flex-1" placeholder="Option ${rowCount + 1}">
+                <button type="button" class="text-slate-400 hover:text-red-500 px-2 transition" onclick="removeOption(this)" title="Remove Option"><i class="fa-solid fa-times"></i></button>
+            `;
+            list.appendChild(newRow);
+        };
+
+        window.removeOption = function(btn) {
+            const list = btn.closest('.options-list');
+            if (list.querySelectorAll('.option-row').length <= 2) {
+                alert('A question must have at least 2 options.');
+                return;
+            }
+            btn.closest('.option-row').remove();
+            
+            // Re-update placeholders for empty inputs to maintain logical numbering UI
+            list.querySelectorAll('.option-row').forEach((row, index) => {
+                const input = row.querySelector('.opt-input');
+                if (!input.value) {
+                    input.placeholder = `Option ${index + 1}`;
+                }
+            });
+        };
+        // ----------------------------------------
+
+        async function uploadQuestionImage(inputElem, block) {
+            const file = inputElem.files[0]; if(!file) return;
+            try {
+                const res = await fetch(`${API_BASE_URL}/admin/content/upload-url`, { method: 'POST', headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` }, body: JSON.stringify({ fileName: file.name, fileType: file.type }) });
+                const data = await res.json(); 
+                await fetch(data.uploadUrl, { method: 'PUT', headers: { 'Content-Type': file.type }, body: file });
+                
+                const previewContainer = block.querySelector('.q-img-preview');
+                if (previewContainer.tagName === 'SPAN') {
+                    const img = document.createElement('img');
+                    img.className = 'q-img-preview w-full h-full object-cover';
+                    img.src = data.readUrl;
+                    previewContainer.replaceWith(img);
+                } else {
+                    previewContainer.src = data.readUrl; 
+                }
+                
+                block.querySelector('.q-img-url').value = data.readUrl;
+                
+                if(!block.querySelector('.fa-times')) {
+                    const btn = document.createElement('button');
+                    btn.className = "absolute -top-2 -right-2 bg-white text-red-500 border border-red-200 rounded-full w-6 h-6 flex items-center justify-center shadow hover:bg-red-50 z-10";
+                    btn.innerHTML = `<i class="fa-solid fa-times text-[10px]"></i>`;
+                    btn.onclick = () => removeQuestionImage(block);
+                    block.querySelector('.relative.group').appendChild(btn);
+                }
+            } catch(e) { alert('Image upload failed.'); }
+        }
+
+        function removeQuestionImage(block) {
+            const preview = block.querySelector('.q-img-preview');
+            const span = document.createElement('span');
+            span.className = 'q-img-preview text-xs font-semibold text-slate-400';
+            span.innerText = 'No Image';
+            preview.replaceWith(span);
+            block.querySelector('.q-img-url').value = '';
+            const btn = block.querySelector('.fa-times');
+            if(btn) btn.closest('button').remove();
+        }
+
+        async function saveTest(status) {
+            const title = document.getElementById('testTitle').value.trim(); 
+            const id = document.getElementById('edit-test-id').value;
+            
+            // Build Levels and Attempts
+            const levels = [];
+            const levelAttempts = {};
+            
+            const selectAllCb = document.getElementById('selectAllLevels');
+            if (selectAllCb && selectAllCb.checked) {
+                levels.push('All Levels');
+                const attemptsVal = parseInt(document.getElementById('attempts-All Levels').value) || 1;
+                levelAttempts['All Levels'] = attemptsVal;
+            } else {
+                document.querySelectorAll('.level-cb:checked').forEach(cb => {
+                    levels.push(cb.value);
+                    const safeId = cb.value.replace(/\s+/g, '-');
+                    const attemptsVal = parseInt(document.getElementById(`attempts-${safeId}`).value) || 1;
+                    levelAttempts[cb.value] = attemptsVal;
+                });
+            }
+
+            let startTime = document.getElementById('testStartTime').value;
+            let endTime = document.getElementById('testEndTime').value;
+            const timeLimit = document.getElementById('testTimeLimit').value;
+            const passingScore = document.getElementById('testPassingScore').value;
+            const releaseResults = document.getElementById('testReleaseResults').checked;
+            const showAnswersImmediately = document.getElementById('testShowAnswers').checked;
+
+            if(!title) return alert('Missing Assessment Title.');
+            if (levels.length === 0) return alert('Please select at least one Target Audience level.');
+            
+            if (startTime) startTime = new Date(startTime).toISOString();
+            if (endTime) endTime = new Date(endTime).toISOString();
+
+            const questions = [];
+            let isValid = true;
+            
+            document.querySelectorAll('.question-block').forEach((block, index) => {
+                const type = block.dataset.type; 
+                const text = block.querySelector('.q-text').value.trim(); 
+                const imageUrl = block.querySelector('.q-img-url').value;
+                const posMarks = parseFloat(block.querySelector('.q-pos-marks').value) || 3;
+                const negMarks = parseFloat(block.querySelector('.q-neg-marks').value) || 0;
+                
+                let options = [], correctOptions = [];
+                if(type === 'mcq' || type === 'msq') {
+                    block.querySelectorAll('.opt-input').forEach(i => options.push(i.value.trim()));
+                    // The loop relies on DOM order, supporting dynamic options perfectly
+                    block.querySelectorAll(`input[name^="ans_"]`).forEach((cb, idx) => { 
+                        if(cb.checked) correctOptions.push(idx.toString()); 
+                    });
+                } else { 
+                    const fibVal = block.querySelector('.fib-ans').value.trim();
+                    if(fibVal) correctOptions.push(fibVal); 
+                }
+                
+                if(!text) { alert(`Item ${index+1}: Question text missing.`); isValid = false; return; }
+                if(correctOptions.length === 0) { alert(`Item ${index+1}: Correct answer not specified.`); isValid = false; return; }
+
+                questions.push({ 
+                    id: `q${index}`, type, text, imageUrl, options, correctOptions, 
+                    positiveMarks: posMarks, negativeMarks: negMarks
+                });
+            });
+
+            if(!isValid) return;
+            if(questions.length === 0) return alert('At least one question is required.');
+
+            try {
+                const payload = { 
+                    id, title, levels, levelAttempts, status, questions, 
+                    startTime, endTime, timeLimit, passingScore, 
+                    releaseResults, showAnswersImmediately 
+                };
+                
+                const res = await fetch(`${API_BASE_URL}/admin/tests`, { 
+                    method: 'POST', 
+                    headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` }, 
+                    body: JSON.stringify(payload) 
+                });
+                
+                if(res.ok) { 
+                    alert(`Saved successfully as ${status}.`); 
+                    await fetchLibrary(); 
+                    hideEditor(); 
+                } else {
+                    throw new Error("Server synchronization failed");
+                }
+            } catch (e) { 
+                alert('Save failed: Network latency or backend issue.'); 
+            }
+        }
+
+        async function deleteTest(id) {
+            if(!confirm('Delete this assessment permanently?')) return;
+            try { 
+                await fetch(`${API_BASE_URL}/admin/tests/${id}`, { method: 'DELETE', headers: { 'Authorization': `Bearer ${token}` }}); 
+                fetchLibrary(); 
+            } catch(e) {
+                alert("Delete action failed.");
+            }
+        }
+
+        function logout() { localStorage.clear(); window.location.href = '../login.html'; }
+    </script>
+</body>
+</html>

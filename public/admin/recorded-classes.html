@@ -1,0 +1,833 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Geeky Researcher | Recorded Classes</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    
+    <link href="https://cdn.quilljs.com/1.3.6/quill.snow.css" rel="stylesheet">
+    <script src="https://cdn.quilljs.com/1.3.6/quill.js"></script>
+    
+    <script>
+        tailwind.config = { 
+            theme: { 
+                extend: { 
+                    fontFamily: { sans: ['Inter', 'sans-serif'] }, 
+                    colors: { brand: { light: '#14b8a6', DEFAULT: '#0f766e', dark: '#115e59' } } 
+                } 
+            } 
+        }
+    </script>
+    <style>
+        body { background-color: #f8fafc; color: #0f172a; }
+        .admin-card { background: white; border: 1px solid #e2e8f0; border-radius: 0.75rem; box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.05); }
+        .admin-input { background: white; border: 1px solid #cbd5e1; border-radius: 0.5rem; transition: all 0.2s; width: 100%; padding: 0.6rem 0.8rem; font-size: 0.875rem; color: #334155; font-weight: 500;}
+        .admin-input:focus { border-color: #0f766e; box-shadow: 0 0 0 3px rgba(15, 118, 110, 0.1); outline: none; }
+        .admin-input:disabled { background-color: #f1f5f9; cursor: not-allowed; color: #94a3b8;}
+        .admin-label { display: block; font-size: 0.875rem; font-weight: 700; color: #334155; margin-bottom: 0.5rem; }
+        
+        .btn-primary { background: #0f766e; color: white; border-radius: 0.5rem; font-weight: 600; padding: 0.75rem 1.5rem; transition: background 0.2s; border: none; cursor: pointer; display: inline-flex; align-items: center; justify-content: center;}
+        .btn-primary:hover { background: #115e59; }
+        .btn-secondary { background: white; border: 1px solid #cbd5e1; color: #334155; border-radius: 0.5rem; font-weight: 600; padding: 0.75rem 1.5rem; transition: all 0.2s; cursor: pointer; display: inline-flex; align-items: center; justify-content: center;}
+        .btn-secondary:hover { background: #f8fafc; border-color: #94a3b8; }
+
+        .sidebar-link { display: flex; align-items: center; gap: 0.75rem; padding: 0.75rem 1rem; color: #94a3b8; border-radius: 0.5rem; font-weight: 500; transition: all 0.2s; }
+        .sidebar-link:hover { background: #1e293b; color: #f8fafc; }
+        .sidebar-link.active { background: #1e293b; color: white; border-left: 4px solid #14b8a6; }
+        
+        .custom-scrollbar::-webkit-scrollbar { width: 6px; height: 6px; }
+        .custom-scrollbar::-webkit-scrollbar-track { background: transparent; }
+        .custom-scrollbar::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 10px; }
+        
+        .ql-toolbar.ql-snow { border-radius: 0.5rem 0.5rem 0 0; background: #f8fafc; border-color: #e2e8f0; }
+        .ql-container.ql-snow { border-radius: 0 0 0.5rem 0.5rem; border-color: #e2e8f0; font-family: 'Inter', sans-serif; font-size: 0.875rem; min-height: 250px; background: white; }
+
+        /* Type Cards */
+        .type-card { border: 2px solid #e2e8f0; border-radius: 0.75rem; padding: 1.25rem 1rem; cursor: pointer; transition: all 0.2s; background: white; display: flex; flex-direction: column; align-items: center; text-align: center; gap: 0.5rem;}
+        .type-card:hover { border-color: #cbd5e1; background: #f8fafc; transform: translateY(-2px); box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05); }
+        .type-card.selected { border-color: #0f766e; background: #f0fdf4; box-shadow: 0 4px 6px -1px rgba(15, 118, 110, 0.1); }
+        .type-card i { font-size: 2rem; margin-bottom: 0.25rem; }
+
+        /* Preview Rich Content */
+        .rich-content { font-size: 14px; line-height: 1.6; color: #475569; }
+        .rich-content h2, .rich-content h3 { color: #0f172a; font-weight: 700; margin-top: 1.5rem; margin-bottom: 0.5rem; border-bottom: 1px solid #e2e8f0; padding-bottom: 0.25rem;}
+        .rich-content p { margin-bottom: 1rem; }
+        .rich-content ul { list-style-type: disc; margin-left: 1.5rem; margin-bottom: 1rem; }
+        .rich-content img { border-radius: 0.5rem; max-width: 100%; border: 1px solid #e2e8f0; margin: 1rem 0; }
+
+        /* Toast */
+        .toast { transition: transform 0.3s ease-out, opacity 0.3s ease-out; transform: translateY(100%); opacity: 0; }
+        .toast.show { transform: translateY(0); opacity: 1; }
+    </style>
+</head>
+<body class="antialiased overflow-hidden w-full h-screen flex">
+
+    <!-- Toast Notification Container -->
+    <div id="toast-container" class="fixed bottom-5 right-5 z-[200] flex flex-col gap-2"></div>
+
+    <!-- Sidebar -->
+    <div class="w-64 bg-slate-900 flex-col hidden md:flex shrink-0 z-10 shadow-xl">
+        <div class="flex items-center gap-3 p-6 border-b border-slate-800">
+            <img src="https://res.cloudinary.com/dzuxwvamy/image/upload/v1783935221/WhatsApp_Image_2026-07-08_at_6.25.14_PM_aiuvde.jpg" class="w-10 h-10 rounded bg-white p-1 object-cover">
+            <div class="font-bold text-white leading-tight text-sm">Geeky Researcher<br><span class="text-brand-light font-normal text-xs">Admin Console</span></div>
+        </div>
+        <nav class="flex-1 space-y-2 p-4">
+            <a href="dashboard.html" class="sidebar-link"><i class="fa-solid fa-chart-line w-5 text-center"></i> Dashboard</a>
+            <a href="approvals.html" class="sidebar-link"><i class="fa-solid fa-user-check w-5 text-center"></i> Access Control</a>
+            <a href="content-builder.html" class="sidebar-link"><i class="fa-solid fa-folder-plus w-5 text-center"></i> Curriculum Builder</a>
+            <a href="recorded-classes.html" class="sidebar-link active"><i class="fa-solid fa-video w-5 text-center"></i> Recorded Classes</a>
+            <a href="test-creator.html" class="sidebar-link"><i class="fa-solid fa-vial w-5 text-center"></i> Assessments</a>
+            <a href="reports.html" class="sidebar-link"><i class="fa-solid fa-file-invoice w-5 text-center"></i> Reports</a>
+        </nav>
+        <div class="p-4 border-t border-slate-800">
+            <button onclick="logout()" class="w-full text-left text-sm text-red-400 font-medium hover:text-red-300 py-2 transition"><i class="fa-solid fa-sign-out-alt mr-2"></i> Sign Out</button>
+        </div>
+    </div>
+
+    <!-- Preview Modal -->
+    <div id="preview-modal" class="hidden fixed inset-0 z-[100] bg-slate-900/80 backdrop-blur-sm flex items-center justify-center p-4">
+        <div class="bg-slate-50 w-full max-w-4xl max-h-[90vh] flex flex-col overflow-hidden shadow-2xl rounded-xl border border-slate-700">
+            <div class="bg-white border-b border-slate-200 px-6 py-4 flex justify-between items-center shrink-0">
+                <div class="flex items-center gap-3">
+                    <span class="bg-emerald-100 text-emerald-700 px-2 py-1 rounded text-xs font-bold uppercase tracking-wider"><i class="fa-solid fa-eye mr-1"></i> Student View Preview</span>
+                </div>
+                <button onclick="document.getElementById('preview-modal').classList.add('hidden')" class="text-slate-500 hover:text-slate-800 bg-slate-100 hover:bg-slate-200 rounded px-4 py-2 text-sm font-bold transition">Close Preview</button>
+            </div>
+            
+            <div class="flex-1 overflow-y-auto custom-scrollbar p-6 md:p-10">
+                <div class="max-w-3xl mx-auto w-full">
+                    
+                    <!-- Video Preview Block -->
+                    <div id="video-preview-block" class="w-full aspect-video bg-slate-900 rounded-xl flex items-center justify-center shadow-lg border border-slate-700 mb-6 hidden overflow-hidden">
+                        <div class="text-slate-500 flex flex-col items-center">
+                            <i class="fa-solid fa-circle-play text-6xl mb-4 text-brand bg-white rounded-full"></i>
+                            <p class="font-bold text-sm text-slate-300" id="preview-filename-display">Secure Video Stream Placeholder</p>
+                        </div>
+                    </div>
+
+                    <div class="bg-white border border-slate-200 rounded-xl p-8 shadow-sm">
+                        <span id="preview-type-badge" class="inline-block px-2 py-0.5 bg-slate-100 border border-slate-200 text-slate-500 text-[10px] font-bold tracking-widest uppercase rounded mb-3">Item Type</span>
+                        <h1 id="preview-title" class="text-2xl md:text-3xl font-bold text-slate-900 leading-tight border-b border-slate-100 pb-4 mb-6">Content Title</h1>
+                        
+                        <div id="preview-body" class="rich-content min-h-[150px]">
+                            <!-- Rendered Notes HTML here -->
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- OpenRouter AI Settings Modal -->
+    <div id="ai-modal" class="hidden fixed inset-0 bg-slate-900/60 z-50 flex items-center justify-center p-4">
+        <div class="bg-white rounded-xl shadow-2xl w-full max-w-md overflow-hidden border border-slate-200">
+            <div class="bg-gradient-to-r from-purple-600 to-indigo-600 p-5 flex justify-between items-center">
+                <h3 class="font-bold text-white flex items-center gap-2"><i class="fa-solid fa-wand-magic-sparkles"></i> AI Transcription Assist</h3>
+                <button onclick="document.getElementById('ai-modal').classList.add('hidden')" class="text-white/80 hover:text-white"><i class="fa-solid fa-times text-xl"></i></button>
+            </div>
+            <div class="p-8">
+                <p class="text-sm text-slate-600 mb-6">Leverage OpenRouter to automatically generate structured notes, summaries, or transcripts based on your video topic.</p>
+                
+                <div class="mb-5">
+                    <label class="admin-label">OpenRouter API Key <span class="text-[10px] font-normal text-slate-400 block mt-1">(Saved locally in your browser)</span></label>
+                    <input type="password" id="openRouterKey" class="admin-input font-mono" placeholder="sk-or-v1-...">
+                </div>
+                
+                <div class="mb-6">
+                    <label class="admin-label">AI Instruction Prompt</label>
+                    <textarea id="aiPrompt" class="admin-input h-28 resize-none" placeholder="e.g. Generate a detailed study outline for a medical lecture on Cellular Pathology..."></textarea>
+                </div>
+
+                <button onclick="generateAiNotes()" id="generateAiBtn" class="w-full bg-purple-600 hover:bg-purple-700 text-white font-bold py-3 rounded-lg shadow-md transition flex items-center justify-center gap-2">
+                    <i class="fa-solid fa-bolt"></i> Generate Notes
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Main Content -->
+    <div class="flex-1 overflow-hidden flex flex-col h-full bg-slate-50 relative">
+        <div class="px-8 py-6 border-b border-slate-200 bg-white flex justify-between items-center shrink-0 shadow-sm z-10">
+            <div>
+                <h2 class="text-2xl font-bold text-slate-900">Recorded Classes Engine</h2>
+                <p class="text-sm text-slate-500 mt-1">Organize video lectures into structured folders with specific level-based access.</p>
+            </div>
+            <button class="btn-primary shadow-md" onclick="resetForm()">
+                <i class="fa-solid fa-plus mr-2"></i> Add New Recording
+            </button>
+        </div>
+
+        <div class="flex flex-col lg:flex-row flex-1 overflow-hidden">
+            
+            <!-- LEFT: Directory Tree -->
+            <div class="w-full lg:w-[350px] shrink-0 border-r border-slate-200 bg-white flex flex-col h-full relative">
+                <div class="p-4 border-b border-slate-100 bg-slate-50/50 flex items-center justify-between">
+                    <h3 class="font-bold text-slate-800 text-sm uppercase tracking-wider"><i class="fa-solid fa-sitemap text-brand mr-2"></i> Repository</h3>
+                    <button onclick="fetchRecordings()" class="text-slate-400 hover:text-brand transition" title="Refresh Tree"><i class="fa-solid fa-sync-alt"></i></button>
+                </div>
+                <div class="flex-1 overflow-y-auto custom-scrollbar p-4" id="hierarchy-tree">
+                    <div class="text-center text-slate-400 py-10"><i class="fa-solid fa-circle-notch fa-spin mb-2 text-2xl"></i><br>Loading structure...</div>
+                </div>
+            </div>
+
+            <!-- RIGHT: Dynamic Editor -->
+            <div class="flex-1 overflow-y-auto custom-scrollbar p-6 md:p-8 bg-slate-50 relative">
+                
+                <form id="recordForm" onsubmit="handleFormSubmit(event)" class="max-w-4xl mx-auto pb-20">
+                    
+                    <div id="upload-overlay" class="absolute inset-0 bg-white/90 z-50 hidden flex-col items-center justify-center backdrop-blur-sm rounded-xl border border-slate-200">
+                        <i class="fa-solid fa-cloud-arrow-up text-5xl text-brand mb-4 animate-bounce"></i>
+                        <h3 class="font-bold text-slate-800 text-xl">Uploading Secure Video...</h3>
+                        <p class="text-sm font-medium text-slate-500 mt-2" id="upload-status-text">Please wait, pushing to AWS S3. Do not close this window.</p>
+                    </div>
+
+                    <div class="flex justify-between items-end mb-6">
+                        <div>
+                            <h3 id="form-main-title" class="text-2xl font-bold text-slate-900">Create New Entry</h3>
+                            <span id="edit-badge" class="hidden bg-amber-100 text-amber-800 px-2 py-1 rounded text-xs font-bold uppercase tracking-wider mt-2 inline-block"><i class="fa-solid fa-pen mr-1"></i> Edit Mode</span>
+                        </div>
+                        <button type="button" onclick="previewContent()" class="btn-secondary text-sm"><i class="fa-solid fa-eye mr-2"></i> Preview</button>
+                    </div>
+
+                    <input type="hidden" id="editRecordId">
+                    <input type="hidden" id="recordType" value="folder">
+                    
+                    <!-- Step 1: Type Selection -->
+                    <div class="admin-card p-8 mb-8 border-t-4 border-t-brand">
+                        <div class="flex items-center gap-3 mb-6">
+                            <div class="w-8 h-8 rounded-full bg-brand/10 text-brand flex items-center justify-center font-bold">1</div>
+                            <h4 class="text-lg font-bold text-slate-800">What are you creating?</h4>
+                        </div>
+                        <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                            <div onclick="selectEntryType('folder')" class="type-card selected" id="type-folder">
+                                <i class="fa-solid fa-folder text-brand"></i>
+                                <span class="font-bold text-sm text-slate-800">Main Folder</span>
+                                <span class="text-xs text-slate-500">Root Grouping (e.g. Year)</span>
+                            </div>
+                            <div onclick="selectEntryType('subfolder')" class="type-card" id="type-subfolder">
+                                <i class="fa-regular fa-folder-open text-blue-500"></i>
+                                <span class="font-bold text-sm text-slate-800">Sub-Folder</span>
+                                <span class="text-xs text-slate-500">Nested Group (e.g. Subject)</span>
+                            </div>
+                            <div onclick="selectEntryType('video')" class="type-card" id="type-video">
+                                <i class="fa-solid fa-circle-play text-purple-500"></i>
+                                <span class="font-bold text-sm text-slate-800">Video Class</span>
+                                <span class="text-xs text-slate-500">Actual Secure Video File</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Step 2: Details & Access -->
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-8 mb-8">
+                        <div class="admin-card p-8">
+                            <div class="flex items-center gap-3 mb-6">
+                                <div class="w-8 h-8 rounded-full bg-slate-100 text-slate-600 flex items-center justify-center font-bold">2</div>
+                                <h4 class="text-lg font-bold text-slate-800">Placement & Identity</h4>
+                            </div>
+                            <label class="admin-label">Parent Directory</label>
+                            <select id="recordParent" class="admin-input bg-slate-100 mb-6" disabled>
+                                <option value="">-- Main Folders sit at root --</option>
+                            </select>
+                            
+                            <label class="admin-label">Title / Name</label>
+                            <input type="text" id="recordTitle" class="admin-input font-bold text-lg" placeholder="e.g., Cellular Pathology Lecture" required>
+                        </div>
+                        
+                        <div class="admin-card p-8 border-l-4 border-l-amber-400">
+                            <div class="flex items-center gap-3 mb-6">
+                                <div class="w-8 h-8 rounded-full bg-amber-100 text-amber-700 flex items-center justify-center font-bold"><i class="fa-solid fa-users"></i></div>
+                                <h4 class="text-lg font-bold text-slate-800">Access Permissions</h4>
+                            </div>
+                            <label class="admin-label">Target Audience <span class="text-xs font-normal text-amber-600 block mt-1">If unchecked, it automatically inherits access from its parent folder.</span></label>
+                            <div class="mt-2 border border-slate-200 rounded-lg bg-slate-50 overflow-hidden">
+                                <label class="flex items-center gap-3 cursor-pointer p-3 border-b border-slate-200 bg-white hover:bg-slate-50 transition">
+                                    <input type="checkbox" id="selectAllLevels" value="All Levels" class="w-4 h-4 text-brand" onchange="toggleAllLevels(this)">
+                                    <span class="font-bold text-sm text-slate-800">Global (All Levels)</span>
+                                </label>
+                                <div id="levelCheckboxes" class="max-h-32 overflow-y-auto custom-scrollbar p-2 space-y-1">
+                                    <span class="text-slate-400 text-xs italic px-2">Loading levels...</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Step 3: Media & Notes (Dynamic) -->
+                    <div id="video-container" class="hidden flex-col gap-8 mb-8 animate-[fadeIn_0.3s_ease-in-out]">
+                        
+                        <!-- Video Upload -->
+                        <div class="admin-card p-8 border-l-4 border-l-purple-500 bg-slate-50 shadow-md">
+                            <div class="flex items-center gap-3 mb-4">
+                                <div class="w-8 h-8 rounded-full bg-purple-600 text-white flex items-center justify-center font-bold"><i class="fa-solid fa-cloud-arrow-up"></i></div>
+                                <h4 class="text-lg font-bold text-slate-800">Secure Video Attachment</h4>
+                            </div>
+                            
+                            <!-- Default Upload Box -->
+                            <div id="upload-dropzone" class="bg-white border-2 border-dashed border-slate-300 rounded-lg flex flex-col items-center justify-center p-10 text-center transition hover:border-purple-400">
+                                <i class="fa-solid fa-file-video text-5xl text-purple-200 mb-4"></i>
+                                <p class="text-sm font-medium text-slate-600 mb-6">Select an MP4 or WebM file. It will be securely streamed to prevent unauthorized downloads.</p>
+                                <input type="file" id="videoFile" accept="video/mp4,video/webm" class="text-sm border border-slate-300 rounded-md p-2 bg-slate-50 cursor-pointer w-full max-w-xs shadow-sm font-semibold">
+                            </div>
+
+                            <!-- "File Exists" State Box (Hidden by default) -->
+                            <div id="existing-file-card" class="hidden bg-emerald-50 border border-emerald-200 rounded-lg p-6 flex flex-col sm:flex-row items-center justify-between gap-4">
+                                <div class="flex items-center gap-4 min-w-0">
+                                    <div class="w-12 h-12 bg-emerald-100 text-emerald-600 rounded-full flex items-center justify-center text-xl shrink-0"><i class="fa-solid fa-check"></i></div>
+                                    <div class="min-w-0">
+                                        <h4 class="font-bold text-emerald-800 text-base mb-1">Video Successfully Attached</h4>
+                                        <p class="text-sm text-emerald-600 font-medium truncate" id="existing-filename">video.mp4</p>
+                                    </div>
+                                </div>
+                                <button type="button" onclick="revealUploader()" class="px-4 py-2 bg-white border border-emerald-200 text-emerald-700 rounded-md shadow-sm hover:bg-emerald-100 text-sm font-bold transition shrink-0">Replace Video</button>
+                            </div>
+                        </div>
+
+                    </div>
+
+                    <!-- Notes Editor (Always visible) -->
+                    <div class="admin-card p-8 flex flex-col min-h-[350px] shadow-md">
+                        <div class="flex justify-between items-center mb-4 border-b border-slate-100 pb-3">
+                            <div class="flex items-center gap-3">
+                                <div class="w-8 h-8 rounded-full bg-slate-200 text-slate-600 flex items-center justify-center font-bold"><i class="fa-solid fa-align-left text-sm"></i></div>
+                                <div>
+                                    <h4 class="text-lg font-bold text-slate-800">Class Notes & Transcripts</h4>
+                                    <p class="text-xs text-slate-500 font-normal">Use this editor to write notes. You can also insert inline images using the toolbar.</p>
+                                </div>
+                            </div>
+                            <button type="button" onclick="document.getElementById('ai-modal').classList.remove('hidden')" class="text-xs font-bold text-purple-600 bg-purple-50 hover:bg-purple-100 px-4 py-2 rounded-md transition flex items-center gap-2 border border-purple-200 shadow-sm shrink-0">
+                                <i class="fa-solid fa-wand-magic-sparkles"></i> AI Generation
+                            </button>
+                        </div>
+                        <div id="quill-editor" class="flex-1 bg-white mt-2"></div>
+                    </div>
+
+                    <!-- Actions -->
+                    <div class="flex gap-4 mt-8">
+                        <button type="button" onclick="resetForm()" class="btn-secondary flex-1 shadow-sm text-base py-3 font-bold text-slate-500">Cancel</button>
+                        <button type="submit" id="submitBtn" class="btn-primary flex-[2] shadow-md text-lg py-3 font-bold">
+                            <i class="fa-solid fa-save mr-2"></i> Save Entry
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const API_BASE_URL = 'http://localhost:5000/api';
+        const token = localStorage.getItem('token');
+        const user = JSON.parse(localStorage.getItem('user'));
+        
+        let quill;
+        let allRecordings = [];
+        let allLevels = [];
+
+        if (!token || !user || user.role !== 'admin') { 
+            localStorage.clear(); 
+            window.location.href = '../login.html'; 
+        }
+
+        document.addEventListener('DOMContentLoaded', async () => {
+            initQuill();
+            loadAiKey();
+            await fetchLevels();
+            await fetchRecordings();
+        });
+
+        // Simple Custom Toast Notification
+        function showToast(message, type = 'success') {
+            const container = document.getElementById('toast-container');
+            const toast = document.createElement('div');
+            const bgClass = type === 'success' ? 'bg-emerald-50 border-emerald-200 text-emerald-800' : 'bg-red-50 border-red-200 text-red-800';
+            const iconClass = type === 'success' ? 'fa-check-circle text-emerald-500' : 'fa-exclamation-circle text-red-500';
+
+            toast.className = `toast flex items-center gap-3 p-4 border rounded-lg shadow-lg font-medium text-sm w-72 ${bgClass}`;
+            toast.innerHTML = `<i class="fa-solid ${iconClass} text-lg"></i> <span class="flex-1">${message}</span>`;
+            
+            container.appendChild(toast);
+            requestAnimationFrame(() => toast.classList.add('show'));
+            setTimeout(() => {
+                toast.classList.remove('show');
+                setTimeout(() => toast.remove(), 300);
+            }, 3000);
+        }
+
+        function initQuill() {
+            quill = new Quill('#quill-editor', {
+                theme: 'snow',
+                modules: {
+                    toolbar: {
+                        container: [
+                            [{ 'header': [1, 2, 3, false] }],
+                            ['bold', 'italic', 'underline', 'strike'],
+                            [{ 'list': 'ordered'}, { 'list': 'bullet' }],
+                            ['link', 'image', 'video'],
+                            ['clean']
+                        ],
+                        handlers: {
+                            image: () => selectLocalMedia('image'),
+                            video: () => selectLocalMedia('video')
+                        }
+                    }
+                },
+                placeholder: 'Type manual notes here, or click "AI Generation" to automatically build structure...'
+            });
+        }
+
+        function selectLocalMedia(type) {
+            const input = document.createElement('input');
+            input.setAttribute('type', 'file');
+            input.setAttribute('accept', type === 'image' ? 'image/*' : 'video/mp4,video/webm');
+            input.click();
+
+            input.onchange = async () => {
+                const file = input.files[0];
+                if (!file) return;
+
+                const overlay = document.getElementById('upload-overlay');
+                overlay.classList.remove('hidden');
+                overlay.classList.add('flex');
+                document.getElementById('upload-status-text').innerText = `Uploading inline ${type} securely to S3...`;
+
+                try {
+                    const res = await fetch(`${API_BASE_URL}/admin/content/upload-url`, { 
+                        method: 'POST', 
+                        headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` }, 
+                        body: JSON.stringify({ fileName: file.name, fileType: file.type }) 
+                    });
+                    const data = await res.json();
+                    
+                    await fetch(data.uploadUrl, { method: 'PUT', headers: { 'Content-Type': file.type }, body: file });
+                    
+                    const range = quill.getSelection(true);
+                    quill.insertEmbed(range.index, type, data.readUrl);
+                    quill.setSelection(range.index + 1);
+                } catch (err) { 
+                    showToast('S3 Media Upload failed.', 'error'); 
+                } finally { 
+                    overlay.classList.add('hidden'); 
+                    overlay.classList.remove('flex'); 
+                }
+            };
+        }
+
+        /* --- Filename Extractor --- */
+        function extractFilename(s3Key) {
+            if (!s3Key) return 'Secure Uploaded File';
+            const parts = s3Key.split('-');
+            if (parts.length > 1) { return parts.slice(1).join('-'); }
+            return s3Key.split('/').pop();
+        }
+
+        function revealUploader() {
+            document.getElementById('existing-file-card').classList.add('hidden');
+            document.getElementById('upload-dropzone').classList.remove('hidden');
+            document.getElementById('upload-dropzone').classList.add('flex');
+            document.getElementById('videoFile').value = '';
+        }
+
+        async function fetchLevels() {
+            try {
+                const res = await fetch(`${API_BASE_URL}/admin/levels`, { headers: { 'Authorization': `Bearer ${token}` } });
+                allLevels = await res.json();
+                
+                const container = document.getElementById('levelCheckboxes');
+                container.innerHTML = '';
+                
+                allLevels.forEach(lvl => {
+                    container.innerHTML += `
+                        <label class="flex items-center gap-3 cursor-pointer hover:bg-slate-100 p-2 rounded-md transition border border-transparent hover:border-slate-200">
+                            <input type="checkbox" value="${lvl.levelName}" class="level-cb w-4 h-4 text-brand" onchange="updateAllLevelsCheckbox()">
+                            <span class="text-slate-700 font-medium">${lvl.levelName}</span>
+                        </label>
+                    `;
+                });
+            } catch(e) { console.error("Failed to fetch levels"); }
+        }
+
+        function toggleAllLevels(selectAllCb) {
+            document.querySelectorAll('.level-cb').forEach(cb => cb.checked = selectAllCb.checked);
+        }
+
+        function updateAllLevelsCheckbox() {
+            const checkboxes = document.querySelectorAll('.level-cb');
+            document.getElementById('selectAllLevels').checked = Array.from(checkboxes).every(cb => cb.checked);
+        }
+
+        function getSelectedLevels() {
+            const selectAllCb = document.getElementById('selectAllLevels');
+            if (selectAllCb && selectAllCb.checked) return ['All Levels'];
+            return Array.from(document.querySelectorAll('.level-cb:checked')).map(cb => cb.value);
+        }
+
+        function setSelectedLevels(levelsArray) {
+            const checkboxes = document.querySelectorAll('.level-cb');
+            const selectAllCb = document.getElementById('selectAllLevels');
+            
+            checkboxes.forEach(cb => cb.checked = false);
+            if(selectAllCb) selectAllCb.checked = false;
+
+            if (!levelsArray || levelsArray.length === 0) return;
+
+            if (levelsArray.includes('All Levels')) {
+                if(selectAllCb) selectAllCb.checked = true;
+                checkboxes.forEach(cb => cb.checked = true);
+            } else {
+                checkboxes.forEach(cb => { cb.checked = levelsArray.includes(cb.value); });
+            }
+        }
+
+        // --- Visual Card Selection ---
+        function selectEntryType(type) {
+            document.getElementById('recordType').value = type;
+            
+            // Visual Update
+            document.querySelectorAll('.type-card').forEach(card => card.classList.remove('selected'));
+            document.getElementById(`type-${type}`).classList.add('selected');
+
+            toggleFormMode();
+        }
+
+        function toggleFormMode() {
+            const type = document.getElementById('recordType').value;
+            const parentSelect = document.getElementById('recordParent');
+            const videoContainer = document.getElementById('video-container');
+            
+            if (type === 'folder') {
+                parentSelect.disabled = true; 
+                parentSelect.classList.add('bg-slate-100'); 
+                parentSelect.innerHTML = '<option value="">-- Main Folders sit at root --</option>';
+                videoContainer.classList.add('hidden');
+                videoContainer.classList.remove('flex');
+            } else {
+                parentSelect.disabled = false; 
+                parentSelect.classList.remove('bg-slate-100');
+                populateParentOptions(type);
+                
+                if(type === 'video') {
+                    videoContainer.classList.remove('hidden');
+                    videoContainer.classList.add('flex');
+                } else {
+                    videoContainer.classList.add('hidden');
+                    videoContainer.classList.remove('flex');
+                }
+            }
+        }
+
+        function populateParentOptions(type) {
+            const parentSelect = document.getElementById('recordParent');
+            parentSelect.innerHTML = '<option value="" disabled selected>-- Select a Parent Folder --</option>';
+            const targetParentType = type === 'subfolder' ? 'folder' : 'subfolder';
+            const validParents = allRecordings.filter(r => r.type === targetParentType);
+            validParents.forEach(p => parentSelect.innerHTML += `<option value="${p.id}">${p.title}</option>`);
+        }
+
+        async function fetchRecordings() {
+            try {
+                const res = await fetch(`${API_BASE_URL}/admin/recordings`, { headers: { 'Authorization': `Bearer ${token}` } });
+                allRecordings = await res.json();
+                renderTree();
+                toggleFormMode(); 
+            } catch (e) {
+                document.getElementById('hierarchy-tree').innerHTML = '<p class="text-red-500 text-center py-4">Failed to load repository.</p>';
+            }
+        }
+
+        function renderTree() {
+            const tree = document.getElementById('hierarchy-tree');
+            tree.innerHTML = '';
+            
+            const folders = allRecordings.filter(c => c.type === 'folder');
+            if(folders.length === 0) { 
+                tree.innerHTML = '<div class="text-center text-slate-400 py-10"><i class="fa-solid fa-video-slash text-4xl mb-3 opacity-50"></i><br><span class="text-sm font-medium">Repository is empty.</span></div>'; 
+                return; 
+            }
+
+            folders.forEach(folder => {
+                let html = buildNodeHtml(folder, 'fa-folder', 'text-brand', true);
+                html += `<div class="tree-children border-l border-slate-200 ml-3 pl-3 mt-1 space-y-1 mb-3">`;
+                
+                const subfolders = allRecordings.filter(c => c.parentId === folder.id);
+                subfolders.forEach(sub => {
+                    html += buildNodeHtml(sub, 'fa-folder-open', 'text-blue-500', false);
+                    html += `<div class="tree-children border-l border-slate-100 ml-3 pl-3 mt-1 space-y-1 mb-2">`;
+                    
+                    const videos = allRecordings.filter(c => c.parentId === sub.id);
+                    videos.forEach(vid => {
+                        html += buildNodeHtml(vid, 'fa-circle-play', 'text-purple-500', false, true);
+                    });
+                    html += `</div>`; 
+                });
+                html += `</div>`; 
+                tree.innerHTML += html;
+            });
+        }
+
+        function buildNodeHtml(node, iconClass, colorClass, isRoot = false, isVideo = false) {
+            const hasS3File = node.s3Key ? true : false;
+            const fileBadge = hasS3File ? `<span class="text-[9px] bg-slate-200 text-slate-600 px-1.5 py-0.5 rounded ml-2 font-bold whitespace-nowrap"><i class="fa-solid fa-paperclip"></i> Attached</span>` : '';
+            
+            let levelTags = '';
+            if(node.levels && node.levels.length > 0) {
+                const lText = node.levels.includes('All Levels') ? 'All' : node.levels.length;
+                levelTags = `<span class="text-[9px] text-slate-400 ml-1">(${lText})</span>`;
+            }
+
+            const bgClass = isRoot ? 'bg-slate-100 border border-slate-200' : 'hover:bg-slate-50 border border-transparent';
+            const padding = isRoot ? 'p-2 mt-2 rounded' : 'py-1 px-1 rounded';
+            const titleClass = isRoot ? 'font-bold text-sm text-slate-800' : (isVideo ? 'font-medium text-xs text-slate-600' : 'font-semibold text-[13px] text-slate-700');
+
+            return `
+                <div class="group flex justify-between items-start ${bgClass} ${padding} transition cursor-pointer" onclick="editRecord('${node.id}')">
+                    <div class="flex-1 overflow-hidden flex items-center">
+                        <div class="${titleClass} flex items-center truncate">
+                            <i class="fa-solid ${iconClass} ${colorClass} w-5 text-center mr-1"></i> ${node.title}
+                        </div>
+                        ${levelTags}
+                        ${fileBadge}
+                    </div>
+                    <div class="hidden group-hover:flex gap-1 pl-2 pt-0.5 bg-white shadow-sm rounded px-1 shrink-0">
+                        <button type="button" onclick="editRecord('${node.id}'); event.stopPropagation();" class="text-slate-400 hover:text-brand transition w-5 h-5 flex items-center justify-center border border-slate-200 rounded" title="Edit"><i class="fa-solid fa-pen text-[9px]"></i></button>
+                        <button type="button" onclick="deleteRecord('${node.id}'); event.stopPropagation();" class="text-slate-400 hover:text-red-500 transition w-5 h-5 flex items-center justify-center border border-red-100 rounded" title="Delete"><i class="fa-solid fa-trash text-[9px]"></i></button>
+                    </div>
+                </div>`;
+        }
+
+
+        /* --- Editing, Preview & Submit --- */
+        function previewContent() {
+            const title = document.getElementById('recordTitle').value || 'Untitled Entry';
+            const type = document.getElementById('recordType').value;
+            const bodyContainer = document.getElementById('preview-body');
+            const videoBlock = document.getElementById('video-preview-block');
+            
+            document.getElementById('preview-title').innerText = title;
+            document.getElementById('preview-type-badge').innerText = type.toUpperCase();
+            
+            if (type === 'video') {
+                videoBlock.classList.remove('hidden');
+                const fileInput = document.getElementById('videoFile');
+                const existingFileCard = document.getElementById('existing-file-card');
+                
+                if(fileInput && fileInput.files.length > 0) {
+                    // Playable local video specifically requested
+                    const fileUrl = URL.createObjectURL(fileInput.files[0]);
+                    videoBlock.innerHTML = `<video src="${fileUrl}" controls class="w-full h-full max-h-[400px] object-contain bg-black"></video>`;
+                } else if(existingFileCard && !existingFileCard.classList.contains('hidden')) {
+                    videoBlock.innerHTML = `
+                        <div class="text-slate-500 flex flex-col items-center py-12 bg-slate-800 w-full h-full">
+                            <i class="fa-solid fa-cloud text-6xl mb-4 text-brand-light"></i>
+                            <p class="font-bold text-sm text-slate-300 mt-2">File is securely stored in AWS</p>
+                            <p class="text-xs text-slate-400 mt-1">${document.getElementById('existing-filename').innerText}</p>
+                        </div>`;
+                } else {
+                    videoBlock.innerHTML = `
+                        <div class="text-slate-500 flex flex-col items-center py-12 bg-slate-100 border border-slate-300 w-full h-full">
+                            <i class="fa-solid fa-circle-play text-6xl mb-4 text-purple-300 bg-white rounded-full"></i>
+                            <p class="font-bold text-sm text-slate-500">Secure Video Stream Placeholder</p>
+                        </div>`;
+                }
+            } else {
+                videoBlock.classList.add('hidden');
+                videoBlock.innerHTML = '';
+            }
+
+            bodyContainer.innerHTML = quill.root.innerHTML || '<p class="text-slate-400 italic text-sm">No notes or transcripts provided.</p>';
+            
+            document.getElementById('preview-modal').classList.remove('hidden');
+        }
+
+        function editRecord(id) {
+            const item = allRecordings.find(c => c.id === id);
+            if (!item) return;
+
+            // Reset UI first
+            document.getElementById('upload-dropzone').classList.remove('hidden');
+            document.getElementById('upload-dropzone').classList.add('flex');
+            document.getElementById('existing-file-card').classList.add('hidden');
+            document.getElementById('existing-file-card').classList.remove('flex');
+            document.getElementById('videoFile').value = '';
+
+            document.getElementById('editRecordId').value = item.id;
+            document.getElementById('recordTitle').value = item.title;
+            
+            selectEntryType(item.type);
+            setSelectedLevels(item.levels || []);
+
+            if (item.parentId) {
+                document.getElementById('recordParent').value = item.parentId;
+            }
+
+            quill.clipboard.dangerouslyPasteHTML(item.notes || '');
+            
+            if (item.type === 'video') {
+                if(item.s3Key) {
+                    const filename = extractFilename(item.s3Key);
+                    document.getElementById('existing-filename').innerText = filename;
+                    
+                    document.getElementById('upload-dropzone').classList.add('hidden');
+                    document.getElementById('upload-dropzone').classList.remove('flex');
+                    document.getElementById('existing-file-card').classList.remove('hidden');
+                    document.getElementById('existing-file-card').classList.add('flex');
+                }
+            }
+
+            document.getElementById('form-main-title').innerText = `Editing: ${item.title}`;
+            document.getElementById('edit-badge').classList.remove('hidden');
+            document.getElementById('submitBtn').innerHTML = `<i class="fa-solid fa-check mr-2"></i> Update Entry`;
+        }
+
+        function resetForm() {
+            document.getElementById('recordForm').reset();
+            document.getElementById('editRecordId').value = '';
+            setSelectedLevels([]);
+            quill.setContents([]);
+            
+            // Reset File UI
+            document.getElementById('upload-dropzone').classList.remove('hidden');
+            document.getElementById('upload-dropzone').classList.add('flex');
+            document.getElementById('existing-file-card').classList.add('hidden');
+            document.getElementById('existing-file-card').classList.remove('flex');
+            document.getElementById('videoFile').value = '';
+            
+            document.getElementById('form-main-title').innerText = `Create New Entry`;
+            document.getElementById('edit-badge').classList.add('hidden');
+            document.getElementById('submitBtn').innerHTML = `<i class="fa-solid fa-save mr-2"></i> Save Entry`;
+            
+            selectEntryType('folder');
+        }
+
+        async function deleteRecord(id) {
+            if(!confirm('Delete this entry? Note: Ensure folders are empty before deleting.')) return;
+            try {
+                const res = await fetch(`${API_BASE_URL}/admin/recordings/${id}`, { method: 'DELETE', headers: { 'Authorization': `Bearer ${token}` } });
+                if(res.ok) {
+                    showToast('Deleted successfully.');
+                    fetchRecordings();
+                }
+            } catch (e) { showToast('Delete failed.', 'error'); }
+        }
+
+        async function handleFormSubmit(e) {
+            e.preventDefault();
+            
+            const id = document.getElementById('editRecordId').value;
+            const title = document.getElementById('recordTitle').value.trim();
+            const levels = getSelectedLevels();
+            const type = document.getElementById('recordType').value;
+            const parentId = document.getElementById('recordParent').value;
+            const notes = quill.root.innerHTML;
+            const fileInput = document.getElementById('videoFile');
+            
+            if (levels.length === 0) return showToast("Please select at least one Target Audience level.", "error");
+            if (type !== 'folder' && !parentId) return showToast('Please select a Parent Directory.', "error");
+            
+            const submitBtn = document.getElementById('submitBtn');
+            const originalText = submitBtn.innerHTML;
+            submitBtn.innerHTML = `<i class="fa-solid fa-circle-notch fa-spin mr-2"></i> Saving...`; 
+            submitBtn.disabled = true;
+
+            try {
+                let s3Key = null;
+                
+                // Handle S3 Upload
+                if (type === 'video' && fileInput.files.length > 0) {
+                    const file = fileInput.files[0];
+                    const overlay = document.getElementById('upload-overlay');
+                    overlay.classList.remove('hidden'); overlay.classList.add('flex');
+                    document.getElementById('upload-status-text').innerText = `Uploading ${file.name}... Please do not refresh.`;
+
+                    const urlRes = await fetch(`${API_BASE_URL}/admin/content/upload-url`, { 
+                        method: 'POST', 
+                        headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` }, 
+                        body: JSON.stringify({ fileName: file.name, fileType: file.type }) 
+                    });
+                    
+                    if(!urlRes.ok) throw new Error("Failed to get S3 upload URL");
+                    
+                    const urlData = await urlRes.json();
+                    s3Key = urlData.s3Key;
+                    
+                    await fetch(urlData.uploadUrl, { method: 'PUT', headers: { 'Content-Type': file.type }, body: file });
+                    overlay.classList.add('hidden'); overlay.classList.remove('flex');
+                } else if (type === 'video' && !id && fileInput.files.length === 0) {
+                    submitBtn.innerHTML = originalText; submitBtn.disabled = false;
+                    return showToast("Please select a video file to upload for a new Video entry.", "error");
+                }
+
+                const payload = { title, type, parentId, levels, notes };
+                if (id) payload.id = id;
+                if (s3Key) payload.s3Key = s3Key;
+
+                const saveRes = await fetch(`${API_BASE_URL}/admin/recordings`, { 
+                    method: 'POST', 
+                    headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` }, 
+                    body: JSON.stringify(payload) 
+                });
+                
+                if(!saveRes.ok) throw new Error("Database save failed");
+                
+                showToast('Entry saved successfully!');
+                resetForm();
+                fetchRecordings();
+            } catch (err) { 
+                showToast('Save failed.', 'error'); 
+                document.getElementById('upload-overlay').classList.add('hidden');
+                document.getElementById('upload-overlay').classList.remove('flex');
+            } finally { 
+                submitBtn.innerHTML = originalText;
+                submitBtn.disabled = false;
+            }
+        }
+
+        /* --- OpenRouter AI Integration --- */
+        function loadAiKey() {
+            const key = localStorage.getItem('openRouterApiKey');
+            if(key) document.getElementById('openRouterKey').value = key;
+        }
+
+        function generateAiNotes() {
+            const apiKey = document.getElementById('openRouterKey').value.trim();
+            const prompt = document.getElementById('aiPrompt').value.trim();
+            const btn = document.getElementById('generateAiBtn');
+
+            if(!apiKey || !prompt) return showToast("API Key and Prompt are required.", "error");
+
+            localStorage.setItem('openRouterApiKey', apiKey);
+            btn.innerHTML = `<i class="fa-solid fa-circle-notch fa-spin"></i> Generating...`;
+            btn.disabled = true;
+
+            fetch("https://openrouter.ai/api/v1/chat/completions", {
+                method: "POST",
+                headers: {
+                    "Authorization": `Bearer ${apiKey}`,
+                    "Content-Type": "application/json",
+                    "HTTP-Referer": window.location.href,
+                    "X-Title": "Geeky Researcher LMS" 
+                },
+                body: JSON.stringify({
+                    "model": "meta-llama/llama-3-8b-instruct:free",
+                    "messages": [
+                        {"role": "system", "content": "You are an academic assistant. Format your response in clean HTML using <h2>, <h3>, <p>, <ul>, and <li> tags. DO NOT wrap the output in markdown code blocks."},
+                        {"role": "user", "content": prompt}
+                    ]
+                })
+            }).then(res => res.json()).then(data => {
+                const aiHtmlContent = data.choices[0].message.content;
+                quill.clipboard.dangerouslyPasteHTML(quill.root.innerHTML + "<br><br>" + aiHtmlContent);
+                document.getElementById('ai-modal').classList.add('hidden');
+                showToast('AI transcription completed.');
+            }).catch(e => {
+                showToast("AI Generation failed.", "error");
+            }).finally(() => {
+                btn.innerHTML = `<i class="fa-solid fa-bolt"></i> Generate Notes`;
+                btn.disabled = false;
+            });
+        }
+
+        function logout() { localStorage.clear(); window.location.href = '../login.html'; }
+    </script>
+</body>
+</html>
