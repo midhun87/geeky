@@ -4,6 +4,8 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Geeky Researcher | Recorded Classes</title>
+    
+    <!-- External Libraries -->
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
@@ -12,43 +14,72 @@
     <script src="https://cdn.quilljs.com/1.3.6/quill.js"></script>
     
     <script>
-        tailwind.config = { 
-            theme: { 
-                extend: { 
-                    fontFamily: { sans: ['Inter', 'sans-serif'] }, 
-                    colors: { brand: { light: '#14b8a6', DEFAULT: '#0f766e', dark: '#115e59' } } 
-                } 
-            } 
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: { sans: ['Inter', 'sans-serif'] },
+                    colors: {
+                        brand: { 50: '#f0fdfa', 100: '#ccfbf1', 500: '#14b8a6', 600: '#0d9488', 700: '#0f766e', 900: '#134e4a' }
+                    },
+                    animation: {
+                        'fade-in': 'fadeIn 0.3s ease-out',
+                        'slide-in-right': 'slideInRight 0.3s ease-out',
+                    },
+                    keyframes: {
+                        fadeIn: { '0%': { opacity: '0' }, '100%': { opacity: '1' } },
+                        slideInRight: { '0%': { transform: 'translateX(100%)', opacity: '0' }, '100%': { transform: 'translateX(0)', opacity: '1' } }
+                    }
+                }
+            }
         }
     </script>
     <style>
-        body { background-color: #f8fafc; color: #0f172a; }
-        .admin-card { background: white; border: 1px solid #e2e8f0; border-radius: 0.75rem; box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.05); }
-        .admin-input { background: white; border: 1px solid #cbd5e1; border-radius: 0.5rem; transition: all 0.2s; width: 100%; padding: 0.6rem 0.8rem; font-size: 0.875rem; color: #334155; font-weight: 500;}
-        .admin-input:focus { border-color: #0f766e; box-shadow: 0 0 0 3px rgba(15, 118, 110, 0.1); outline: none; }
-        .admin-input:disabled { background-color: #f1f5f9; cursor: not-allowed; color: #94a3b8;}
-        .admin-label { display: block; font-size: 0.875rem; font-weight: 700; color: #334155; margin-bottom: 0.5rem; }
+        /* Custom Scrollbar */
+        ::-webkit-scrollbar { width: 6px; height: 6px; }
+        ::-webkit-scrollbar-track { background: transparent; }
+        ::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 10px; }
+        ::-webkit-scrollbar-thumb:hover { background: #94a3b8; }
         
-        .btn-primary { background: #0f766e; color: white; border-radius: 0.5rem; font-weight: 600; padding: 0.75rem 1.5rem; transition: background 0.2s; border: none; cursor: pointer; display: inline-flex; align-items: center; justify-content: center;}
-        .btn-primary:hover { background: #115e59; }
-        .btn-secondary { background: white; border: 1px solid #cbd5e1; color: #334155; border-radius: 0.5rem; font-weight: 600; padding: 0.75rem 1.5rem; transition: all 0.2s; cursor: pointer; display: inline-flex; align-items: center; justify-content: center;}
-        .btn-secondary:hover { background: #f8fafc; border-color: #94a3b8; }
+        body { background-color: #f1f5f9; color: #1e293b; }
+        
+        /* Clean Input Styling */
+        .input-field {
+            width: 100%; padding: 0.625rem 0.875rem; font-size: 0.875rem;
+            background-color: #f8fafc; border: 1px solid #cbd5e1; border-radius: 0.5rem;
+            transition: all 0.2s ease-in-out; color: #334155; font-weight: 500;
+        }
+        .input-field:focus {
+            background-color: #ffffff; border-color: #14b8a6; outline: none;
+            box-shadow: 0 0 0 3px rgba(20, 184, 166, 0.15);
+        }
+        .input-field:disabled { background-color: #f1f5f9; cursor: not-allowed; color: #94a3b8; opacity: 0.7;}
 
-        .sidebar-link { display: flex; align-items: center; gap: 0.75rem; padding: 0.75rem 1rem; color: #94a3b8; border-radius: 0.5rem; font-weight: 500; transition: all 0.2s; }
-        .sidebar-link:hover { background: #1e293b; color: #f8fafc; }
-        .sidebar-link.active { background: #1e293b; color: white; border-left: 4px solid #14b8a6; }
-        
-        .custom-scrollbar::-webkit-scrollbar { width: 6px; height: 6px; }
-        .custom-scrollbar::-webkit-scrollbar-track { background: transparent; }
-        .custom-scrollbar::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 10px; }
-        
-        .ql-toolbar.ql-snow { border-radius: 0.5rem 0.5rem 0 0; background: #f8fafc; border-color: #e2e8f0; }
-        .ql-container.ql-snow { border-radius: 0 0 0.5rem 0.5rem; border-color: #e2e8f0; font-family: 'Inter', sans-serif; font-size: 0.875rem; min-height: 250px; background: white; }
+        /* Sidebar Links */
+        .nav-link {
+            display: flex; align-items: center; gap: 0.75rem; padding: 0.75rem 1rem;
+            color: #64748b; border-radius: 0.5rem; font-weight: 500; transition: all 0.2s;
+        }
+        .nav-link:hover { background-color: #f1f5f9; color: #0f766e; }
+        .nav-link.active {
+            background-color: #f0fdfa; color: #0d9488;
+            border-right: 3px solid #14b8a6;
+        }
+
+        .no-scrollbar::-webkit-scrollbar { display: none; }
+        .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+
+        /* Quill Editor Overrides */
+        .ql-toolbar.ql-snow { border-radius: 0.75rem 0.75rem 0 0; background: #f8fafc; border-color: #e2e8f0; }
+        .ql-container.ql-snow { border-radius: 0 0 0.75rem 0.75rem; border-color: #e2e8f0; font-family: 'Inter', sans-serif; font-size: 0.875rem; min-height: 250px; background: white; }
 
         /* Type Cards */
-        .type-card { border: 2px solid #e2e8f0; border-radius: 0.75rem; padding: 1.25rem 1rem; cursor: pointer; transition: all 0.2s; background: white; display: flex; flex-direction: column; align-items: center; text-align: center; gap: 0.5rem;}
+        .type-card { 
+            border: 2px solid #e2e8f0; border-radius: 0.75rem; padding: 1.25rem 1rem; 
+            cursor: pointer; transition: all 0.2s; background: white; 
+            display: flex; flex-direction: column; align-items: center; text-align: center; gap: 0.5rem;
+        }
         .type-card:hover { border-color: #cbd5e1; background: #f8fafc; transform: translateY(-2px); box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05); }
-        .type-card.selected { border-color: #0f766e; background: #f0fdf4; box-shadow: 0 4px 6px -1px rgba(15, 118, 110, 0.1); }
+        .type-card.selected { border-color: #0d9488; background: #f0fdfa; box-shadow: 0 4px 6px -1px rgba(20, 184, 166, 0.1); }
         .type-card i { font-size: 2rem; margin-bottom: 0.25rem; }
 
         /* Preview Rich Content */
@@ -57,59 +88,273 @@
         .rich-content p { margin-bottom: 1rem; }
         .rich-content ul { list-style-type: disc; margin-left: 1.5rem; margin-bottom: 1rem; }
         .rich-content img { border-radius: 0.5rem; max-width: 100%; border: 1px solid #e2e8f0; margin: 1rem 0; }
-
-        /* Toast */
-        .toast { transition: transform 0.3s ease-out, opacity 0.3s ease-out; transform: translateY(100%); opacity: 0; }
-        .toast.show { transform: translateY(0); opacity: 1; }
     </style>
 </head>
-<body class="antialiased overflow-hidden w-full h-screen flex">
+<body class="antialiased w-full h-screen flex overflow-hidden">
 
-    <!-- Toast Notification Container -->
-    <div id="toast-container" class="fixed bottom-5 right-5 z-[200] flex flex-col gap-2"></div>
-
-    <!-- Sidebar -->
-    <div class="w-64 bg-slate-900 flex-col hidden md:flex shrink-0 z-10 shadow-xl">
-        <div class="flex items-center gap-3 p-6 border-b border-slate-800">
-            <img src="https://res.cloudinary.com/dzuxwvamy/image/upload/v1783935221/WhatsApp_Image_2026-07-08_at_6.25.14_PM_aiuvde.jpg" class="w-10 h-10 rounded bg-white p-1 object-cover">
-            <div class="font-bold text-white leading-tight text-sm">Geeky Researcher<br><span class="text-brand-light font-normal text-xs">Admin Console</span></div>
+    <!-- Mobile Top Navigation Bar -->
+    <div class="md:hidden fixed top-0 left-0 right-0 h-16 bg-white border-b border-slate-200 z-30 flex items-center justify-between px-4 shadow-sm">
+        <div class="flex items-center gap-2">
+            <img src="https://res.cloudinary.com/dzuxwvamy/image/upload/v1783935221/WhatsApp_Image_2026-07-08_at_6.25.14_PM_aiuvde.jpg" class="w-8 h-8 rounded-full object-cover">
+            <span class="font-bold text-slate-800 text-sm">Geeky Researcher</span>
         </div>
-        <nav class="flex-1 space-y-2 p-4">
-            <a href="dashboard.html" class="sidebar-link"><i class="fa-solid fa-chart-line w-5 text-center"></i> Dashboard</a>
-            <a href="approvals.html" class="sidebar-link"><i class="fa-solid fa-user-check w-5 text-center"></i> Access Control</a>
-            <a href="content-builder.html" class="sidebar-link"><i class="fa-solid fa-folder-plus w-5 text-center"></i> Curriculum Builder</a>
-            <a href="recorded-classes.html" class="sidebar-link active"><i class="fa-solid fa-video w-5 text-center"></i> Recorded Classes</a>
-            <a href="test-creator.html" class="sidebar-link"><i class="fa-solid fa-vial w-5 text-center"></i> Assessments</a>
-            <a href="reports.html" class="sidebar-link"><i class="fa-solid fa-file-invoice w-5 text-center"></i> Reports</a>
-        </nav>
-        <div class="p-4 border-t border-slate-800">
-            <button onclick="logout()" class="w-full text-left text-sm text-red-400 font-medium hover:text-red-300 py-2 transition"><i class="fa-solid fa-sign-out-alt mr-2"></i> Sign Out</button>
-        </div>
+        <button onclick="toggleMobileMenu()" class="text-slate-500 hover:text-slate-800 focus:outline-none p-2 rounded-md bg-slate-50">
+            <i class="fa-solid fa-bars text-lg"></i>
+        </button>
     </div>
 
-    <!-- Preview Modal -->
-    <div id="preview-modal" class="hidden fixed inset-0 z-[100] bg-slate-900/80 backdrop-blur-sm flex items-center justify-center p-4">
-        <div class="bg-slate-50 w-full max-w-4xl max-h-[90vh] flex flex-col overflow-hidden shadow-2xl rounded-xl border border-slate-700">
-            <div class="bg-white border-b border-slate-200 px-6 py-4 flex justify-between items-center shrink-0">
-                <div class="flex items-center gap-3">
-                    <span class="bg-emerald-100 text-emerald-700 px-2 py-1 rounded text-xs font-bold uppercase tracking-wider"><i class="fa-solid fa-eye mr-1"></i> Student View Preview</span>
+    <!-- Mobile Menu Overlay -->
+    <div id="mobile-overlay" onclick="toggleMobileMenu()" class="fixed inset-0 bg-slate-900/50 z-40 hidden md:hidden backdrop-blur-sm transition-opacity"></div>
+
+    <!-- Sidebar (Desktop & Mobile Drawer) -->
+    <aside id="sidebar" class="fixed md:static inset-y-0 left-0 z-50 w-64 bg-white border-r border-slate-200 flex flex-col transform -translate-x-full md:translate-x-0 transition-transform duration-300 ease-in-out shrink-0">
+        <!-- Logo Area -->
+        <div class="h-16 flex items-center gap-3 px-6 border-b border-slate-100">
+            <img src="https://res.cloudinary.com/dzuxwvamy/image/upload/v1783935221/WhatsApp_Image_2026-07-08_at_6.25.14_PM_aiuvde.jpg" class="w-9 h-9 rounded-full object-cover shadow-sm">
+            <div>
+                <div class="font-bold text-slate-800 leading-tight text-sm">Geeky Researcher</div>
+                <div class="text-brand-500 text-[11px] font-medium uppercase tracking-wider">Admin Portal</div>
+            </div>
+        </div>
+        
+        <!-- Navigation Links -->
+        <nav class="flex-1 overflow-y-auto no-scrollbar py-4 px-3 space-y-1">
+            <p class="px-3 text-xs font-semibold text-slate-400 uppercase tracking-wider mb-2 mt-4">Menu</p>
+            <a href="dashboard_2.html" class="nav-link"><i class="fa-solid fa-chart-pie w-5 text-center"></i> Dashboard</a>
+            <a href="approvals.html" class="nav-link"><i class="fa-solid fa-users w-5 text-center"></i> Student Approvals</a>
+            <a href="content-builder.html" class="nav-link"><i class="fa-solid fa-book-open w-5 text-center"></i> Content Builder</a>
+            <a href="recorded-classes.html" class="nav-link active"><i class="fa-solid fa-video w-5 text-center"></i> Recorded Classes</a>
+            <a href="test-creator.html" class="nav-link"><i class="fa-solid fa-clipboard-list w-5 text-center"></i> Test Creator</a>
+            
+            <p class="px-3 text-xs font-semibold text-slate-400 uppercase tracking-wider mb-2 mt-6">Settings</p>
+            <a href="reports.html" class="nav-link"><i class="fa-solid fa-file-invoice w-5 text-center"></i> Reports</a>
+        </nav>
+        
+        <!-- Bottom Action -->
+        <div class="p-4 border-t border-slate-100">
+            <button onclick="handleLogout()" class="w-full flex items-center justify-center gap-2 text-sm text-slate-600 font-medium hover:text-red-600 hover:bg-red-50 py-2.5 rounded-lg transition-colors">
+                <i class="fa-solid fa-arrow-right-from-bracket"></i> Log Out
+            </button>
+        </div>
+    </aside>
+
+    <!-- Main Content -->
+    <main class="flex-1 overflow-hidden flex flex-col h-full bg-slate-50 relative pt-16 md:pt-0 w-full">
+        <!-- Header -->
+        <div class="px-4 md:px-8 py-5 border-b border-slate-200 bg-white flex flex-col sm:flex-row justify-between sm:items-center gap-4 shrink-0 shadow-sm z-10">
+            <div>
+                <h2 class="text-2xl font-bold text-slate-900 tracking-tight">Recorded Classes Engine</h2>
+                <p class="text-sm text-slate-500 mt-1">Organize video lectures into folders with specific access levels.</p>
+            </div>
+            <button class="bg-brand-600 hover:bg-brand-700 text-white font-medium py-2 px-4 rounded-lg transition-colors shadow-sm flex items-center justify-center gap-2 text-sm whitespace-nowrap" onclick="resetForm()">
+                <i class="fa-solid fa-plus"></i> Add New Recording
+            </button>
+        </div>
+
+        <div class="flex flex-col lg:flex-row flex-1 overflow-hidden">
+            
+            <!-- LEFT: Directory Tree -->
+            <div class="w-full lg:w-[320px] shrink-0 border-b lg:border-b-0 lg:border-r border-slate-200 bg-white flex flex-col h-1/3 lg:h-full relative">
+                <div class="p-4 border-b border-slate-100 bg-slate-50 flex items-center justify-between shrink-0">
+                    <h3 class="font-bold text-slate-700 text-xs uppercase tracking-wider flex items-center gap-2">
+                        <i class="fa-solid fa-sitemap text-brand-500"></i> Repository
+                    </h3>
+                    <button onclick="fetchRecordings()" class="text-slate-400 hover:text-brand-600 transition p-1" title="Refresh Tree">
+                        <i class="fa-solid fa-sync-alt"></i>
+                    </button>
                 </div>
-                <button onclick="document.getElementById('preview-modal').classList.add('hidden')" class="text-slate-500 hover:text-slate-800 bg-slate-100 hover:bg-slate-200 rounded px-4 py-2 text-sm font-bold transition">Close Preview</button>
+                <div class="flex-1 overflow-y-auto p-4" id="hierarchy-tree">
+                    <div class="text-center text-slate-400 py-10 flex flex-col items-center">
+                        <i class="fa-solid fa-circle-notch fa-spin mb-3 text-2xl text-brand-500"></i>
+                        <span class="text-sm">Loading structure...</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- RIGHT: Dynamic Editor -->
+            <div class="flex-1 overflow-y-auto p-4 md:p-8 bg-slate-50/50 relative">
+                
+                <form id="recordForm" onsubmit="handleFormSubmit(event)" class="max-w-4xl mx-auto pb-20">
+                    
+                    <div id="upload-overlay" class="absolute inset-0 bg-white/90 z-50 hidden flex-col items-center justify-center backdrop-blur-sm rounded-xl border border-slate-200 m-4">
+                        <i class="fa-solid fa-cloud-arrow-up text-5xl text-brand-500 mb-4 animate-bounce"></i>
+                        <h3 class="font-bold text-slate-800 text-xl">Uploading Secure Video...</h3>
+                        <p class="text-sm font-medium text-slate-500 mt-2" id="upload-status-text">Please wait, pushing to AWS S3. Do not close this window.</p>
+                    </div>
+
+                    <div class="flex flex-col sm:flex-row justify-between sm:items-end gap-4 mb-6">
+                        <div>
+                            <h3 id="form-main-title" class="text-xl md:text-2xl font-bold text-slate-900 tracking-tight">Create New Entry</h3>
+                            <span id="edit-badge" class="hidden bg-amber-100 text-amber-700 px-2.5 py-1 rounded-md text-xs font-bold uppercase tracking-wider mt-2 inline-flex items-center gap-1">
+                                <i class="fa-solid fa-pen"></i> Edit Mode
+                            </span>
+                        </div>
+                        <button type="button" onclick="previewContent()" class="bg-white border border-slate-200 text-slate-600 hover:bg-slate-50 px-4 py-2 rounded-lg text-sm font-medium transition shadow-sm flex items-center justify-center gap-2">
+                            <i class="fa-solid fa-eye"></i> Preview
+                        </button>
+                    </div>
+
+                    <input type="hidden" id="editRecordId">
+                    <input type="hidden" id="recordType" value="folder">
+                    
+                    <!-- Step 1: Type Selection -->
+                    <div class="bg-white rounded-xl border border-slate-200 shadow-sm p-6 mb-6">
+                        <div class="flex items-center gap-3 mb-5">
+                            <div class="w-7 h-7 rounded-full bg-brand-50 text-brand-600 flex items-center justify-center font-bold text-sm">1</div>
+                            <h4 class="text-base font-bold text-slate-800">What are you creating?</h4>
+                        </div>
+                        <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                            <div onclick="selectEntryType('folder')" class="type-card selected" id="type-folder">
+                                <i class="fa-solid fa-folder text-brand-500"></i>
+                                <span class="font-bold text-sm text-slate-800">Main Folder</span>
+                                <span class="text-[11px] text-slate-500">Root Grouping (e.g. Year)</span>
+                            </div>
+                            <div onclick="selectEntryType('subfolder')" class="type-card" id="type-subfolder">
+                                <i class="fa-regular fa-folder-open text-blue-500"></i>
+                                <span class="font-bold text-sm text-slate-800">Sub-Folder</span>
+                                <span class="text-[11px] text-slate-500">Nested Group (e.g. Subject)</span>
+                            </div>
+                            <div onclick="selectEntryType('video')" class="type-card" id="type-video">
+                                <i class="fa-solid fa-circle-play text-purple-500"></i>
+                                <span class="font-bold text-sm text-slate-800">Video Class</span>
+                                <span class="text-[11px] text-slate-500">Actual Secure Video File</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Step 2: Details & Access -->
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
+                        <div class="bg-white rounded-xl border border-slate-200 shadow-sm p-6">
+                            <div class="flex items-center gap-3 mb-5">
+                                <div class="w-7 h-7 rounded-full bg-slate-100 text-slate-600 flex items-center justify-center font-bold text-sm">2</div>
+                                <h4 class="text-base font-bold text-slate-800">Placement & Identity</h4>
+                            </div>
+                            
+                            <div class="space-y-4">
+                                <div>
+                                    <label class="block text-sm font-bold text-slate-700 mb-1">Parent Directory</label>
+                                    <select id="recordParent" class="input-field" disabled>
+                                        <option value="">-- Main Folders sit at root --</option>
+                                    </select>
+                                </div>
+                                <div>
+                                    <label class="block text-sm font-bold text-slate-700 mb-1">Title / Name</label>
+                                    <input type="text" id="recordTitle" class="input-field font-semibold" placeholder="e.g., Cellular Pathology Lecture" required>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="bg-white rounded-xl border border-slate-200 shadow-sm p-6 relative overflow-hidden">
+                            <div class="absolute left-0 top-0 bottom-0 w-1 bg-amber-400"></div>
+                            <div class="flex items-center gap-3 mb-5">
+                                <div class="w-7 h-7 rounded-full bg-amber-50 text-amber-600 flex items-center justify-center font-bold text-sm"><i class="fa-solid fa-users"></i></div>
+                                <h4 class="text-base font-bold text-slate-800">Access Permissions</h4>
+                            </div>
+                            
+                            <label class="block text-sm font-bold text-slate-700 mb-1">Target Audience</label>
+                            <p class="text-xs text-amber-600 mb-3">If unchecked, it automatically inherits access from its parent folder.</p>
+                            
+                            <div class="border border-slate-200 rounded-lg bg-slate-50 overflow-hidden">
+                                <label class="flex items-center gap-3 cursor-pointer p-3 border-b border-slate-200 bg-white hover:bg-slate-50 transition">
+                                    <input type="checkbox" id="selectAllLevels" value="All Levels" class="w-4 h-4 text-brand-600 rounded border-slate-300 focus:ring-brand-500" onchange="toggleAllLevels(this)">
+                                    <span class="font-bold text-sm text-slate-800">Global (All Levels)</span>
+                                </label>
+                                <div id="levelCheckboxes" class="max-h-[140px] overflow-y-auto p-2 space-y-1">
+                                    <span class="text-slate-400 text-xs italic px-2">Loading levels...</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Step 3: Media & Notes (Dynamic) -->
+                    <div id="video-container" class="hidden flex-col gap-6 mb-6 animate-fade-in">
+                        
+                        <!-- Video Upload -->
+                        <div class="bg-white rounded-xl border border-slate-200 shadow-sm p-6 relative overflow-hidden">
+                            <div class="absolute left-0 top-0 bottom-0 w-1 bg-purple-500"></div>
+                            <div class="flex items-center gap-3 mb-4">
+                                <div class="w-7 h-7 rounded-full bg-purple-100 text-purple-600 flex items-center justify-center font-bold text-sm"><i class="fa-solid fa-cloud-arrow-up"></i></div>
+                                <h4 class="text-base font-bold text-slate-800">Secure Video Attachment</h4>
+                            </div>
+                            
+                            <!-- Default Upload Box -->
+                            <div id="upload-dropzone" class="bg-slate-50 border-2 border-dashed border-slate-300 rounded-xl flex flex-col items-center justify-center p-8 text-center transition hover:border-purple-400 group">
+                                <i class="fa-solid fa-file-video text-4xl text-purple-200 mb-3 group-hover:text-purple-300 transition-colors"></i>
+                                <p class="text-sm text-slate-600 mb-4 max-w-sm">Select an MP4 or WebM file. It will be securely streamed to prevent unauthorized downloads.</p>
+                                <input type="file" id="videoFile" accept="video/mp4,video/webm" class="text-sm border border-slate-300 rounded-md p-2 bg-white cursor-pointer w-full max-w-xs shadow-sm focus:outline-none focus:ring-2 focus:ring-purple-500">
+                            </div>
+
+                            <!-- "File Exists" State Box -->
+                            <div id="existing-file-card" class="hidden bg-emerald-50 border border-emerald-200 rounded-xl p-5 flex flex-col sm:flex-row items-center justify-between gap-4">
+                                <div class="flex items-center gap-4 min-w-0">
+                                    <div class="w-10 h-10 bg-emerald-100 text-emerald-600 rounded-full flex items-center justify-center text-lg shrink-0"><i class="fa-solid fa-check"></i></div>
+                                    <div class="min-w-0">
+                                        <h4 class="font-bold text-emerald-800 text-sm mb-0.5">Video Successfully Attached</h4>
+                                        <p class="text-xs text-emerald-600 font-medium truncate" id="existing-filename">video.mp4</p>
+                                    </div>
+                                </div>
+                                <button type="button" onclick="revealUploader()" class="px-3 py-1.5 bg-white border border-emerald-200 text-emerald-700 rounded-lg shadow-sm hover:bg-emerald-100 text-xs font-bold transition shrink-0">Replace Video</button>
+                            </div>
+                        </div>
+
+                    </div>
+
+                    <!-- Notes Editor (Always visible) -->
+                    <div class="bg-white rounded-xl border border-slate-200 shadow-sm p-6 flex flex-col min-h-[350px]">
+                        <div class="flex flex-col sm:flex-row justify-between sm:items-center gap-4 mb-4 border-b border-slate-100 pb-4">
+                            <div class="flex items-center gap-3">
+                                <div class="w-7 h-7 rounded-full bg-slate-100 text-slate-600 flex items-center justify-center font-bold text-sm"><i class="fa-solid fa-align-left"></i></div>
+                                <div>
+                                    <h4 class="text-base font-bold text-slate-800">Class Notes & Transcripts</h4>
+                                    <p class="text-[11px] text-slate-500">Write notes manually or generate via AI.</p>
+                                </div>
+                            </div>
+                            <button type="button" onclick="document.getElementById('ai-modal').classList.remove('hidden')" class="bg-purple-50 border border-purple-200 text-purple-700 hover:bg-purple-100 px-4 py-2 rounded-lg text-sm font-bold transition shadow-sm flex items-center justify-center gap-2">
+                                <i class="fa-solid fa-wand-magic-sparkles"></i> AI Generation
+                            </button>
+                        </div>
+                        <div id="quill-editor" class="flex-1 bg-white"></div>
+                    </div>
+
+                    <!-- Actions -->
+                    <div class="flex flex-col sm:flex-row gap-3 mt-8">
+                        <button type="button" onclick="resetForm()" class="bg-white border border-slate-200 text-slate-600 hover:bg-slate-50 px-6 py-2.5 rounded-lg font-medium transition shadow-sm w-full sm:w-auto">Cancel</button>
+                        <button type="submit" id="submitBtn" class="bg-brand-600 hover:bg-brand-700 text-white px-8 py-2.5 rounded-lg font-medium transition shadow-sm flex items-center justify-center gap-2 w-full sm:w-auto sm:ml-auto">
+                            <i class="fa-solid fa-save"></i> Save Entry
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </main>
+
+    <!-- Preview Modal -->
+    <div id="preview-modal" class="hidden fixed inset-0 z-[100] bg-slate-900/60 backdrop-blur-sm flex items-center justify-center p-4">
+        <div class="bg-white w-full max-w-4xl max-h-[90vh] flex flex-col overflow-hidden shadow-2xl rounded-2xl border border-slate-200 animate-fade-in">
+            <div class="bg-slate-50 border-b border-slate-200 px-6 py-4 flex justify-between items-center shrink-0">
+                <div class="flex items-center gap-3">
+                    <span class="bg-emerald-100 text-emerald-700 px-2.5 py-1 rounded-md text-[10px] font-bold uppercase tracking-wider flex items-center gap-1">
+                        <i class="fa-solid fa-eye"></i> Student View
+                    </span>
+                </div>
+                <button onclick="document.getElementById('preview-modal').classList.add('hidden')" class="text-slate-400 hover:text-slate-600 focus:outline-none p-1 transition">
+                    <i class="fa-solid fa-xmark text-xl"></i>
+                </button>
             </div>
             
-            <div class="flex-1 overflow-y-auto custom-scrollbar p-6 md:p-10">
+            <div class="flex-1 overflow-y-auto p-6 md:p-10">
                 <div class="max-w-3xl mx-auto w-full">
                     
                     <!-- Video Preview Block -->
-                    <div id="video-preview-block" class="w-full aspect-video bg-slate-900 rounded-xl flex items-center justify-center shadow-lg border border-slate-700 mb-6 hidden overflow-hidden">
+                    <div id="video-preview-block" class="w-full aspect-video bg-slate-900 rounded-xl flex items-center justify-center shadow-md mb-8 hidden overflow-hidden border border-slate-800">
                         <div class="text-slate-500 flex flex-col items-center">
-                            <i class="fa-solid fa-circle-play text-6xl mb-4 text-brand bg-white rounded-full"></i>
+                            <i class="fa-solid fa-circle-play text-6xl mb-4 text-brand-500 bg-white rounded-full"></i>
                             <p class="font-bold text-sm text-slate-300" id="preview-filename-display">Secure Video Stream Placeholder</p>
                         </div>
                     </div>
 
-                    <div class="bg-white border border-slate-200 rounded-xl p-8 shadow-sm">
-                        <span id="preview-type-badge" class="inline-block px-2 py-0.5 bg-slate-100 border border-slate-200 text-slate-500 text-[10px] font-bold tracking-widest uppercase rounded mb-3">Item Type</span>
+                    <div class="bg-white border border-slate-100 rounded-xl p-8 shadow-sm">
+                        <span id="preview-type-badge" class="inline-block px-2 py-0.5 bg-slate-100 border border-slate-200 text-slate-500 text-[10px] font-bold tracking-widest uppercase rounded mb-4">Item Type</span>
                         <h1 id="preview-title" class="text-2xl md:text-3xl font-bold text-slate-900 leading-tight border-b border-slate-100 pb-4 mb-6">Content Title</h1>
                         
                         <div id="preview-body" class="rich-content min-h-[150px]">
@@ -122,23 +367,24 @@
     </div>
 
     <!-- OpenRouter AI Settings Modal -->
-    <div id="ai-modal" class="hidden fixed inset-0 bg-slate-900/60 z-50 flex items-center justify-center p-4">
-        <div class="bg-white rounded-xl shadow-2xl w-full max-w-md overflow-hidden border border-slate-200">
+    <div id="ai-modal" class="hidden fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-50 flex items-center justify-center p-4">
+        <div class="bg-white rounded-2xl shadow-2xl w-full max-w-md overflow-hidden border border-slate-200 animate-fade-in">
             <div class="bg-gradient-to-r from-purple-600 to-indigo-600 p-5 flex justify-between items-center">
                 <h3 class="font-bold text-white flex items-center gap-2"><i class="fa-solid fa-wand-magic-sparkles"></i> AI Transcription Assist</h3>
-                <button onclick="document.getElementById('ai-modal').classList.add('hidden')" class="text-white/80 hover:text-white"><i class="fa-solid fa-times text-xl"></i></button>
+                <button onclick="document.getElementById('ai-modal').classList.add('hidden')" class="text-white/80 hover:text-white focus:outline-none transition"><i class="fa-solid fa-xmark text-xl"></i></button>
             </div>
-            <div class="p-8">
-                <p class="text-sm text-slate-600 mb-6">Leverage OpenRouter to automatically generate structured notes, summaries, or transcripts based on your video topic.</p>
+            <div class="p-6 md:p-8">
+                <p class="text-sm text-slate-600 mb-6 leading-relaxed">Leverage OpenRouter to automatically generate structured notes, summaries, or transcripts based on your video topic.</p>
                 
-                <div class="mb-5">
-                    <label class="admin-label">OpenRouter API Key <span class="text-[10px] font-normal text-slate-400 block mt-1">(Saved locally in your browser)</span></label>
-                    <input type="password" id="openRouterKey" class="admin-input font-mono" placeholder="sk-or-v1-...">
+                <div class="mb-5 space-y-1">
+                    <label class="block text-sm font-bold text-slate-700">OpenRouter API Key</label>
+                    <p class="text-[11px] text-slate-500">(Saved locally in your browser)</p>
+                    <input type="password" id="openRouterKey" class="input-field font-mono text-sm mt-1" placeholder="sk-or-v1-...">
                 </div>
                 
-                <div class="mb-6">
-                    <label class="admin-label">AI Instruction Prompt</label>
-                    <textarea id="aiPrompt" class="admin-input h-28 resize-none" placeholder="e.g. Generate a detailed study outline for a medical lecture on Cellular Pathology..."></textarea>
+                <div class="mb-6 space-y-1">
+                    <label class="block text-sm font-bold text-slate-700">AI Instruction Prompt</label>
+                    <textarea id="aiPrompt" class="input-field h-28 resize-none text-sm mt-1" placeholder="e.g. Generate a detailed study outline for a medical lecture on Cellular Pathology..."></textarea>
                 </div>
 
                 <button onclick="generateAiNotes()" id="generateAiBtn" class="w-full bg-purple-600 hover:bg-purple-700 text-white font-bold py-3 rounded-lg shadow-md transition flex items-center justify-center gap-2">
@@ -148,177 +394,13 @@
         </div>
     </div>
 
-    <!-- Main Content -->
-    <div class="flex-1 overflow-hidden flex flex-col h-full bg-slate-50 relative">
-        <div class="px-8 py-6 border-b border-slate-200 bg-white flex justify-between items-center shrink-0 shadow-sm z-10">
-            <div>
-                <h2 class="text-2xl font-bold text-slate-900">Recorded Classes Engine</h2>
-                <p class="text-sm text-slate-500 mt-1">Organize video lectures into structured folders with specific level-based access.</p>
-            </div>
-            <button class="btn-primary shadow-md" onclick="resetForm()">
-                <i class="fa-solid fa-plus mr-2"></i> Add New Recording
-            </button>
-        </div>
-
-        <div class="flex flex-col lg:flex-row flex-1 overflow-hidden">
-            
-            <!-- LEFT: Directory Tree -->
-            <div class="w-full lg:w-[350px] shrink-0 border-r border-slate-200 bg-white flex flex-col h-full relative">
-                <div class="p-4 border-b border-slate-100 bg-slate-50/50 flex items-center justify-between">
-                    <h3 class="font-bold text-slate-800 text-sm uppercase tracking-wider"><i class="fa-solid fa-sitemap text-brand mr-2"></i> Repository</h3>
-                    <button onclick="fetchRecordings()" class="text-slate-400 hover:text-brand transition" title="Refresh Tree"><i class="fa-solid fa-sync-alt"></i></button>
-                </div>
-                <div class="flex-1 overflow-y-auto custom-scrollbar p-4" id="hierarchy-tree">
-                    <div class="text-center text-slate-400 py-10"><i class="fa-solid fa-circle-notch fa-spin mb-2 text-2xl"></i><br>Loading structure...</div>
-                </div>
-            </div>
-
-            <!-- RIGHT: Dynamic Editor -->
-            <div class="flex-1 overflow-y-auto custom-scrollbar p-6 md:p-8 bg-slate-50 relative">
-                
-                <form id="recordForm" onsubmit="handleFormSubmit(event)" class="max-w-4xl mx-auto pb-20">
-                    
-                    <div id="upload-overlay" class="absolute inset-0 bg-white/90 z-50 hidden flex-col items-center justify-center backdrop-blur-sm rounded-xl border border-slate-200">
-                        <i class="fa-solid fa-cloud-arrow-up text-5xl text-brand mb-4 animate-bounce"></i>
-                        <h3 class="font-bold text-slate-800 text-xl">Uploading Secure Video...</h3>
-                        <p class="text-sm font-medium text-slate-500 mt-2" id="upload-status-text">Please wait, pushing to AWS S3. Do not close this window.</p>
-                    </div>
-
-                    <div class="flex justify-between items-end mb-6">
-                        <div>
-                            <h3 id="form-main-title" class="text-2xl font-bold text-slate-900">Create New Entry</h3>
-                            <span id="edit-badge" class="hidden bg-amber-100 text-amber-800 px-2 py-1 rounded text-xs font-bold uppercase tracking-wider mt-2 inline-block"><i class="fa-solid fa-pen mr-1"></i> Edit Mode</span>
-                        </div>
-                        <button type="button" onclick="previewContent()" class="btn-secondary text-sm"><i class="fa-solid fa-eye mr-2"></i> Preview</button>
-                    </div>
-
-                    <input type="hidden" id="editRecordId">
-                    <input type="hidden" id="recordType" value="folder">
-                    
-                    <!-- Step 1: Type Selection -->
-                    <div class="admin-card p-8 mb-8 border-t-4 border-t-brand">
-                        <div class="flex items-center gap-3 mb-6">
-                            <div class="w-8 h-8 rounded-full bg-brand/10 text-brand flex items-center justify-center font-bold">1</div>
-                            <h4 class="text-lg font-bold text-slate-800">What are you creating?</h4>
-                        </div>
-                        <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
-                            <div onclick="selectEntryType('folder')" class="type-card selected" id="type-folder">
-                                <i class="fa-solid fa-folder text-brand"></i>
-                                <span class="font-bold text-sm text-slate-800">Main Folder</span>
-                                <span class="text-xs text-slate-500">Root Grouping (e.g. Year)</span>
-                            </div>
-                            <div onclick="selectEntryType('subfolder')" class="type-card" id="type-subfolder">
-                                <i class="fa-regular fa-folder-open text-blue-500"></i>
-                                <span class="font-bold text-sm text-slate-800">Sub-Folder</span>
-                                <span class="text-xs text-slate-500">Nested Group (e.g. Subject)</span>
-                            </div>
-                            <div onclick="selectEntryType('video')" class="type-card" id="type-video">
-                                <i class="fa-solid fa-circle-play text-purple-500"></i>
-                                <span class="font-bold text-sm text-slate-800">Video Class</span>
-                                <span class="text-xs text-slate-500">Actual Secure Video File</span>
-                            </div>
-                        </div>
-                    </div>
-
-                    <!-- Step 2: Details & Access -->
-                    <div class="grid grid-cols-1 md:grid-cols-2 gap-8 mb-8">
-                        <div class="admin-card p-8">
-                            <div class="flex items-center gap-3 mb-6">
-                                <div class="w-8 h-8 rounded-full bg-slate-100 text-slate-600 flex items-center justify-center font-bold">2</div>
-                                <h4 class="text-lg font-bold text-slate-800">Placement & Identity</h4>
-                            </div>
-                            <label class="admin-label">Parent Directory</label>
-                            <select id="recordParent" class="admin-input bg-slate-100 mb-6" disabled>
-                                <option value="">-- Main Folders sit at root --</option>
-                            </select>
-                            
-                            <label class="admin-label">Title / Name</label>
-                            <input type="text" id="recordTitle" class="admin-input font-bold text-lg" placeholder="e.g., Cellular Pathology Lecture" required>
-                        </div>
-                        
-                        <div class="admin-card p-8 border-l-4 border-l-amber-400">
-                            <div class="flex items-center gap-3 mb-6">
-                                <div class="w-8 h-8 rounded-full bg-amber-100 text-amber-700 flex items-center justify-center font-bold"><i class="fa-solid fa-users"></i></div>
-                                <h4 class="text-lg font-bold text-slate-800">Access Permissions</h4>
-                            </div>
-                            <label class="admin-label">Target Audience <span class="text-xs font-normal text-amber-600 block mt-1">If unchecked, it automatically inherits access from its parent folder.</span></label>
-                            <div class="mt-2 border border-slate-200 rounded-lg bg-slate-50 overflow-hidden">
-                                <label class="flex items-center gap-3 cursor-pointer p-3 border-b border-slate-200 bg-white hover:bg-slate-50 transition">
-                                    <input type="checkbox" id="selectAllLevels" value="All Levels" class="w-4 h-4 text-brand" onchange="toggleAllLevels(this)">
-                                    <span class="font-bold text-sm text-slate-800">Global (All Levels)</span>
-                                </label>
-                                <div id="levelCheckboxes" class="max-h-32 overflow-y-auto custom-scrollbar p-2 space-y-1">
-                                    <span class="text-slate-400 text-xs italic px-2">Loading levels...</span>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-
-                    <!-- Step 3: Media & Notes (Dynamic) -->
-                    <div id="video-container" class="hidden flex-col gap-8 mb-8 animate-[fadeIn_0.3s_ease-in-out]">
-                        
-                        <!-- Video Upload -->
-                        <div class="admin-card p-8 border-l-4 border-l-purple-500 bg-slate-50 shadow-md">
-                            <div class="flex items-center gap-3 mb-4">
-                                <div class="w-8 h-8 rounded-full bg-purple-600 text-white flex items-center justify-center font-bold"><i class="fa-solid fa-cloud-arrow-up"></i></div>
-                                <h4 class="text-lg font-bold text-slate-800">Secure Video Attachment</h4>
-                            </div>
-                            
-                            <!-- Default Upload Box -->
-                            <div id="upload-dropzone" class="bg-white border-2 border-dashed border-slate-300 rounded-lg flex flex-col items-center justify-center p-10 text-center transition hover:border-purple-400">
-                                <i class="fa-solid fa-file-video text-5xl text-purple-200 mb-4"></i>
-                                <p class="text-sm font-medium text-slate-600 mb-6">Select an MP4 or WebM file. It will be securely streamed to prevent unauthorized downloads.</p>
-                                <input type="file" id="videoFile" accept="video/mp4,video/webm" class="text-sm border border-slate-300 rounded-md p-2 bg-slate-50 cursor-pointer w-full max-w-xs shadow-sm font-semibold">
-                            </div>
-
-                            <!-- "File Exists" State Box (Hidden by default) -->
-                            <div id="existing-file-card" class="hidden bg-emerald-50 border border-emerald-200 rounded-lg p-6 flex flex-col sm:flex-row items-center justify-between gap-4">
-                                <div class="flex items-center gap-4 min-w-0">
-                                    <div class="w-12 h-12 bg-emerald-100 text-emerald-600 rounded-full flex items-center justify-center text-xl shrink-0"><i class="fa-solid fa-check"></i></div>
-                                    <div class="min-w-0">
-                                        <h4 class="font-bold text-emerald-800 text-base mb-1">Video Successfully Attached</h4>
-                                        <p class="text-sm text-emerald-600 font-medium truncate" id="existing-filename">video.mp4</p>
-                                    </div>
-                                </div>
-                                <button type="button" onclick="revealUploader()" class="px-4 py-2 bg-white border border-emerald-200 text-emerald-700 rounded-md shadow-sm hover:bg-emerald-100 text-sm font-bold transition shrink-0">Replace Video</button>
-                            </div>
-                        </div>
-
-                    </div>
-
-                    <!-- Notes Editor (Always visible) -->
-                    <div class="admin-card p-8 flex flex-col min-h-[350px] shadow-md">
-                        <div class="flex justify-between items-center mb-4 border-b border-slate-100 pb-3">
-                            <div class="flex items-center gap-3">
-                                <div class="w-8 h-8 rounded-full bg-slate-200 text-slate-600 flex items-center justify-center font-bold"><i class="fa-solid fa-align-left text-sm"></i></div>
-                                <div>
-                                    <h4 class="text-lg font-bold text-slate-800">Class Notes & Transcripts</h4>
-                                    <p class="text-xs text-slate-500 font-normal">Use this editor to write notes. You can also insert inline images using the toolbar.</p>
-                                </div>
-                            </div>
-                            <button type="button" onclick="document.getElementById('ai-modal').classList.remove('hidden')" class="text-xs font-bold text-purple-600 bg-purple-50 hover:bg-purple-100 px-4 py-2 rounded-md transition flex items-center gap-2 border border-purple-200 shadow-sm shrink-0">
-                                <i class="fa-solid fa-wand-magic-sparkles"></i> AI Generation
-                            </button>
-                        </div>
-                        <div id="quill-editor" class="flex-1 bg-white mt-2"></div>
-                    </div>
-
-                    <!-- Actions -->
-                    <div class="flex gap-4 mt-8">
-                        <button type="button" onclick="resetForm()" class="btn-secondary flex-1 shadow-sm text-base py-3 font-bold text-slate-500">Cancel</button>
-                        <button type="submit" id="submitBtn" class="btn-primary flex-[2] shadow-md text-lg py-3 font-bold">
-                            <i class="fa-solid fa-save mr-2"></i> Save Entry
-                        </button>
-                    </div>
-                </form>
-            </div>
-        </div>
-    </div>
+    <!-- Toast Notification Container -->
+    <div id="toast-container" class="fixed top-4 right-4 z-[200] flex flex-col gap-2 pointer-events-none"></div>
 
     <script>
         const API_BASE_URL = '/api';
         const token = localStorage.getItem('token');
-        const user = JSON.parse(localStorage.getItem('user'));
+        const user = localStorage.getItem('user') ? JSON.parse(localStorage.getItem('user')) : null;
         
         let quill;
         let allRecordings = [];
@@ -336,23 +418,44 @@
             await fetchRecordings();
         });
 
-        // Simple Custom Toast Notification
+        // --- UI Interactions ---
+
+        function toggleMobileMenu() {
+            const sidebar = document.getElementById('sidebar');
+            const overlay = document.getElementById('mobile-overlay');
+            
+            if (sidebar.classList.contains('-translate-x-full')) {
+                sidebar.classList.remove('-translate-x-full');
+                overlay.classList.remove('hidden');
+                document.body.classList.add('overflow-hidden'); 
+            } else {
+                sidebar.classList.add('-translate-x-full');
+                overlay.classList.add('hidden');
+                document.body.classList.remove('overflow-hidden');
+            }
+        }
+
         function showToast(message, type = 'success') {
             const container = document.getElementById('toast-container');
             const toast = document.createElement('div');
-            const bgClass = type === 'success' ? 'bg-emerald-50 border-emerald-200 text-emerald-800' : 'bg-red-50 border-red-200 text-red-800';
-            const iconClass = type === 'success' ? 'fa-check-circle text-emerald-500' : 'fa-exclamation-circle text-red-500';
-
-            toast.className = `toast flex items-center gap-3 p-4 border rounded-lg shadow-lg font-medium text-sm w-72 ${bgClass}`;
-            toast.innerHTML = `<i class="fa-solid ${iconClass} text-lg"></i> <span class="flex-1">${message}</span>`;
+            
+            const bg = type === 'success' ? 'bg-white border-l-4 border-emerald-500' : 'bg-white border-l-4 border-red-500';
+            const icon = type === 'success' ? '<i class="fa-solid fa-circle-check text-emerald-500"></i>' : '<i class="fa-solid fa-circle-exclamation text-red-500"></i>';
+            
+            toast.className = `${bg} shadow-lg rounded px-4 py-3 text-sm text-slate-700 flex items-center gap-3 animate-slide-in-right pointer-events-auto min-w-[250px]`;
+            toast.innerHTML = `${icon} <span>${message}</span>`;
             
             container.appendChild(toast);
-            requestAnimationFrame(() => toast.classList.add('show'));
+            
             setTimeout(() => {
-                toast.classList.remove('show');
+                toast.style.opacity = '0';
+                toast.style.transform = 'translateX(100%)';
+                toast.style.transition = 'all 0.3s ease-out';
                 setTimeout(() => toast.remove(), 300);
             }, 3000);
         }
+
+        // --- Logic (Unchanged) ---
 
         function initQuill() {
             quill = new Quill('#quill-editor', {
@@ -413,7 +516,6 @@
             };
         }
 
-        /* --- Filename Extractor --- */
         function extractFilename(s3Key) {
             if (!s3Key) return 'Secure Uploaded File';
             const parts = s3Key.split('-');
@@ -439,8 +541,8 @@
                 allLevels.forEach(lvl => {
                     container.innerHTML += `
                         <label class="flex items-center gap-3 cursor-pointer hover:bg-slate-100 p-2 rounded-md transition border border-transparent hover:border-slate-200">
-                            <input type="checkbox" value="${lvl.levelName}" class="level-cb w-4 h-4 text-brand" onchange="updateAllLevelsCheckbox()">
-                            <span class="text-slate-700 font-medium">${lvl.levelName}</span>
+                            <input type="checkbox" value="${lvl.levelName}" class="level-cb w-4 h-4 text-brand-600 rounded border-slate-300 focus:ring-brand-500" onchange="updateAllLevelsCheckbox()">
+                            <span class="text-slate-700 font-medium text-sm">${lvl.levelName}</span>
                         </label>
                     `;
                 });
@@ -479,7 +581,6 @@
             }
         }
 
-        // --- Visual Card Selection ---
         function selectEntryType(type) {
             document.getElementById('recordType').value = type;
             
@@ -497,13 +598,13 @@
             
             if (type === 'folder') {
                 parentSelect.disabled = true; 
-                parentSelect.classList.add('bg-slate-100'); 
+                parentSelect.classList.add('bg-slate-50', 'opacity-70'); 
                 parentSelect.innerHTML = '<option value="">-- Main Folders sit at root --</option>';
                 videoContainer.classList.add('hidden');
                 videoContainer.classList.remove('flex');
             } else {
                 parentSelect.disabled = false; 
-                parentSelect.classList.remove('bg-slate-100');
+                parentSelect.classList.remove('bg-slate-50', 'opacity-70');
                 populateParentOptions(type);
                 
                 if(type === 'video') {
@@ -531,7 +632,7 @@
                 renderTree();
                 toggleFormMode(); 
             } catch (e) {
-                document.getElementById('hierarchy-tree').innerHTML = '<p class="text-red-500 text-center py-4">Failed to load repository.</p>';
+                document.getElementById('hierarchy-tree').innerHTML = '<p class="text-red-500 text-center py-4 text-sm">Failed to load repository.</p>';
             }
         }
 
@@ -541,18 +642,18 @@
             
             const folders = allRecordings.filter(c => c.type === 'folder');
             if(folders.length === 0) { 
-                tree.innerHTML = '<div class="text-center text-slate-400 py-10"><i class="fa-solid fa-video-slash text-4xl mb-3 opacity-50"></i><br><span class="text-sm font-medium">Repository is empty.</span></div>'; 
+                tree.innerHTML = '<div class="text-center text-slate-400 py-10 flex flex-col items-center"><i class="fa-solid fa-video-slash text-3xl mb-3 opacity-50 text-slate-300"></i><span class="text-sm font-medium">Repository is empty.</span></div>'; 
                 return; 
             }
 
             folders.forEach(folder => {
-                let html = buildNodeHtml(folder, 'fa-folder', 'text-brand', true);
-                html += `<div class="tree-children border-l border-slate-200 ml-3 pl-3 mt-1 space-y-1 mb-3">`;
+                let html = buildNodeHtml(folder, 'fa-folder', 'text-brand-500', true);
+                html += `<div class="tree-children border-l-2 border-slate-100 ml-3.5 pl-3 mt-1.5 space-y-1 mb-4">`;
                 
                 const subfolders = allRecordings.filter(c => c.parentId === folder.id);
                 subfolders.forEach(sub => {
                     html += buildNodeHtml(sub, 'fa-folder-open', 'text-blue-500', false);
-                    html += `<div class="tree-children border-l border-slate-100 ml-3 pl-3 mt-1 space-y-1 mb-2">`;
+                    html += `<div class="tree-children border-l border-slate-100 ml-3 pl-3 mt-1 space-y-1 mb-3">`;
                     
                     const videos = allRecordings.filter(c => c.parentId === sub.id);
                     videos.forEach(vid => {
@@ -575,8 +676,8 @@
                 levelTags = `<span class="text-[9px] text-slate-400 ml-1">(${lText})</span>`;
             }
 
-            const bgClass = isRoot ? 'bg-slate-100 border border-slate-200' : 'hover:bg-slate-50 border border-transparent';
-            const padding = isRoot ? 'p-2 mt-2 rounded' : 'py-1 px-1 rounded';
+            const bgClass = isRoot ? 'bg-slate-50 border border-slate-200 hover:bg-slate-100' : 'hover:bg-slate-50 border border-transparent';
+            const padding = isRoot ? 'p-2.5 mt-2 rounded-lg' : 'py-1.5 px-2 rounded-md';
             const titleClass = isRoot ? 'font-bold text-sm text-slate-800' : (isVideo ? 'font-medium text-xs text-slate-600' : 'font-semibold text-[13px] text-slate-700');
 
             return `
@@ -588,15 +689,13 @@
                         ${levelTags}
                         ${fileBadge}
                     </div>
-                    <div class="hidden group-hover:flex gap-1 pl-2 pt-0.5 bg-white shadow-sm rounded px-1 shrink-0">
-                        <button type="button" onclick="editRecord('${node.id}'); event.stopPropagation();" class="text-slate-400 hover:text-brand transition w-5 h-5 flex items-center justify-center border border-slate-200 rounded" title="Edit"><i class="fa-solid fa-pen text-[9px]"></i></button>
-                        <button type="button" onclick="deleteRecord('${node.id}'); event.stopPropagation();" class="text-slate-400 hover:text-red-500 transition w-5 h-5 flex items-center justify-center border border-red-100 rounded" title="Delete"><i class="fa-solid fa-trash text-[9px]"></i></button>
+                    <div class="hidden group-hover:flex gap-1 pl-2 pt-0.5 bg-white shadow-sm rounded px-1 shrink-0 ml-2">
+                        <button type="button" onclick="editRecord('${node.id}'); event.stopPropagation();" class="text-slate-400 hover:text-brand-600 transition w-6 h-6 flex items-center justify-center rounded hover:bg-slate-50" title="Edit"><i class="fa-solid fa-pen text-[10px]"></i></button>
+                        <button type="button" onclick="deleteRecord('${node.id}'); event.stopPropagation();" class="text-slate-400 hover:text-red-500 transition w-6 h-6 flex items-center justify-center rounded hover:bg-red-50" title="Delete"><i class="fa-solid fa-trash text-[10px]"></i></button>
                     </div>
                 </div>`;
         }
 
-
-        /* --- Editing, Preview & Submit --- */
         function previewContent() {
             const title = document.getElementById('recordTitle').value || 'Untitled Entry';
             const type = document.getElementById('recordType').value;
@@ -612,20 +711,19 @@
                 const existingFileCard = document.getElementById('existing-file-card');
                 
                 if(fileInput && fileInput.files.length > 0) {
-                    // Playable local video specifically requested
                     const fileUrl = URL.createObjectURL(fileInput.files[0]);
-                    videoBlock.innerHTML = `<video src="${fileUrl}" controls class="w-full h-full max-h-[400px] object-contain bg-black"></video>`;
+                    videoBlock.innerHTML = `<video src="${fileUrl}" controls class="w-full h-full max-h-[400px] object-contain bg-black rounded-xl"></video>`;
                 } else if(existingFileCard && !existingFileCard.classList.contains('hidden')) {
                     videoBlock.innerHTML = `
                         <div class="text-slate-500 flex flex-col items-center py-12 bg-slate-800 w-full h-full">
-                            <i class="fa-solid fa-cloud text-6xl mb-4 text-brand-light"></i>
+                            <i class="fa-solid fa-cloud text-5xl mb-4 text-brand-300"></i>
                             <p class="font-bold text-sm text-slate-300 mt-2">File is securely stored in AWS</p>
                             <p class="text-xs text-slate-400 mt-1">${document.getElementById('existing-filename').innerText}</p>
                         </div>`;
                 } else {
                     videoBlock.innerHTML = `
-                        <div class="text-slate-500 flex flex-col items-center py-12 bg-slate-100 border border-slate-300 w-full h-full">
-                            <i class="fa-solid fa-circle-play text-6xl mb-4 text-purple-300 bg-white rounded-full"></i>
+                        <div class="text-slate-500 flex flex-col items-center py-12 bg-slate-50 border border-slate-200 w-full h-full">
+                            <i class="fa-solid fa-circle-play text-5xl mb-4 text-purple-300 bg-white rounded-full"></i>
                             <p class="font-bold text-sm text-slate-500">Secure Video Stream Placeholder</p>
                         </div>`;
                 }
@@ -643,7 +741,6 @@
             const item = allRecordings.find(c => c.id === id);
             if (!item) return;
 
-            // Reset UI first
             document.getElementById('upload-dropzone').classList.remove('hidden');
             document.getElementById('upload-dropzone').classList.add('flex');
             document.getElementById('existing-file-card').classList.add('hidden');
@@ -685,7 +782,6 @@
             setSelectedLevels([]);
             quill.setContents([]);
             
-            // Reset File UI
             document.getElementById('upload-dropzone').classList.remove('hidden');
             document.getElementById('upload-dropzone').classList.add('flex');
             document.getElementById('existing-file-card').classList.add('hidden');
@@ -706,8 +802,10 @@
                 if(res.ok) {
                     showToast('Deleted successfully.');
                     fetchRecordings();
+                } else {
+                    showToast('Delete failed.', 'error');
                 }
-            } catch (e) { showToast('Delete failed.', 'error'); }
+            } catch (e) { showToast('Delete failed. Network error.', 'error'); }
         }
 
         async function handleFormSubmit(e) {
@@ -820,14 +918,17 @@
                 document.getElementById('ai-modal').classList.add('hidden');
                 showToast('AI transcription completed.');
             }).catch(e => {
-                showToast("AI Generation failed.", "error");
+                showToast("AI Generation failed. Check API key.", "error");
             }).finally(() => {
                 btn.innerHTML = `<i class="fa-solid fa-bolt"></i> Generate Notes`;
                 btn.disabled = false;
             });
         }
 
-        function logout() { localStorage.clear(); window.location.href = '../login.html'; }
+        function handleLogout() {
+            localStorage.clear(); 
+            window.location.href = '../login.html';
+        }
     </script>
 </body>
 </html>

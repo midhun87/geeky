@@ -4,92 +4,130 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Geeky Researcher | Enterprise Test Creator</title>
+    
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     
     <script>
-        tailwind.config = { 
-            theme: { 
-                extend: { 
-                    fontFamily: { sans: ['Inter', 'sans-serif'] }, 
-                    colors: { brand: { light: '#14b8a6', DEFAULT: '#0f766e', dark: '#115e59' } } 
-                } 
-            } 
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: { sans: ['Inter', 'sans-serif'] },
+                    colors: {
+                        brand: { 50: '#f0fdfa', 100: '#ccfbf1', 500: '#14b8a6', 600: '#0d9488', 700: '#0f766e', 900: '#134e4a' }
+                    },
+                    animation: {
+                        'fade-in': 'fadeIn 0.3s ease-out',
+                        'slide-in-right': 'slideInRight 0.3s ease-out',
+                    },
+                    keyframes: {
+                        fadeIn: { '0%': { opacity: '0' }, '100%': { opacity: '1' } },
+                        slideInRight: { '0%': { transform: 'translateX(100%)', opacity: '0' }, '100%': { transform: 'translateX(0)', opacity: '1' } }
+                    }
+                }
+            }
         }
     </script>
     <style>
-        body { background-color: #f8fafc; color: #0f172a; }
-        .admin-card { background: white; border: 1px solid #e2e8f0; border-radius: 0.5rem; box-shadow: 0 1px 3px 0 rgb(0 0 0 / 0.1); }
-        .admin-input { background: white; border: 1px solid #cbd5e1; border-radius: 0.375rem; transition: all 0.2s; width: 100%; padding: 0.5rem 0.75rem; font-size: 0.875rem; color: #334155; }
-        .admin-input:focus { border-color: #0f766e; box-shadow: 0 0 0 3px rgba(15, 118, 110, 0.1); outline: none; }
-        .admin-input:disabled { background-color: #f1f5f9; cursor: not-allowed; opacity: 0.6; }
-        .admin-label { display: block; font-size: 0.875rem; font-weight: 600; color: #475569; margin-bottom: 0.5rem; }
+        ::-webkit-scrollbar { width: 6px; height: 6px; }
+        ::-webkit-scrollbar-track { background: transparent; }
+        ::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 10px; }
+        ::-webkit-scrollbar-thumb:hover { background: #94a3b8; }
         
-        .btn-primary { background: #0f766e; color: white; border-radius: 0.375rem; font-weight: 500; padding: 0.6rem 1.2rem; transition: background 0.2s; border: none; cursor: pointer; display: inline-flex; align-items: center; justify-content: center; gap: 0.5rem; }
-        .btn-primary:hover { background: #115e59; }
-        
-        .btn-secondary { background: white; border: 1px solid #cbd5e1; color: #334155; border-radius: 0.375rem; font-weight: 500; padding: 0.6rem 1.2rem; transition: all 0.2s; cursor: pointer; display: inline-flex; align-items: center; justify-content: center; gap: 0.5rem; }
-        .btn-secondary:hover { background: #f1f5f9; }
+        body { background-color: #f1f5f9; color: #1e293b; }
 
-        .sidebar-link { display: flex; align-items: center; gap: 0.75rem; padding: 0.75rem 1rem; color: #94a3b8; border-radius: 0.375rem; font-weight: 500; transition: all 0.2s; }
-        .sidebar-link:hover { background: #1e293b; color: #f8fafc; }
-        .sidebar-link.active { background: #1e293b; color: white; border-left: 4px solid #14b8a6; }
-        
-        /* Custom Scrollbar */
-        .custom-scrollbar::-webkit-scrollbar { width: 6px; height: 6px; }
-        .custom-scrollbar::-webkit-scrollbar-track { background: transparent; }
-        .custom-scrollbar::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 10px; }
-        .custom-scrollbar::-webkit-scrollbar-thumb:hover { background: #94a3b8; }
+        .nav-link {
+            display: flex; align-items: center; gap: 0.75rem; padding: 0.75rem 1rem;
+            color: #64748b; border-radius: 0.5rem; font-weight: 500; transition: all 0.2s;
+        }
+        .nav-link:hover { background-color: #f1f5f9; color: #0f766e; }
+        .nav-link.active { background-color: #f0fdfa; color: #0d9488; border-right: 3px solid #14b8a6; }
+        .no-scrollbar::-webkit-scrollbar { display: none; }
+        .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+
+        /* Form Inputs */
+        .admin-input {
+            width: 100%; padding: 0.625rem 0.875rem; font-size: 0.875rem;
+            background-color: #f8fafc; border: 1px solid #cbd5e1; border-radius: 0.5rem;
+            transition: all 0.2s ease-in-out; color: #334155;
+        }
+        .admin-input:focus { background-color: #ffffff; border-color: #14b8a6; outline: none; box-shadow: 0 0 0 3px rgba(20, 184, 166, 0.15); }
+        .admin-input:disabled { background-color: #f1f5f9; cursor: not-allowed; opacity: 0.6; }
 
         /* Specialized Buttons */
         .q-type-btn {
-            flex: 1; padding: 1.25rem 1rem; border: 1px dashed #cbd5e1; border-radius: 0.5rem; font-weight: 600; font-size: 0.875rem; color: #475569; transition: all 0.2s; background: white; cursor: pointer; display: flex; flex-direction: column; align-items: center; gap: 0.5rem;
+            flex: 1; padding: 1rem; border: 1px dashed #cbd5e1; border-radius: 0.75rem; font-weight: 600; font-size: 0.875rem; color: #64748b; transition: all 0.2s; background: white; cursor: pointer; display: flex; flex-direction: column; align-items: center; gap: 0.5rem; justify-content: center;
         }
-        .q-type-btn:hover { border-color: #0f766e; color: #0f766e; background: #f0fdf4; transform: translateY(-1px); box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1); }
-        .q-type-btn i { font-size: 1.5rem; }
+        .q-type-btn:hover { border-color: #0d9488; color: #0f766e; background: #f0fdfa; transform: translateY(-1px); box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.05); }
+        .q-type-btn i { font-size: 1.25rem; }
     </style>
 </head>
-<body class="antialiased overflow-hidden w-full h-screen flex">
+<body class="antialiased w-full h-screen flex overflow-hidden">
 
-    <!-- Sidebar -->
-    <div class="w-64 bg-slate-900 flex-col hidden md:flex shrink-0 z-10 shadow-xl">
-        <div class="flex items-center gap-3 p-6 border-b border-slate-800">
-            <img src="https://res.cloudinary.com/dzuxwvamy/image/upload/v1783935221/WhatsApp_Image_2026-07-08_at_6.25.14_PM_aiuvde.jpg" class="w-10 h-10 rounded bg-white p-1 object-cover">
-            <div class="font-bold text-white leading-tight text-sm">Geeky Researcher<br><span class="text-brand-light font-normal text-xs">Admin Console</span></div>
+    <!-- Mobile Top Navigation Bar -->
+    <div class="md:hidden fixed top-0 left-0 right-0 h-16 bg-white border-b border-slate-200 z-30 flex items-center justify-between px-4 shadow-sm">
+        <div class="flex items-center gap-2">
+            <img src="https://res.cloudinary.com/dzuxwvamy/image/upload/v1783935221/WhatsApp_Image_2026-07-08_at_6.25.14_PM_aiuvde.jpg" class="w-8 h-8 rounded-full object-cover">
+            <span class="font-bold text-slate-800 text-sm">Geeky Researcher</span>
         </div>
-        <nav class="flex-1 space-y-1 p-4">
-            <a href="dashboard.html" class="sidebar-link"><i class="fa-solid fa-chart-line w-5 text-center"></i> Dashboard</a>
-            <a href="approvals.html" class="sidebar-link"><i class="fa-solid fa-user-check w-5 text-center"></i> Access Control</a>
-            <a href="content-builder.html" class="sidebar-link"><i class="fa-solid fa-folder-plus w-5 text-center"></i> Curriculum</a>
-            <a href="test-creator.html" class="sidebar-link active"><i class="fa-solid fa-vial w-5 text-center"></i> Assessments</a>
-            <a href="reports.html" class="sidebar-link"><i class="fa-solid fa-file-invoice w-5 text-center"></i> Reports</a>
-        </nav>
-        <div class="p-4 border-t border-slate-800">
-            <button onclick="logout()" class="w-full text-left text-sm text-red-400 font-medium hover:text-red-300 py-2 transition"><i class="fa-solid fa-sign-out-alt mr-2"></i> Sign Out</button>
-        </div>
+        <button onclick="toggleMobileMenu()" class="text-slate-500 hover:text-slate-800 focus:outline-none p-2 rounded-md bg-slate-50">
+            <i class="fa-solid fa-bars text-lg"></i>
+        </button>
     </div>
 
+    <!-- Mobile Menu Overlay -->
+    <div id="mobile-overlay" onclick="toggleMobileMenu()" class="fixed inset-0 bg-slate-900/50 z-40 hidden md:hidden backdrop-blur-sm transition-opacity"></div>
+
+    <!-- Sidebar -->
+    <aside id="sidebar" class="fixed md:static inset-y-0 left-0 z-50 w-64 bg-white border-r border-slate-200 flex flex-col transform -translate-x-full md:translate-x-0 transition-transform duration-300 ease-in-out shrink-0">
+        <div class="h-16 flex items-center gap-3 px-6 border-b border-slate-100">
+            <img src="https://res.cloudinary.com/dzuxwvamy/image/upload/v1783935221/WhatsApp_Image_2026-07-08_at_6.25.14_PM_aiuvde.jpg" class="w-9 h-9 rounded-full object-cover shadow-sm">
+            <div>
+                <div class="font-bold text-slate-800 leading-tight text-sm">Geeky Researcher</div>
+                <div class="text-brand-500 text-[11px] font-medium uppercase tracking-wider">Admin Portal</div>
+            </div>
+        </div>
+        
+        <nav class="flex-1 overflow-y-auto no-scrollbar py-4 px-3 space-y-1">
+            <p class="px-3 text-xs font-semibold text-slate-400 uppercase tracking-wider mb-2 mt-4">Menu</p>
+            <a href="dashboard_2.html" class="nav-link"><i class="fa-solid fa-chart-pie w-5 text-center"></i> Dashboard</a>
+            <a href="students.html" class="nav-link"><i class="fa-solid fa-user-graduate w-5 text-center"></i> Student Directory</a>
+            <a href="approvals.html" class="nav-link"><i class="fa-solid fa-users w-5 text-center"></i> Access Control</a>
+            <a href="content-builder.html" class="nav-link"><i class="fa-solid fa-book-open w-5 text-center"></i> Curriculum Builder</a>
+            <a href="recorded-classes.html" class="nav-link"><i class="fa-solid fa-video w-5 text-center"></i> Recorded Classes</a>
+            <a href="test-creator.html" class="nav-link active"><i class="fa-solid fa-clipboard-list w-5 text-center"></i> Assessments</a>
+            <p class="px-3 text-xs font-semibold text-slate-400 uppercase tracking-wider mb-2 mt-6">Settings</p>
+            <a href="reports.html" class="nav-link"><i class="fa-solid fa-file-invoice w-5 text-center"></i> Reports</a>
+        </nav>
+        
+        <div class="p-4 border-t border-slate-100">
+            <button onclick="logout()" class="w-full flex items-center justify-center gap-2 text-sm text-slate-600 font-medium hover:text-red-600 hover:bg-red-50 py-2.5 rounded-lg transition-colors">
+                <i class="fa-solid fa-arrow-right-from-bracket"></i> Log Out
+            </button>
+        </div>
+    </aside>
+
     <!-- Main Content -->
-    <div class="flex-1 overflow-hidden flex flex-col h-full bg-slate-50 relative z-0">
+    <main class="flex-1 flex flex-col h-full w-full pt-16 md:pt-0 bg-slate-50 relative z-0">
         
         <!-- View: Library -->
-        <div id="view-library" class="flex flex-col h-full p-6 md:p-8">
-            <div class="mb-6 flex flex-col md:flex-row justify-between items-start md:items-end shrink-0 gap-4">
+        <div id="view-library" class="flex flex-col h-full overflow-hidden">
+            <div class="p-6 md:p-8 shrink-0 flex flex-col md:flex-row justify-between items-start md:items-end gap-4 border-b border-slate-200 bg-white shadow-sm z-10">
                 <div>
-                    <h2 class="text-2xl font-bold text-slate-900">Assessment Engine</h2>
-                    <p class="text-sm text-slate-500 mt-1">Design examinations, assign targeted levels, and set specific attempt rules.</p>
+                    <h2 class="text-2xl font-bold text-slate-900 tracking-tight">Assessment Engine</h2>
+                    <p class="text-sm text-slate-500 mt-1">Design examinations, assign targeted levels, and set rules.</p>
                 </div>
-                <button class="btn-primary shadow-md" onclick="showEditor()">
+                <button class="bg-brand-600 hover:bg-brand-700 text-white font-medium py-2.5 px-5 rounded-lg transition-colors shadow-sm flex items-center justify-center gap-2 text-sm whitespace-nowrap" onclick="showEditor()">
                     <i class="fa-solid fa-plus"></i> New Assessment
                 </button>
             </div>
             
-            <div class="admin-card flex-1 overflow-y-auto custom-scrollbar p-6">
-                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4" id="library-grid">
+            <div class="flex-1 overflow-y-auto p-6 md:p-8 bg-slate-50/50">
+                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6" id="library-grid">
                     <div class="col-span-full flex flex-col items-center justify-center py-20 text-slate-400">
-                        <i class="fa-solid fa-circle-notch fa-spin text-3xl mb-3"></i>
-                        <span>Loading assessments...</span>
+                        <i class="fa-solid fa-circle-notch fa-spin text-3xl mb-3 text-brand-500"></i>
+                        <span class="text-sm font-medium">Loading assessments...</span>
                     </div>
                 </div>
             </div>
@@ -99,82 +137,82 @@
         <div id="view-editor" class="hidden flex-col h-full overflow-hidden bg-white">
             
             <!-- Editor Header -->
-            <div class="border-b border-slate-200 px-6 py-4 flex justify-between items-center bg-white z-20 shrink-0">
+            <div class="border-b border-slate-200 px-6 py-4 flex flex-col sm:flex-row justify-between sm:items-center bg-white shadow-sm z-20 shrink-0 gap-4">
                 <div class="flex items-center gap-4">
-                    <button onclick="hideEditor()" class="w-9 h-9 rounded border border-slate-300 hover:bg-slate-100 flex items-center justify-center transition text-slate-600">
+                    <button onclick="hideEditor()" class="w-9 h-9 rounded-lg border border-slate-200 hover:bg-slate-50 flex items-center justify-center transition text-slate-500">
                         <i class="fa-solid fa-arrow-left"></i>
                     </button>
                     <div>
-                        <h2 class="text-lg font-bold text-slate-900" id="editor-title-display">New Assessment Protocol</h2>
+                        <h2 class="text-lg font-bold text-slate-900 tracking-tight" id="editor-title-display">New Assessment Protocol</h2>
                     </div>
                 </div>
                 <div class="flex gap-3">
-                    <button class="btn-secondary" onclick="saveTest('draft')">Save Draft</button>
-                    <button class="btn-primary" onclick="saveTest('published')">Publish Live</button>
+                    <button class="bg-slate-100 hover:bg-slate-200 text-slate-700 font-medium py-2 px-4 rounded-lg transition-colors shadow-sm text-sm" onclick="saveTest('draft')">Save Draft</button>
+                    <button class="bg-brand-600 hover:bg-brand-700 text-white font-medium py-2 px-5 rounded-lg transition-colors shadow-sm text-sm" onclick="saveTest('published')">Publish Live</button>
                 </div>
             </div>
 
             <div class="flex flex-col lg:flex-row flex-1 overflow-hidden bg-slate-50">
                 
                 <!-- LEFT: Main Questions Canvas -->
-                <div class="flex-1 overflow-y-auto custom-scrollbar p-6 lg:p-8">
+                <div class="flex-1 overflow-y-auto p-6 lg:p-8">
                     
                     <!-- Title Configuration -->
-                    <div class="admin-card p-6 mb-6 border-t-4 border-t-brand">
+                    <div class="bg-white rounded-xl border border-slate-200 shadow-sm p-6 mb-6">
                         <input type="hidden" id="edit-test-id">
-                        <label class="admin-label text-brand">Assessment Title</label>
-                        <input type="text" id="testTitle" class="w-full text-xl font-bold border-none bg-transparent outline-none placeholder-slate-300" placeholder="e.g., Final Examination: Cellular Pathology">
+                        <label class="block text-xs font-bold text-brand-600 uppercase tracking-wider mb-2">Assessment Title</label>
+                        <input type="text" id="testTitle" class="w-full text-xl md:text-2xl font-bold border-none bg-transparent outline-none placeholder-slate-300 text-slate-900" placeholder="e.g., Final Examination: Cellular Pathology">
                     </div>
 
                     <!-- Dynamic Questions Container -->
                     <div id="questions-container" class="space-y-6 mb-6"></div>
                     
                     <!-- Append Question UI -->
-                    <div class="admin-card p-6 bg-white border-dashed border-2 flex flex-col md:flex-row gap-4 justify-center items-center">
-                        <span class="font-bold text-slate-500 mr-2 text-sm"><i class="fa-solid fa-plus mr-1"></i> Add Question:</span>
+                    <div class="bg-white rounded-xl border-2 border-dashed border-slate-300 p-6 flex flex-col md:flex-row gap-6 justify-center items-center">
+                        <span class="font-bold text-slate-600 text-sm whitespace-nowrap"><i class="fa-solid fa-plus-circle text-slate-400 mr-2"></i> Add Question Type:</span>
                         <div class="flex w-full md:w-auto gap-3 flex-1">
-                            <button onclick="addQuestion('mcq')" class="q-type-btn !p-3 !flex-row">
-                                <i class="fa-regular fa-circle-dot text-brand"></i> Single Correct
+                            <button onclick="addQuestion('mcq')" class="q-type-btn !flex-row !p-3">
+                                <i class="fa-regular fa-circle-dot text-brand-500"></i> <span class="hidden sm:inline">Single Correct</span><span class="sm:hidden">MCQ</span>
                             </button>
-                            <button onclick="addQuestion('msq')" class="q-type-btn !p-3 !flex-row">
-                                <i class="fa-solid fa-check-double text-blue-600"></i> Multiple Correct
+                            <button onclick="addQuestion('msq')" class="q-type-btn !flex-row !p-3">
+                                <i class="fa-solid fa-check-double text-blue-500"></i> <span class="hidden sm:inline">Multiple Correct</span><span class="sm:hidden">MSQ</span>
                             </button>
-                            <button onclick="addQuestion('fib')" class="q-type-btn !p-3 !flex-row">
-                                <i class="fa-solid fa-pen-clip text-amber-600"></i> Short Answer
+                            <button onclick="addQuestion('fib')" class="q-type-btn !flex-row !p-3">
+                                <i class="fa-solid fa-pen-clip text-amber-500"></i> <span class="hidden sm:inline">Short Answer</span><span class="sm:hidden">FIB</span>
                             </button>
                         </div>
                     </div>
                 </div>
 
                 <!-- RIGHT: Configuration Sidebar -->
-                <div class="w-full lg:w-[350px] shrink-0 overflow-y-auto custom-scrollbar border-l border-slate-200 bg-white p-6 space-y-6 shadow-[-4px_0_15px_rgba(0,0,0,0.02)]">
+                <div class="w-full lg:w-[320px] xl:w-[350px] shrink-0 overflow-y-auto border-t lg:border-t-0 lg:border-l border-slate-200 bg-white p-6 space-y-6 lg:shadow-[-4px_0_15px_rgba(0,0,0,0.02)]">
                     
                     <!-- Access & Attempts -->
                     <div>
-                        <h3 class="font-bold text-slate-800 text-sm mb-3 pb-2 border-b border-slate-100 flex items-center gap-2">
-                            <i class="fa-solid fa-users text-brand"></i> Target Audience & Attempts
+                        <h3 class="font-bold text-slate-800 text-sm mb-2 pb-2 border-b border-slate-100 flex items-center gap-2">
+                            <div class="w-6 h-6 rounded bg-brand-50 text-brand-600 flex items-center justify-center"><i class="fa-solid fa-users text-xs"></i></div> Target Audience
                         </h3>
-                        <p class="text-[11px] text-slate-500 mb-3">Check levels to grant access and set max attempts per student for that level.</p>
+                        <p class="text-[11px] text-slate-500 mb-3">Set access and max attempts per level.</p>
                         
-                        <div id="levelCheckboxes" class="space-y-2 max-h-64 overflow-y-auto custom-scrollbar pr-1">
+                        <div id="levelCheckboxes" class="space-y-2 max-h-64 overflow-y-auto pr-1">
                             <!-- Populated dynamically via JS -->
                         </div>
                     </div>
 
                     <!-- Scheduler -->
                     <div>
-                        <h3 class="font-bold text-slate-800 text-sm mb-3 pb-2 border-b border-slate-100 flex items-center gap-2">
-                            <i class="fa-solid fa-calendar-alt text-blue-500"></i> Availability Window
+                        <h3 class="font-bold text-slate-800 text-sm mb-2 pb-2 border-b border-slate-100 flex items-center gap-2">
+                            <div class="w-6 h-6 rounded bg-blue-50 text-blue-500 flex items-center justify-center"><i class="fa-solid fa-calendar-alt text-xs"></i></div> Availability
                         </h3>
                         <p class="text-[11px] text-slate-500 mb-3">Leave blank for permanent access.</p>
                         <div class="space-y-3">
                             <div>
-                                <label class="text-[11px] font-bold text-slate-500 uppercase">Commences</label>
-                                <input type="datetime-local" id="testStartTime" class="admin-input !py-1.5 !text-xs mt-1">
+                                <label class="text-[10px] font-bold text-slate-500 uppercase tracking-wider">Commences</label>
+                                <input type="datetime-local" id="testStartTime" class="admin-input !py-2 !text-xs mt-1">
                             </div>
                             <div>
-                                <label class="text-[11px] font-bold text-slate-500 uppercase">Concludes</label>
-                                <input type="datetime-local" id="testEndTime" class="admin-input !py-1.5 !text-xs mt-1">
+                                <label class="text-[10px] font-bold text-slate-500 uppercase tracking-wider">Concludes</label>
+                                <input type="datetime-local" id="testEndTime" class="admin-input !py-2 !text-xs mt-1">
                             </div>
                         </div>
                     </div>
@@ -182,16 +220,16 @@
                     <!-- Exam Rules -->
                     <div>
                         <h3 class="font-bold text-slate-800 text-sm mb-3 pb-2 border-b border-slate-100 flex items-center gap-2">
-                            <i class="fa-solid fa-scale-balanced text-amber-500"></i> Examination Rules
+                            <div class="w-6 h-6 rounded bg-amber-50 text-amber-500 flex items-center justify-center"><i class="fa-solid fa-scale-balanced text-xs"></i></div> Rules
                         </h3>
-                        <div class="space-y-3">
+                        <div class="space-y-3 bg-slate-50 p-4 rounded-lg border border-slate-100">
                             <div class="flex items-center justify-between">
-                                <label class="text-xs font-semibold text-slate-600">Duration (Mins)</label>
-                                <input type="number" id="testTimeLimit" class="admin-input !w-20 !py-1 text-center font-bold" value="60" min="1">
+                                <label class="text-xs font-semibold text-slate-700">Duration (Mins)</label>
+                                <input type="number" id="testTimeLimit" class="admin-input !w-20 !py-1 text-center font-bold text-brand-600 bg-white" value="60" min="1">
                             </div>
                             <div class="flex items-center justify-between">
-                                <label class="text-xs font-semibold text-slate-600">Passing Mark (%)</label>
-                                <input type="number" id="testPassingScore" class="admin-input !w-20 !py-1 text-center font-bold" value="50" min="1" max="100">
+                                <label class="text-xs font-semibold text-slate-700">Passing Mark (%)</label>
+                                <input type="number" id="testPassingScore" class="admin-input !w-20 !py-1 text-center font-bold text-brand-600 bg-white" value="50" min="1" max="100">
                             </div>
                         </div>
                     </div>
@@ -199,15 +237,15 @@
                     <!-- Post-Exam Rules -->
                     <div>
                         <h3 class="font-bold text-slate-800 text-sm mb-3 pb-2 border-b border-slate-100 flex items-center gap-2">
-                            <i class="fa-solid fa-eye text-emerald-500"></i> Post-Submission
+                            <div class="w-6 h-6 rounded bg-emerald-50 text-emerald-500 flex items-center justify-center"><i class="fa-solid fa-eye text-xs"></i></div> Post-Submission
                         </h3>
-                        <div class="space-y-2">
-                            <label class="flex items-start gap-2 cursor-pointer">
-                                <input type="checkbox" id="testReleaseResults" class="mt-0.5 text-brand" checked> 
+                        <div class="space-y-3">
+                            <label class="flex items-start gap-3 cursor-pointer p-2 rounded hover:bg-slate-50 transition border border-transparent hover:border-slate-100">
+                                <input type="checkbox" id="testReleaseResults" class="mt-0.5 text-brand-600 rounded" checked> 
                                 <span class="text-xs text-slate-700 font-medium leading-tight">Display score instantly after submission</span>
                             </label>
-                            <label class="flex items-start gap-2 cursor-pointer">
-                                <input type="checkbox" id="testShowAnswers" class="mt-0.5 text-brand" checked> 
+                            <label class="flex items-start gap-3 cursor-pointer p-2 rounded hover:bg-slate-50 transition border border-transparent hover:border-slate-100">
+                                <input type="checkbox" id="testShowAnswers" class="mt-0.5 text-brand-600 rounded" checked> 
                                 <span class="text-xs text-slate-700 font-medium leading-tight">Reveal correct answer key in review</span>
                             </label>
                         </div>
@@ -216,19 +254,71 @@
                 </div>
             </div>
         </div>
+    </main>
+
+    <!-- Delete Confirmation Modal -->
+    <div id="delete-modal" class="fixed inset-0 z-[60] hidden">
+        <div class="absolute inset-0 bg-slate-900/40 backdrop-blur-sm" onclick="closeDeleteModal()"></div>
+        <div class="flex items-center justify-center min-h-screen px-4 pt-4 pb-20 text-center sm:p-0 pointer-events-none">
+            <div class="relative bg-white rounded-xl text-left overflow-hidden shadow-xl transform transition-all sm:my-8 sm:max-w-md w-full animate-fade-in pointer-events-auto">
+                <div class="bg-white px-4 pt-5 pb-4 sm:p-6 sm:pb-4">
+                    <div class="sm:flex sm:items-start">
+                        <div class="mx-auto flex-shrink-0 flex items-center justify-center h-12 w-12 rounded-full bg-red-100 sm:mx-0 sm:h-10 sm:w-10">
+                            <i class="fa-solid fa-trash-can text-red-600"></i>
+                        </div>
+                        <div class="mt-3 text-center sm:mt-0 sm:ml-4 sm:text-left">
+                            <h3 class="text-lg leading-6 font-semibold text-slate-900">Delete Assessment</h3>
+                            <div class="mt-2">
+                                <p class="text-sm text-slate-500">Are you sure you want to permanently delete this assessment? This action cannot be undone.</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="bg-slate-50 px-4 py-3 sm:px-6 sm:flex sm:flex-row-reverse border-t border-slate-100 gap-2">
+                    <button type="button" id="confirm-delete-btn" class="w-full inline-flex justify-center rounded-lg border border-transparent shadow-sm px-4 py-2 bg-red-600 text-base font-medium text-white hover:bg-red-700 focus:outline-none sm:w-auto sm:text-sm transition-colors">
+                        Delete Assessment
+                    </button>
+                    <button type="button" onclick="closeDeleteModal()" class="mt-3 w-full inline-flex justify-center rounded-lg border border-slate-300 shadow-sm px-4 py-2 bg-white text-base font-medium text-slate-700 hover:bg-slate-50 focus:outline-none sm:mt-0 sm:w-auto sm:text-sm transition-colors">
+                        Cancel
+                    </button>
+                </div>
+            </div>
+        </div>
     </div>
+
+    <!-- Toast Notification Container -->
+    <div id="toast-container" class="fixed top-4 right-4 z-[70] flex flex-col gap-2 pointer-events-none"></div>
 
     <script>
         const API_BASE_URL = '/api';
         const token = localStorage.getItem('token');
-        const user = JSON.parse(localStorage.getItem('user'));
+        const user = localStorage.getItem('user') ? JSON.parse(localStorage.getItem('user')) : null;
         let qCounter = 0; 
         let testLibrary = [];
         let allLevels = [];
+        let testToDelete = null;
 
-        if (!token || !user || user.role !== 'admin') { 
-            localStorage.clear(); 
-            window.location.href = '../login.html'; 
+        if (!token || !user || user.role !== 'admin') { localStorage.clear(); window.location.href = '../login.html'; }
+
+        function toggleMobileMenu() {
+            const sidebar = document.getElementById('sidebar');
+            const overlay = document.getElementById('mobile-overlay');
+            if (sidebar.classList.contains('-translate-x-full')) {
+                sidebar.classList.remove('-translate-x-full'); overlay.classList.remove('hidden'); document.body.classList.add('overflow-hidden'); 
+            } else {
+                sidebar.classList.add('-translate-x-full'); overlay.classList.add('hidden'); document.body.classList.remove('overflow-hidden');
+            }
+        }
+
+        function showToast(message, type = 'success') {
+            const container = document.getElementById('toast-container');
+            const toast = document.createElement('div');
+            const bg = type === 'success' ? 'bg-white border-l-4 border-emerald-500' : 'bg-white border-l-4 border-red-500';
+            const icon = type === 'success' ? '<i class="fa-solid fa-circle-check text-emerald-500"></i>' : '<i class="fa-solid fa-circle-exclamation text-red-500"></i>';
+            toast.className = `${bg} shadow-lg rounded px-4 py-3 text-sm text-slate-700 flex items-center gap-3 animate-slide-in-right pointer-events-auto min-w-[250px]`;
+            toast.innerHTML = `${icon} <span>${message}</span>`;
+            container.appendChild(toast);
+            setTimeout(() => { toast.style.opacity = '0'; toast.style.transform = 'translateX(100%)'; toast.style.transition = 'all 0.3s ease-out'; setTimeout(() => toast.remove(), 300); }, 3000);
         }
 
         document.addEventListener('DOMContentLoaded', async () => { 
@@ -244,14 +334,14 @@
                 const container = document.getElementById('levelCheckboxes');
                 
                 let html = `
-                    <div class="flex items-center justify-between gap-2 p-2 bg-slate-50 border border-slate-200 rounded mb-2">
+                    <div class="flex items-center justify-between gap-2 p-2 bg-slate-50 border border-slate-200 rounded-lg mb-2">
                         <label class="flex items-center gap-2 cursor-pointer flex-1">
-                            <input type="checkbox" id="selectAllLevels" value="All Levels" class="w-4 h-4 text-brand" onchange="toggleAllLevels(this)">
-                            <span class="font-bold text-xs text-slate-800">Global Audience (All)</span>
+                            <input type="checkbox" id="selectAllLevels" value="All Levels" class="w-4 h-4 text-brand-600 rounded border-slate-300 focus:ring-brand-500" onchange="toggleAllLevels(this)">
+                            <span class="font-bold text-xs text-slate-800">Global Audience</span>
                         </label>
-                        <div class="flex items-center gap-1">
-                            <span class="text-[10px] text-slate-500 font-semibold uppercase">Max:</span>
-                            <input type="number" id="attempts-All Levels" class="admin-input !w-16 !py-0.5 !px-1 text-center !text-xs font-bold" value="1" min="1" disabled>
+                        <div class="flex items-center gap-1.5 bg-white px-2 py-1 rounded border border-slate-200">
+                            <span class="text-[10px] text-slate-400 font-semibold uppercase">Max:</span>
+                            <input type="number" id="attempts-All Levels" class="admin-input !w-12 !py-0.5 !px-1 text-center !text-xs font-bold !bg-transparent !border-none !shadow-none p-0" value="1" min="1" disabled>
                         </div>
                     </div>
                 `;
@@ -259,21 +349,21 @@
                 allLevels.forEach(lvl => {
                     const safeId = lvl.levelName.replace(/\s+/g, '-');
                     html += `
-                        <div class="flex items-center justify-between gap-2 p-2 hover:bg-slate-50 border border-transparent hover:border-slate-100 rounded transition">
+                        <div class="flex items-center justify-between gap-2 p-2 hover:bg-slate-50 border border-transparent hover:border-slate-100 rounded-lg transition">
                             <label class="flex items-center gap-2 cursor-pointer flex-1">
-                                <input type="checkbox" value="${lvl.levelName}" class="level-cb w-4 h-4 text-brand" onchange="toggleLevelInput(this)">
+                                <input type="checkbox" value="${lvl.levelName}" class="level-cb w-4 h-4 text-brand-600 rounded border-slate-300 focus:ring-brand-500" onchange="toggleLevelInput(this)">
                                 <span class="text-xs text-slate-700 font-medium">${lvl.levelName}</span>
                             </label>
-                            <div class="flex items-center gap-1">
+                            <div class="flex items-center gap-1.5 bg-white px-2 py-1 rounded border border-slate-200 shadow-sm">
                                 <span class="text-[10px] text-slate-400 font-semibold uppercase">Max:</span>
-                                <input type="number" id="attempts-${safeId}" class="admin-input !w-16 !py-0.5 !px-1 text-center !text-xs font-bold" value="1" min="1" disabled>
+                                <input type="number" id="attempts-${safeId}" class="admin-input !w-12 !py-0.5 !px-1 text-center !text-xs font-bold !bg-transparent !border-none !shadow-none p-0" value="1" min="1" disabled>
                             </div>
                         </div>
                     `;
                 });
                 container.innerHTML = html;
             } catch(e) {
-                alert("Failed to connect to level registry.");
+                showToast("Failed to connect to level registry.", "error");
             }
         }
 
@@ -289,10 +379,7 @@
 
         function toggleAllLevels(selectAllCb) {
             const checkboxes = document.querySelectorAll('.level-cb');
-            checkboxes.forEach(cb => {
-                cb.checked = selectAllCb.checked;
-                toggleLevelInput(cb);
-            });
+            checkboxes.forEach(cb => { cb.checked = selectAllCb.checked; toggleLevelInput(cb); });
             const allInput = document.getElementById('attempts-All Levels');
             if(allInput) allInput.disabled = !selectAllCb.checked;
         }
@@ -307,7 +394,6 @@
             const checkboxes = document.querySelectorAll('.level-cb');
             const selectAllCb = document.getElementById('selectAllLevels');
             
-            // Reset all first
             checkboxes.forEach(cb => { cb.checked = false; toggleLevelInput(cb); });
             if(selectAllCb) { selectAllCb.checked = false; document.getElementById('attempts-All Levels').disabled = true; }
 
@@ -325,9 +411,7 @@
                     toggleLevelInput(cb);
                     const safeId = cb.value.replace(/\s+/g, '-');
                     const input = document.getElementById(`attempts-${safeId}`);
-                    if (input && savedAttempts && savedAttempts[cb.value]) {
-                        input.value = savedAttempts[cb.value];
-                    }
+                    if (input && savedAttempts && savedAttempts[cb.value]) { input.value = savedAttempts[cb.value]; }
                 });
             } else {
                 checkboxes.forEach(cb => {
@@ -336,9 +420,7 @@
                         toggleLevelInput(cb);
                         const safeId = cb.value.replace(/\s+/g, '-');
                         const input = document.getElementById(`attempts-${safeId}`);
-                        if (input && savedAttempts && savedAttempts[cb.value]) {
-                            input.value = savedAttempts[cb.value];
-                        }
+                        if (input && savedAttempts && savedAttempts[cb.value]) { input.value = savedAttempts[cb.value]; }
                     }
                 });
             }
@@ -350,9 +432,7 @@
                 const res = await fetch(`${API_BASE_URL}/admin/tests`, { headers: { 'Authorization': `Bearer ${token}` } });
                 testLibrary = await res.json();
                 renderLibrary();
-            } catch (err) {
-                alert("Data sync failure.");
-            }
+            } catch (err) { showToast("Data sync failure.", "error"); }
         }
 
         function renderLibrary() {
@@ -362,46 +442,83 @@
             if(testLibrary.length === 0) { 
                 grid.innerHTML = `
                     <div class="col-span-full flex flex-col items-center justify-center py-20 text-slate-400">
-                        <i class="fa-solid fa-box-open text-3xl mb-3"></i>
-                        <span>Repository is empty.</span>
+                        <i class="fa-solid fa-box-open text-4xl mb-4 opacity-50"></i>
+                        <span class="text-sm font-medium">Repository is empty. Create your first assessment.</span>
                     </div>`; 
                 return; 
             }
             
             testLibrary.forEach(test => {
                 const qCount = test.questions ? test.questions.length : 0;
-                
                 let badge = test.status === 'published' 
-                    ? `<span class="bg-emerald-100 text-emerald-700 px-2 py-0.5 rounded text-[10px] font-bold uppercase">Published</span>`
-                    : `<span class="bg-slate-200 text-slate-600 px-2 py-0.5 rounded text-[10px] font-bold uppercase">Draft</span>`;
+                    ? `<span class="bg-emerald-50 text-emerald-700 border border-emerald-200 px-2 py-0.5 rounded text-[10px] font-bold uppercase tracking-wider">Published</span>`
+                    : `<span class="bg-slate-100 text-slate-600 border border-slate-200 px-2 py-0.5 rounded text-[10px] font-bold uppercase tracking-wider">Draft</span>`;
                 
                 let levelsDisplay = 'Unassigned';
                 if (test.levels && test.levels.length > 0) {
-                     levelsDisplay = test.levels.includes('All Levels') ? 'Global' : test.levels.join(', ');
+                     levelsDisplay = test.levels.includes('All Levels') ? 'Global Audience' : test.levels.join(', ');
                 }
 
                 grid.innerHTML += `
-                    <div class="admin-card p-5 hover:border-brand-light transition flex flex-col group bg-white">
-                        <div class="flex justify-between items-start mb-3">
+                    <div class="bg-white p-5 rounded-xl border border-slate-200 shadow-sm hover:shadow-md hover:border-brand-300 transition-all flex flex-col group">
+                        <div class="flex justify-between items-start mb-4">
                             ${badge}
-                            <span class="text-[10px] font-semibold text-slate-500 truncate max-w-[100px]" title="${levelsDisplay}"><i class="fa-solid fa-users"></i> ${levelsDisplay}</span>
+                            <span class="text-[10px] font-semibold text-slate-400 truncate max-w-[100px] flex items-center gap-1" title="${levelsDisplay}"><i class="fa-solid fa-users"></i> ${levelsDisplay}</span>
                         </div>
-                        <h3 class="font-bold text-slate-800 text-base mb-3 line-clamp-2" title="${test.title}">${test.title}</h3>
+                        <h3 class="font-bold text-slate-800 text-base mb-4 leading-tight line-clamp-2" title="${test.title}">${test.title}</h3>
                         
-                        <div class="flex gap-3 mb-4 mt-auto">
-                            <span class="text-xs text-slate-500 bg-slate-100 px-2 py-1 rounded"><i class="fa-solid fa-list text-brand mr-1"></i> ${qCount} Items</span>
-                            <span class="text-xs text-slate-500 bg-slate-100 px-2 py-1 rounded"><i class="fa-solid fa-stopwatch text-amber-500 mr-1"></i> ${test.timeLimit || 60}m</span>
+                        <div class="flex gap-2 mb-5 mt-auto">
+                            <span class="text-xs text-slate-600 bg-slate-50 border border-slate-100 px-2 py-1 rounded-md font-medium"><i class="fa-solid fa-list text-brand-500 mr-1"></i> ${qCount} Items</span>
+                            <span class="text-xs text-slate-600 bg-slate-50 border border-slate-100 px-2 py-1 rounded-md font-medium"><i class="fa-solid fa-stopwatch text-amber-500 mr-1"></i> ${test.timeLimit || 60}m</span>
                         </div>
 
-                        <div class="flex gap-2 pt-3 border-t border-slate-100">
-                            <button onclick="editTest('${test.id}')" class="flex-1 btn-secondary !py-1.5 !px-2 !text-xs">Edit</button>
-                            <button onclick="deleteTest('${test.id}')" class="w-8 btn-secondary !py-1.5 !px-0 !text-red-500 hover:!bg-red-50 hover:!border-red-200" title="Delete">
+                        <div class="flex gap-2 pt-4 border-t border-slate-100">
+                            <button onclick="editTest('${test.id}')" class="flex-1 bg-white border border-slate-200 text-slate-700 hover:bg-slate-50 font-medium py-1.5 rounded-lg text-xs transition shadow-sm">Edit</button>
+                            <button onclick="promptDelete('${test.id}')" class="w-9 h-auto bg-white border border-red-200 text-red-500 hover:bg-red-50 flex items-center justify-center rounded-lg transition shadow-sm" title="Delete">
                                 <i class="fa-solid fa-trash-can"></i>
                             </button>
                         </div>
                     </div>
                 `;
             });
+        }
+
+        function promptDelete(id) {
+            testToDelete = id;
+            document.getElementById('delete-modal').classList.remove('hidden');
+            document.getElementById('confirm-delete-btn').onclick = () => executeDelete();
+        }
+
+        function closeDeleteModal() {
+            testToDelete = null;
+            document.getElementById('delete-modal').classList.add('hidden');
+        }
+
+        async function executeDelete() {
+            if(!testToDelete) return;
+            const id = testToDelete;
+            const btn = document.getElementById('confirm-delete-btn');
+            const originalText = btn.innerHTML;
+            
+            btn.innerHTML = `<i class="fa-solid fa-circle-notch fa-spin"></i> Deleting...`;
+            btn.disabled = true;
+
+            try { 
+                const res = await fetch(`${API_BASE_URL}/admin/tests/${id}`, { method: 'DELETE', headers: { 'Authorization': `Bearer ${token}` }}); 
+                if(res.ok) {
+                    showToast('Assessment deleted successfully.');
+                    fetchLibrary();
+                    closeDeleteModal();
+                } else {
+                    showToast('Failed to delete assessment.', 'error');
+                }
+            } catch(e) {
+                showToast("Network error during deletion.", 'error');
+            } finally {
+                btn.innerHTML = originalText;
+                btn.disabled = false;
+                closeDeleteModal();
+            }
         }
 
         function showEditor(isNew = true) {
@@ -473,11 +590,11 @@
             const div = document.createElement('div');
             
             let label, borderCol, icon;
-            if (type === 'mcq') { label = 'Single Correct (MCQ)'; borderCol = 'border-l-brand'; icon = 'fa-circle-dot'; } 
+            if (type === 'mcq') { label = 'Single Correct (MCQ)'; borderCol = 'border-l-brand-500'; icon = 'fa-circle-dot'; } 
             else if (type === 'msq') { label = 'Multiple Correct (MSQ)'; borderCol = 'border-l-blue-500'; icon = 'fa-check-double'; } 
             else { label = 'Short Answer'; borderCol = 'border-l-amber-500'; icon = 'fa-pen-clip'; }
 
-            div.className = `question-block admin-card p-5 border-l-4 ${borderCol} mb-4 relative bg-white`;
+            div.className = `question-block bg-white p-6 rounded-xl border border-slate-200 shadow-sm border-l-4 ${borderCol} mb-4 relative`;
             div.dataset.type = type;
             
             let optionsHtml = '';
@@ -491,14 +608,14 @@
                     const optVal = data && data.options[i] ? data.options[i].replace(/"/g, '&quot;') : '';
                     optionsHtml += `
                         <div class="flex items-center gap-3 option-row">
-                            <input type="${inputType}" name="ans_${id}" value="${i}" class="w-4 h-4 text-brand cursor-pointer" ${isChecked}>
-                            <input type="text" class="opt-input admin-input flex-1" placeholder="Option ${i+1}" value="${optVal}">
-                            <button type="button" class="text-slate-400 hover:text-red-500 px-2 transition" onclick="removeOption(this)" title="Remove Option"><i class="fa-solid fa-times"></i></button>
+                            <input type="${inputType}" name="ans_${id}" value="${i}" class="w-4 h-4 text-brand-600 focus:ring-brand-500 cursor-pointer border-slate-300 rounded${inputType === 'radio' ? '-full' : ''}" ${isChecked}>
+                            <input type="text" class="opt-input admin-input flex-1 !py-1.5" placeholder="Option ${i+1}" value="${optVal}">
+                            <button type="button" class="text-slate-400 hover:text-red-500 w-8 h-8 rounded-full hover:bg-slate-100 flex items-center justify-center transition" onclick="removeOption(this)" title="Remove Option"><i class="fa-solid fa-times"></i></button>
                         </div>`;
                 }
                 optionsHtml += `</div>
-                <div class="mt-3 flex">
-                    <button type="button" class="text-xs font-bold text-brand bg-slate-100 hover:bg-slate-200 px-3 py-1.5 rounded transition flex items-center gap-1.5" onclick="addNewOption('${id}', '${type}')">
+                <div class="mt-4 flex">
+                    <button type="button" class="text-xs font-bold text-brand-600 bg-brand-50 hover:bg-brand-100 px-3 py-1.5 rounded-lg transition flex items-center gap-1.5" onclick="addNewOption('${id}', '${type}')">
                         <i class="fa-solid fa-plus"></i> Add Option
                     </button>
                 </div>`;
@@ -519,48 +636,48 @@
 
             div.innerHTML = `
                 <div class="flex flex-col md:flex-row justify-between md:items-center gap-4 mb-4 border-b border-slate-100 pb-3">
-                    <span class="text-sm font-bold text-slate-700 uppercase flex items-center gap-2"><i class="fa-solid ${icon} text-slate-400"></i> ${label}</span>
+                    <span class="text-xs font-bold text-slate-500 uppercase tracking-wider flex items-center gap-2"><i class="fa-solid ${icon} text-slate-400"></i> ${label}</span>
                     <div class="flex items-center gap-4">
-                        <div class="flex items-center gap-1.5 bg-slate-50 p-1 rounded border border-slate-200">
-                            <span class="text-xs font-bold text-emerald-600 px-1">+</span>
-                            <input type="number" class="q-pos-marks admin-input !w-14 !py-0.5 !px-1 text-center text-xs font-bold" value="${posMarksVal}" min="0" step="0.5" title="Positive Marks">
-                            <span class="text-xs font-bold text-red-500 px-1 border-l border-slate-300">-</span>
-                            <input type="number" class="q-neg-marks admin-input !w-14 !py-0.5 !px-1 text-center text-xs font-bold" value="${negMarksVal}" min="0" step="0.5" title="Negative Marks">
+                        <div class="flex items-center gap-1.5 bg-slate-50 p-1.5 rounded-lg border border-slate-200">
+                            <span class="text-[10px] font-bold text-emerald-600 uppercase tracking-widest pl-1">Pos:</span>
+                            <input type="number" class="q-pos-marks admin-input !w-14 !py-0.5 !px-1 text-center text-xs font-bold bg-white" value="${posMarksVal}" min="0" step="0.5" title="Positive Marks">
+                            <span class="text-slate-300 mx-1">|</span>
+                            <span class="text-[10px] font-bold text-red-500 uppercase tracking-widest">Neg:</span>
+                            <input type="number" class="q-neg-marks admin-input !w-14 !py-0.5 !px-1 text-center text-xs font-bold bg-white" value="${negMarksVal}" min="0" step="0.5" title="Negative Marks">
                         </div>
-                        <button onclick="this.closest('.question-block').remove()" class="text-red-400 hover:text-red-600 bg-red-50 p-2 rounded transition" title="Delete Question">
+                        <button onclick="this.closest('.question-block').remove()" class="text-slate-400 hover:text-red-500 w-8 h-8 rounded-full hover:bg-red-50 flex items-center justify-center transition" title="Delete Question">
                             <i class="fa-solid fa-trash-can"></i>
                         </button>
                     </div>
                 </div>
                 
-                <div class="flex flex-col md:flex-row gap-4 mb-5">
+                <div class="flex flex-col md:flex-row gap-5 mb-5">
                     <div class="flex-1">
-                        <label class="admin-label">Question Text</label>
+                        <label class="block text-xs font-semibold text-slate-600 mb-1">Question Text</label>
                         <textarea class="q-text admin-input min-h-[100px] resize-y" placeholder="Enter question text here...">${textVal}</textarea>
                     </div>
                     <div class="shrink-0 w-full md:w-48 relative group">
-                        <label class="admin-label text-center">Reference Image</label>
-                        <div class="h-[100px] bg-slate-100 rounded border-2 border-dashed border-slate-300 flex items-center justify-center overflow-hidden relative">
-                            ${imgUrl ? `<img src="${imgUrl}" class="q-img-preview w-full h-full object-cover">` : `<span class="q-img-preview text-xs font-semibold text-slate-400">No Image</span>`}
-                            <label class="absolute inset-0 bg-slate-900/50 flex flex-col items-center justify-center opacity-0 group-hover:opacity-100 cursor-pointer transition text-white text-[10px] font-bold">
-                                <i class="fa-solid fa-upload text-sm mb-1"></i> Upload
+                        <label class="block text-xs font-semibold text-slate-600 mb-1 text-center">Reference Image</label>
+                        <div class="h-[100px] bg-slate-50 rounded-lg border-2 border-dashed border-slate-300 flex items-center justify-center overflow-hidden relative">
+                            ${imgUrl ? `<img src="${imgUrl}" class="q-img-preview w-full h-full object-cover">` : `<span class="q-img-preview text-[10px] font-semibold text-slate-400 uppercase tracking-widest">No Image</span>`}
+                            <label class="absolute inset-0 bg-slate-900/60 flex flex-col items-center justify-center opacity-0 group-hover:opacity-100 cursor-pointer transition text-white text-[10px] font-bold uppercase tracking-wider backdrop-blur-sm">
+                                <i class="fa-solid fa-cloud-arrow-up text-lg mb-1"></i> Upload
                                 <input type="file" accept="image/*" class="hidden" onchange="uploadQuestionImage(this, this.closest('.question-block'))">
                             </label>
                         </div>
                         <input type="hidden" class="q-img-url" value="${imgUrl}">
-                        ${imgUrl ? `<button class="absolute -top-2 -right-2 bg-white text-red-500 border border-red-200 rounded-full w-6 h-6 flex items-center justify-center shadow hover:bg-red-50 z-10" onclick="removeQuestionImage(this.closest('.question-block'))"><i class="fa-solid fa-times text-[10px]"></i></button>` : ''}
+                        ${imgUrl ? `<button class="absolute top-6 -right-2 bg-white text-red-500 border border-red-200 rounded-full w-6 h-6 flex items-center justify-center shadow hover:bg-red-50 z-10" onclick="removeQuestionImage(this.closest('.question-block'))"><i class="fa-solid fa-times text-[10px]"></i></button>` : ''}
                     </div>
                 </div>
                 
-                <div class="bg-slate-50 p-4 rounded border border-slate-200">
-                    <label class="admin-label mb-3">Answers</label>
+                <div class="bg-slate-50 p-5 rounded-lg border border-slate-200/60">
+                    <label class="block text-xs font-semibold text-slate-600 mb-3">Options & Answer Key</label>
                     ${optionsHtml}
                 </div>
             `;
             container.appendChild(div);
         }
 
-        // --- NEW: Add / Remove Option Handlers ---
         window.addNewOption = function(qId, type) {
             const list = document.getElementById(`options_${qId}`);
             if(!list) return;
@@ -570,9 +687,9 @@
             const newRow = document.createElement('div');
             newRow.className = 'flex items-center gap-3 option-row';
             newRow.innerHTML = `
-                <input type="${inputType}" name="ans_${qId}" value="${rowCount}" class="w-4 h-4 text-brand cursor-pointer">
-                <input type="text" class="opt-input admin-input flex-1" placeholder="Option ${rowCount + 1}">
-                <button type="button" class="text-slate-400 hover:text-red-500 px-2 transition" onclick="removeOption(this)" title="Remove Option"><i class="fa-solid fa-times"></i></button>
+                <input type="${inputType}" name="ans_${qId}" value="${rowCount}" class="w-4 h-4 text-brand-600 focus:ring-brand-500 cursor-pointer border-slate-300 rounded${inputType === 'radio' ? '-full' : ''}">
+                <input type="text" class="opt-input admin-input flex-1 !py-1.5" placeholder="Option ${rowCount + 1}">
+                <button type="button" class="text-slate-400 hover:text-red-500 w-8 h-8 rounded-full hover:bg-slate-100 flex items-center justify-center transition" onclick="removeOption(this)" title="Remove Option"><i class="fa-solid fa-times"></i></button>
             `;
             list.appendChild(newRow);
         };
@@ -580,20 +697,16 @@
         window.removeOption = function(btn) {
             const list = btn.closest('.options-list');
             if (list.querySelectorAll('.option-row').length <= 2) {
-                alert('A question must have at least 2 options.');
+                showToast('A question must have at least 2 options.', 'error');
                 return;
             }
             btn.closest('.option-row').remove();
             
-            // Re-update placeholders for empty inputs to maintain logical numbering UI
             list.querySelectorAll('.option-row').forEach((row, index) => {
                 const input = row.querySelector('.opt-input');
-                if (!input.value) {
-                    input.placeholder = `Option ${index + 1}`;
-                }
+                if (!input.value) { input.placeholder = `Option ${index + 1}`; }
             });
         };
-        // ----------------------------------------
 
         async function uploadQuestionImage(inputElem, block) {
             const file = inputElem.files[0]; if(!file) return;
@@ -616,18 +729,18 @@
                 
                 if(!block.querySelector('.fa-times')) {
                     const btn = document.createElement('button');
-                    btn.className = "absolute -top-2 -right-2 bg-white text-red-500 border border-red-200 rounded-full w-6 h-6 flex items-center justify-center shadow hover:bg-red-50 z-10";
+                    btn.className = "absolute top-6 -right-2 bg-white text-red-500 border border-red-200 rounded-full w-6 h-6 flex items-center justify-center shadow hover:bg-red-50 z-10";
                     btn.innerHTML = `<i class="fa-solid fa-times text-[10px]"></i>`;
                     btn.onclick = () => removeQuestionImage(block);
                     block.querySelector('.relative.group').appendChild(btn);
                 }
-            } catch(e) { alert('Image upload failed.'); }
+            } catch(e) { showToast('Image upload failed.', 'error'); }
         }
 
         function removeQuestionImage(block) {
             const preview = block.querySelector('.q-img-preview');
             const span = document.createElement('span');
-            span.className = 'q-img-preview text-xs font-semibold text-slate-400';
+            span.className = 'q-img-preview text-[10px] font-semibold text-slate-400 uppercase tracking-widest';
             span.innerText = 'No Image';
             preview.replaceWith(span);
             block.querySelector('.q-img-url').value = '';
@@ -639,7 +752,6 @@
             const title = document.getElementById('testTitle').value.trim(); 
             const id = document.getElementById('edit-test-id').value;
             
-            // Build Levels and Attempts
             const levels = [];
             const levelAttempts = {};
             
@@ -664,8 +776,8 @@
             const releaseResults = document.getElementById('testReleaseResults').checked;
             const showAnswersImmediately = document.getElementById('testShowAnswers').checked;
 
-            if(!title) return alert('Missing Assessment Title.');
-            if (levels.length === 0) return alert('Please select at least one Target Audience level.');
+            if(!title) return showToast('Assessment Title is required.', 'error');
+            if (levels.length === 0) return showToast('Select at least one Target Audience.', 'error');
             
             if (startTime) startTime = new Date(startTime).toISOString();
             if (endTime) endTime = new Date(endTime).toISOString();
@@ -683,7 +795,6 @@
                 let options = [], correctOptions = [];
                 if(type === 'mcq' || type === 'msq') {
                     block.querySelectorAll('.opt-input').forEach(i => options.push(i.value.trim()));
-                    // The loop relies on DOM order, supporting dynamic options perfectly
                     block.querySelectorAll(`input[name^="ans_"]`).forEach((cb, idx) => { 
                         if(cb.checked) correctOptions.push(idx.toString()); 
                     });
@@ -692,8 +803,8 @@
                     if(fibVal) correctOptions.push(fibVal); 
                 }
                 
-                if(!text) { alert(`Item ${index+1}: Question text missing.`); isValid = false; return; }
-                if(correctOptions.length === 0) { alert(`Item ${index+1}: Correct answer not specified.`); isValid = false; return; }
+                if(!text) { showToast(`Q${index+1}: Question text missing.`, 'error'); isValid = false; return; }
+                if(correctOptions.length === 0) { showToast(`Q${index+1}: Correct answer not selected.`, 'error'); isValid = false; return; }
 
                 questions.push({ 
                     id: `q${index}`, type, text, imageUrl, options, correctOptions, 
@@ -702,7 +813,7 @@
             });
 
             if(!isValid) return;
-            if(questions.length === 0) return alert('At least one question is required.');
+            if(questions.length === 0) return showToast('At least one question is required.', 'error');
 
             try {
                 const payload = { 
@@ -718,24 +829,14 @@
                 });
                 
                 if(res.ok) { 
-                    alert(`Saved successfully as ${status}.`); 
+                    showToast(`Saved successfully as ${status}.`); 
                     await fetchLibrary(); 
                     hideEditor(); 
                 } else {
                     throw new Error("Server synchronization failed");
                 }
             } catch (e) { 
-                alert('Save failed: Network latency or backend issue.'); 
-            }
-        }
-
-        async function deleteTest(id) {
-            if(!confirm('Delete this assessment permanently?')) return;
-            try { 
-                await fetch(`${API_BASE_URL}/admin/tests/${id}`, { method: 'DELETE', headers: { 'Authorization': `Bearer ${token}` }}); 
-                fetchLibrary(); 
-            } catch(e) {
-                alert("Delete action failed.");
+                showToast('Save failed: Network latency or backend issue.', 'error'); 
             }
         }
 
