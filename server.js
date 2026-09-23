@@ -581,7 +581,8 @@ app.get('/api/admin/pending-approvals', authenticateToken, isAdmin, async (req, 
         res.json((result.Items || []).map(u => ({ 
             name: u.name, email: u.email, level: u.level, mobile: u.mobile, 
             organization: u.organization, status: u.status, paymentPlan: u.paymentPlan,
-            createdAt: u.createdAt
+            createdAt: u.createdAt,
+            accessExpiresAt: u.accessExpiresAt // Added to fetch the actual expiry date
         })));
     } catch (error) {
         res.status(500).json({ error: 'Failed to fetch pending approvals.' });
@@ -788,6 +789,41 @@ app.post('/api/admin/block-student', authenticateToken, isAdmin, async (req, res
         res.json({ message: 'Student access permanently revoked (Blocked).' });
     } catch (error) { res.status(500).json({ error: 'Failed to block student.' }); }
 });
+
+app.post('/api/admin/unblock-student', authenticateToken, isAdmin, async (req, res) => {
+    try {
+        const { email } = req.body;
+        await dynamoDB.update({ 
+            TableName: TABLE_USERS, Key: { email }, 
+            UpdateExpression: 'set #status = :s', 
+            ExpressionAttributeNames: { '#status': 'status' }, 
+            ExpressionAttributeValues: { ':s': 'approved' } 
+        }).promise();
+        res.json({ message: 'Student access restored (Unblocked).' });
+    } catch (error) { res.status(500).json({ error: 'Failed to unblock student.' }); }
+});
+
+app.post('/api/admin/extend-student', authenticateToken, isAdmin, async (req, res) => {
+    try {
+        const { email, newExpiryDate } = req.body;
+        if (!email || !newExpiryDate) return res.status(400).json({ error: 'Email and new expiry date are required.' });
+
+        await dynamoDB.update({
+            TableName: TABLE_USERS,
+            Key: { email },
+            // Reset status to 'approved' in case their account was previously marked as 'expired'
+            UpdateExpression: 'set accessExpiresAt = :end, #status = :s', 
+            ExpressionAttributeNames: { '#status': 'status' },
+            ExpressionAttributeValues: { 
+                ':end': new Date(newExpiryDate).toISOString(),
+                ':s': 'approved'
+            }
+        }).promise();
+
+        res.json({ message: 'Student access duration extended successfully.' });
+    } catch (error) { res.status(500).json({ error: 'Failed to extend student duration.' }); }
+});
+
 
 app.delete('/api/admin/student/:email', authenticateToken, isAdmin, async (req, res) => {
     try {
@@ -1069,8 +1105,8 @@ app.get('/api/student/content', authenticateToken, async (req, res) => {
         const accessibleContent = getAccessibleTree(data.Items || [], level);
 
         const contentWithSecureUrls = await Promise.all(accessibleContent.map(async (item) => {
-            // Defensive check added here (item && item.s3Key)
-            if (item && item.s3Key && (item.type === 'video' || item.type === 'document')) {
+            // BUG FIX: Removed strict type checking. If it has an S3 Key, generate the URL!
+            if (item && item.s3Key) {
                 try {
                     const urlParams = { Bucket: S3_BUCKET, Key: item.s3Key, Expires: 3600 };
                     item.mediaUrl = await s3.getSignedUrlPromise('getObject', urlParams);
@@ -1098,7 +1134,10 @@ app.get('/api/student/recordings', authenticateToken, async (req, res) => {
         }).promise();
 
         // Apply Inheritance Engine
-        const accessible = getAccessibleTree(data.Items || [], level);
+        let accessible = getAccessibleTree(data.Items || [], level);
+
+        // Sort chronologically so lessons appear in the order they were created by the admin
+        accessible = accessible.sort((a, b) => new Date(a.createdAt || 0) - new Date(b.createdAt || 0));
 
         const withUrls = await Promise.all(accessible.map(async (item) => {
             // Defensive check added here (item && item.s3Key)
@@ -1112,10 +1151,12 @@ app.get('/api/student/recordings', authenticateToken, async (req, res) => {
             }
             return item;
         }));
+        
         res.json(withUrls);
-    } catch (error) { res.status(500).json({ error: 'Recordings fetch failed' }); }
+    } catch (error) { 
+        res.status(500).json({ error: 'Recordings fetch failed' }); 
+    }
 });
-
 /* ==========================================================================
    STUDENT ASSESSMENTS
    ========================================================================== */
@@ -1249,6 +1290,76 @@ app.post('/api/student/tests/submit', authenticateToken, async (req, res) => {
         res.status(500).json({ error: 'Failed to process submission' }); 
     }
 });
+
+app.post('/api/admin/generate-questions-from-text', authenticateToken, isAdmin, async (req, res) => {
+    try {
+        const { text } = req.body;
+        if (!text) return res.status(400).json({ error: 'Text content from PDF is required.' });
+
+        const OPENROUTER_API_KEY = process.env.OPENROUTER_API_KEY;
+        if (!OPENROUTER_API_KEY) {
+            return res.status(500).json({ error: 'OpenRouter API key is not configured in the environment.' });
+        }
+
+        // Limit string to prevent overflowing LLM context limits (adjust if using massive contexts)
+        const safeText = text.substring(0, 50000); 
+
+        const prompt = `
+        Analyze the following text extracted from a document and generate test questions based on the content.
+        Classify each question into one of exactly three types:
+        1. 'mcq' (Single correct option)
+        2. 'msq' (Multiple correct options)
+        3. 'fib' (Fill in the blanks / Short exact answer)
+
+        Output exactly and ONLY a JSON array of objects. Do not include markdown formatting tags like \`\`\`json.
+        Format each object strictly as follows:
+        {
+            "type": "mcq", // must be "mcq", "msq", or "fib"
+            "text": "The question text here",
+            "options": ["Option A", "Option B", "Option C", "Option D"], // Provide 4 options for mcq/msq. Leave empty [] for fib.
+            "correctOptions": ["0"] // Array of STRINGS representing the 0-based indices of the correct options. For fib, provide the exact text answer, e.g. ["Exact Answer String"].
+        }
+        
+        Text to analyze:
+        """
+        ${safeText}
+        """
+        `;
+
+        const response = await fetch("https://openrouter.ai/api/v1/chat/completions", {
+            method: "POST",
+            headers: {
+                "Authorization": `Bearer ${OPENROUTER_API_KEY}`,
+                "Content-Type": "application/json"
+            },
+            body: JSON.stringify({
+                model: "openai/gpt-4o-mini", // Reliable, fast, and structured for JSON output
+                messages: [{ role: "user", content: prompt }]
+            })
+        });
+
+        if (!response.ok) {
+            console.error("OpenRouter API Error:", await response.text());
+            return res.status(500).json({ error: 'Failed to communicate with the AI model.' });
+        }
+
+        const data = await response.json();
+        let aiText = data.choices[0].message.content.trim();
+        
+        // Scrub markdown code block tags if the AI ignores instructions
+        if (aiText.startsWith('```json')) aiText = aiText.slice(7);
+        if (aiText.startsWith('```')) aiText = aiText.slice(3);
+        if (aiText.endsWith('```')) aiText = aiText.slice(0, -3);
+
+        const questions = JSON.parse(aiText.trim());
+        res.json({ questions });
+
+    } catch (error) {
+        console.error("AI Question Generation Error:", error);
+        res.status(500).json({ error: 'Failed to generate questions. Ensure the text format is clear.' });
+    }
+});
+
 
 /* ==========================================================================
    GLOBAL ERROR HANDLER
