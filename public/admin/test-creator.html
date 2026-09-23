@@ -9,6 +9,9 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     
+    <!-- PDF.js for Client-Side Text Extraction -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/2.16.105/pdf.min.js"></script>
+
     <script>
         tailwind.config = {
             theme: {
@@ -118,9 +121,17 @@
                     <h2 class="text-2xl font-bold text-slate-900 tracking-tight">Assessment Engine</h2>
                     <p class="text-sm text-slate-500 mt-1">Design examinations, assign targeted levels, and set rules.</p>
                 </div>
-                <button class="bg-brand-600 hover:bg-brand-700 text-white font-medium py-2.5 px-5 rounded-lg transition-colors shadow-sm flex items-center justify-center gap-2 text-sm whitespace-nowrap" onclick="showEditor()">
-                    <i class="fa-solid fa-plus"></i> New Assessment
-                </button>
+                <div class="flex gap-2 w-full md:w-auto">
+                    <!-- AI Generator Button -->
+                    <input type="file" id="pdf-upload" accept="application/pdf" class="hidden" onchange="handlePdfUpload(event)">
+                    <button id="btn-ai-gen" onclick="document.getElementById('pdf-upload').click()" class="bg-indigo-600 hover:bg-indigo-700 text-white font-medium py-2.5 px-4 rounded-lg transition-colors shadow-sm flex items-center justify-center gap-2 text-sm whitespace-nowrap flex-1 md:flex-none">
+                        <i class="fa-solid fa-wand-magic-sparkles"></i> AI Generate
+                    </button>
+                    <!-- Standard New Test -->
+                    <button class="bg-brand-600 hover:bg-brand-700 text-white font-medium py-2.5 px-4 rounded-lg transition-colors shadow-sm flex items-center justify-center gap-2 text-sm whitespace-nowrap flex-1 md:flex-none" onclick="showEditor()">
+                        <i class="fa-solid fa-plus"></i> New Assessment
+                    </button>
+                </div>
             </div>
             
             <div class="flex-1 overflow-y-auto p-6 md:p-8 bg-slate-50/50">
@@ -290,6 +301,9 @@
     <div id="toast-container" class="fixed top-4 right-4 z-[70] flex flex-col gap-2 pointer-events-none"></div>
 
     <script>
+        // Setup PDF.js Worker
+        pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/2.16.105/pdf.worker.min.js';
+
         const API_BASE_URL = '/api';
         const token = localStorage.getItem('token');
         const user = localStorage.getItem('user') ? JSON.parse(localStorage.getItem('user')) : null;
@@ -314,17 +328,106 @@
             const container = document.getElementById('toast-container');
             const toast = document.createElement('div');
             const bg = type === 'success' ? 'bg-white border-l-4 border-emerald-500' : 'bg-white border-l-4 border-red-500';
-            const icon = type === 'success' ? '<i class="fa-solid fa-circle-check text-emerald-500"></i>' : '<i class="fa-solid fa-circle-exclamation text-red-500"></i>';
+            const icon = type === 'success' ? '<i class="fa-solid fa-circle-check text-emerald-500"></i>' : type === 'info' ? '<i class="fa-solid fa-spinner fa-spin text-blue-500"></i>' : '<i class="fa-solid fa-circle-exclamation text-red-500"></i>';
             toast.className = `${bg} shadow-lg rounded px-4 py-3 text-sm text-slate-700 flex items-center gap-3 animate-slide-in-right pointer-events-auto min-w-[250px]`;
             toast.innerHTML = `${icon} <span>${message}</span>`;
             container.appendChild(toast);
-            setTimeout(() => { toast.style.opacity = '0'; toast.style.transform = 'translateX(100%)'; toast.style.transition = 'all 0.3s ease-out'; setTimeout(() => toast.remove(), 300); }, 3000);
+            setTimeout(() => { toast.style.opacity = '0'; toast.style.transform = 'translateX(100%)'; toast.style.transition = 'all 0.3s ease-out'; setTimeout(() => toast.remove(), 300); }, type === 'info' ? 5000 : 3000);
         }
 
         document.addEventListener('DOMContentLoaded', async () => { 
             await fetchLevels(); 
             await fetchLibrary(); 
         });
+
+        /* --- Dynamic Question Numbering Engine --- */
+        window.updateQuestionNumbers = function() {
+            const blocks = document.querySelectorAll('.question-block');
+            blocks.forEach((block, index) => {
+                const display = block.querySelector('.q-number-display');
+                if (display) {
+                    display.innerText = `Q${index + 1}`;
+                }
+            });
+        };
+
+        /* --- PDF to Test AI Generation Logic --- */
+        async function handlePdfUpload(event) {
+            const file = event.target.files[0];
+            if (!file) return;
+
+            const btn = document.getElementById('btn-ai-gen');
+            const originalBtnHTML = btn.innerHTML;
+            btn.innerHTML = `<i class="fa-solid fa-spinner fa-spin"></i> Reading PDF...`;
+            btn.disabled = true;
+
+            try {
+                // 1. Extract text via PDF.js locally
+                showToast("Extracting text from PDF...", "info");
+                const arrayBuffer = await file.arrayBuffer();
+                const pdf = await pdfjsLib.getDocument(arrayBuffer).promise;
+                let fullText = '';
+                
+                for (let i = 1; i <= pdf.numPages; i++) {
+                    const page = await pdf.getPage(i);
+                    const textContent = await page.getTextContent();
+                    const pageText = textContent.items.map(item => item.str).join(' ');
+                    fullText += pageText + '\n';
+                }
+
+                if (!fullText.trim()) throw new Error("No readable text found in this PDF.");
+
+                // 2. Send text to backend AI generator
+                btn.innerHTML = `<i class="fa-solid fa-brain fa-fade"></i> AI Generating...`;
+                showToast("Analyzing text and formatting questions...", "info");
+
+                const response = await fetch(`${API_BASE_URL}/admin/generate-questions-from-text`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
+                    body: JSON.stringify({ text: fullText })
+                });
+
+                if (!response.ok) {
+                    const errorData = await response.json();
+                    throw new Error(errorData.error || "Failed to generate questions from server.");
+                }
+
+                const data = await response.json();
+                if (!data.questions || data.questions.length === 0) throw new Error("AI returned empty results.");
+
+                // 3. Inject into Editor
+                showEditor(true);
+                document.getElementById('testTitle').value = `${file.name.replace('.pdf', '')} - Auto-Generated Test`;
+                
+                // Clear default empty question
+                document.getElementById('questions-container').innerHTML = '';
+                qCounter = 0;
+                
+                // Parse AI questions and map them to UI
+                data.questions.forEach((aiQ) => {
+                    const formattedData = {
+                        text: aiQ.text,
+                        type: aiQ.type, // 'mcq', 'msq', or 'fib'
+                        options: aiQ.options || [],
+                        correctOptions: aiQ.correctOptions || [], // Should be array of indices like ["0"] or ["Exact Answer"]
+                        positiveMarks: 3,
+                        negativeMarks: 1
+                    };
+                    addQuestion(aiQ.type, formattedData);
+                });
+
+                showToast(`Success! Generated ${data.questions.length} questions. Please review and Save.`, "success");
+
+            } catch (error) {
+                console.error("PDF Processing Error:", error);
+                showToast(error.message || "Failed to process PDF.", "error");
+            } finally {
+                btn.innerHTML = originalBtnHTML;
+                btn.disabled = false;
+                event.target.value = ''; // Reset input to allow re-upload
+            }
+        }
+
 
         /* --- Level-Based Attempts UI Logic --- */
         async function fetchLevels() {
@@ -341,7 +444,7 @@
                         </label>
                         <div class="flex items-center gap-1.5 bg-white px-2 py-1 rounded border border-slate-200">
                             <span class="text-[10px] text-slate-400 font-semibold uppercase">Max:</span>
-                            <input type="number" id="attempts-All Levels" class="admin-input !w-12 !py-0.5 !px-1 text-center !text-xs font-bold !bg-transparent !border-none !shadow-none p-0" value="1" min="1" disabled>
+                            <input type="number" id="attempts-All-Levels" oninput="syncGlobalAttempts(this)" class="admin-input !w-12 !py-0.5 !px-1 text-center !text-xs font-bold !bg-transparent !border-none !shadow-none p-0" value="1" min="1" disabled>
                         </div>
                     </div>
                 `;
@@ -367,6 +470,15 @@
             }
         }
 
+        window.syncGlobalAttempts = function(input) {
+            const val = input.value;
+            document.querySelectorAll('.level-cb:checked').forEach(cb => {
+                const safeId = cb.value.replace(/\s+/g, '-');
+                const childInput = document.getElementById(`attempts-${safeId}`);
+                if (childInput) childInput.value = val;
+            });
+        };
+
         function toggleLevelInput(cb) {
             const safeId = cb.value.replace(/\s+/g, '-');
             const input = document.getElementById(`attempts-${safeId}`);
@@ -380,14 +492,22 @@
         function toggleAllLevels(selectAllCb) {
             const checkboxes = document.querySelectorAll('.level-cb');
             checkboxes.forEach(cb => { cb.checked = selectAllCb.checked; toggleLevelInput(cb); });
-            const allInput = document.getElementById('attempts-All Levels');
-            if(allInput) allInput.disabled = !selectAllCb.checked;
+            const allInput = document.getElementById('attempts-All-Levels');
+            if(allInput) {
+                allInput.disabled = !selectAllCb.checked;
+                if (selectAllCb.checked) syncGlobalAttempts(allInput);
+            }
         }
 
         function updateAllLevelsCheckboxState() {
             const checkboxes = document.querySelectorAll('.level-cb');
             const selectAllCb = document.getElementById('selectAllLevels');
-            if(selectAllCb) selectAllCb.checked = Array.from(checkboxes).every(cb => cb.checked);
+            const allInput = document.getElementById('attempts-All-Levels');
+            if(selectAllCb) {
+                const allChecked = Array.from(checkboxes).length > 0 && Array.from(checkboxes).every(cb => cb.checked);
+                selectAllCb.checked = allChecked;
+                if (allInput) allInput.disabled = !allChecked;
+            }
         }
 
         function populateEditorLevels(savedLevels, savedAttempts) {
@@ -395,14 +515,14 @@
             const selectAllCb = document.getElementById('selectAllLevels');
             
             checkboxes.forEach(cb => { cb.checked = false; toggleLevelInput(cb); });
-            if(selectAllCb) { selectAllCb.checked = false; document.getElementById('attempts-All Levels').disabled = true; }
+            if(selectAllCb) { selectAllCb.checked = false; document.getElementById('attempts-All-Levels').disabled = true; }
 
             if (!savedLevels || savedLevels.length === 0) return;
 
             if (savedLevels.includes('All Levels')) {
                 if(selectAllCb) {
                     selectAllCb.checked = true;
-                    const input = document.getElementById('attempts-All Levels');
+                    const input = document.getElementById('attempts-All-Levels');
                     input.disabled = false;
                     input.value = (savedAttempts && savedAttempts['All Levels']) ? savedAttempts['All Levels'] : 1;
                 }
@@ -411,7 +531,13 @@
                     toggleLevelInput(cb);
                     const safeId = cb.value.replace(/\s+/g, '-');
                     const input = document.getElementById(`attempts-${safeId}`);
-                    if (input && savedAttempts && savedAttempts[cb.value]) { input.value = savedAttempts[cb.value]; }
+                    if (input) {
+                        if (savedAttempts && savedAttempts[cb.value]) {
+                            input.value = savedAttempts[cb.value];
+                        } else if (savedAttempts && savedAttempts['All Levels']) {
+                            input.value = savedAttempts['All Levels'];
+                        }
+                    }
                 });
             } else {
                 checkboxes.forEach(cb => {
@@ -636,7 +762,10 @@
 
             div.innerHTML = `
                 <div class="flex flex-col md:flex-row justify-between md:items-center gap-4 mb-4 border-b border-slate-100 pb-3">
-                    <span class="text-xs font-bold text-slate-500 uppercase tracking-wider flex items-center gap-2"><i class="fa-solid ${icon} text-slate-400"></i> ${label}</span>
+                    <span class="text-xs font-bold text-slate-500 uppercase tracking-wider flex items-center gap-2">
+                        <span class="q-number-display bg-brand-50 text-brand-600 px-2 py-0.5 rounded text-[11px]">Q${document.querySelectorAll('.question-block').length + 1}</span>
+                        <i class="fa-solid ${icon} text-slate-400 ml-1"></i> ${label}
+                    </span>
                     <div class="flex items-center gap-4">
                         <div class="flex items-center gap-1.5 bg-slate-50 p-1.5 rounded-lg border border-slate-200">
                             <span class="text-[10px] font-bold text-emerald-600 uppercase tracking-widest pl-1">Pos:</span>
@@ -645,7 +774,7 @@
                             <span class="text-[10px] font-bold text-red-500 uppercase tracking-widest">Neg:</span>
                             <input type="number" class="q-neg-marks admin-input !w-14 !py-0.5 !px-1 text-center text-xs font-bold bg-white" value="${negMarksVal}" min="0" step="0.5" title="Negative Marks">
                         </div>
-                        <button onclick="this.closest('.question-block').remove()" class="text-slate-400 hover:text-red-500 w-8 h-8 rounded-full hover:bg-red-50 flex items-center justify-center transition" title="Delete Question">
+                        <button onclick="this.closest('.question-block').remove(); updateQuestionNumbers();" class="text-slate-400 hover:text-red-500 w-8 h-8 rounded-full hover:bg-red-50 flex items-center justify-center transition" title="Delete Question">
                             <i class="fa-solid fa-trash-can"></i>
                         </button>
                     </div>
@@ -676,6 +805,7 @@
                 </div>
             `;
             container.appendChild(div);
+            updateQuestionNumbers(); // Ensure accurate numbering when added
         }
 
         window.addNewOption = function(qId, type) {
@@ -705,6 +835,9 @@
             list.querySelectorAll('.option-row').forEach((row, index) => {
                 const input = row.querySelector('.opt-input');
                 if (!input.value) { input.placeholder = `Option ${index + 1}`; }
+                // Also update the radio/checkbox value so indices don't break
+                const radioOrCheckbox = row.querySelector(`input[type="radio"], input[type="checkbox"]`);
+                if(radioOrCheckbox) radioOrCheckbox.value = index;
             });
         };
 
@@ -758,7 +891,7 @@
             const selectAllCb = document.getElementById('selectAllLevels');
             if (selectAllCb && selectAllCb.checked) {
                 levels.push('All Levels');
-                const attemptsVal = parseInt(document.getElementById('attempts-All Levels').value) || 1;
+                const attemptsVal = parseInt(document.getElementById('attempts-All-Levels').value) || 1;
                 levelAttempts['All Levels'] = attemptsVal;
             } else {
                 document.querySelectorAll('.level-cb:checked').forEach(cb => {

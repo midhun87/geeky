@@ -186,6 +186,70 @@
         </div>
     </div>
 
+    <!-- Unblock Confirmation Modal -->
+    <div id="unblock-modal" class="fixed inset-0 z-[60] hidden">
+        <div class="absolute inset-0 bg-slate-900/40 backdrop-blur-sm" onclick="closeUnblockModal()"></div>
+        <div class="flex items-center justify-center min-h-screen px-4 pt-4 pb-20 text-center sm:p-0 pointer-events-none">
+            <div class="relative bg-white rounded-xl text-left overflow-hidden shadow-xl transform transition-all sm:my-8 sm:max-w-md w-full animate-fade-in pointer-events-auto">
+                <div class="bg-white px-4 pt-5 pb-4 sm:p-6 sm:pb-4">
+                    <div class="sm:flex sm:items-start">
+                        <div class="mx-auto flex-shrink-0 flex items-center justify-center h-12 w-12 rounded-full bg-emerald-100 sm:mx-0 sm:h-10 sm:w-10">
+                            <i class="fa-solid fa-unlock-keyhole text-emerald-600"></i>
+                        </div>
+                        <div class="mt-3 text-center sm:mt-0 sm:ml-4 sm:text-left">
+                            <h3 class="text-lg leading-6 font-semibold text-slate-900">Restore Student Access</h3>
+                            <div class="mt-2">
+                                <p class="text-sm text-slate-500">Are you sure you want to restore access for <span id="unblock-target-email" class="font-bold text-slate-700"></span>? They will be able to log in again immediately.</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="bg-slate-50 px-4 py-3 sm:px-6 sm:flex sm:flex-row-reverse border-t border-slate-100 gap-2">
+                    <button type="button" id="confirm-unblock-btn" class="w-full inline-flex justify-center rounded-lg border border-transparent shadow-sm px-4 py-2 bg-emerald-600 text-base font-medium text-white hover:bg-emerald-700 focus:outline-none sm:w-auto sm:text-sm transition-colors">
+                        Restore Access
+                    </button>
+                    <button type="button" onclick="closeUnblockModal()" class="mt-3 w-full inline-flex justify-center rounded-lg border border-slate-300 shadow-sm px-4 py-2 bg-white text-base font-medium text-slate-700 hover:bg-slate-50 focus:outline-none sm:mt-0 sm:w-auto sm:text-sm transition-colors">
+                        Cancel
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Extend Duration Modal -->
+    <div id="extend-modal" class="fixed inset-0 z-[60] hidden">
+        <div class="absolute inset-0 bg-slate-900/40 backdrop-blur-sm" onclick="closeExtendModal()"></div>
+        <div class="flex items-center justify-center min-h-screen px-4 pt-4 pb-20 text-center sm:p-0 pointer-events-none">
+            <div class="relative bg-white rounded-xl text-left overflow-hidden shadow-xl transform transition-all sm:my-8 sm:max-w-md w-full animate-fade-in pointer-events-auto">
+                <div class="bg-white px-6 pt-6 pb-6">
+                    <div class="sm:flex sm:items-start mb-4">
+                        <div class="mx-auto flex-shrink-0 flex items-center justify-center h-12 w-12 rounded-full bg-blue-100 sm:mx-0 sm:h-10 sm:w-10">
+                            <i class="fa-solid fa-calendar-plus text-blue-600"></i>
+                        </div>
+                        <div class="mt-3 text-center sm:mt-0 sm:ml-4 sm:text-left">
+                            <h3 class="text-lg leading-6 font-semibold text-slate-900">Extend Access Duration</h3>
+                            <div class="mt-2">
+                                <p class="text-sm text-slate-500">Select a new expiration date for <span id="extend-target-email" class="font-bold text-slate-700"></span>.</p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="mt-4 pl-0 sm:pl-14 w-full">
+                        <label class="block text-xs font-bold text-slate-700 mb-1">New Expiry Date</label>
+                        <input type="date" id="new-expiry-date" class="w-full text-sm border border-slate-300 rounded-lg bg-white focus:border-brand-500 focus:ring-2 focus:ring-brand-500 focus:outline-none transition-all px-3 py-2 cursor-pointer">
+                    </div>
+                </div>
+                <div class="bg-slate-50 px-4 py-3 sm:px-6 sm:flex sm:flex-row-reverse border-t border-slate-100 gap-2">
+                    <button type="button" id="confirm-extend-btn" class="w-full inline-flex justify-center rounded-lg border border-transparent shadow-sm px-4 py-2 bg-blue-600 text-base font-medium text-white hover:bg-blue-700 focus:outline-none sm:w-auto sm:text-sm transition-colors">
+                        Update Duration
+                    </button>
+                    <button type="button" onclick="closeExtendModal()" class="mt-3 w-full inline-flex justify-center rounded-lg border border-slate-300 shadow-sm px-4 py-2 bg-white text-base font-medium text-slate-700 hover:bg-slate-50 focus:outline-none sm:mt-0 sm:w-auto sm:text-sm transition-colors">
+                        Cancel
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
     <!-- Toast Notification Container -->
     <div id="toast-container" class="fixed top-4 right-4 z-[70] flex flex-col gap-2 pointer-events-none"></div>
 
@@ -196,6 +260,8 @@
         
         let allStudents = [];
         let studentToBlock = null;
+        let studentToUnblock = null;
+        let studentToExtend = null;
 
         if (!token || !user || user.role !== 'admin') { localStorage.clear(); window.location.href = '../login.html'; }
 
@@ -273,9 +339,22 @@
                 const expiryDate = student.accessExpiresAt ? new Date(student.accessExpiresAt).toLocaleDateString(undefined, { year: 'numeric', month: 'short', day: 'numeric' }) : '<span class="text-slate-400 italic text-xs">Not set</span>';
                 const amountFormatted = new Intl.NumberFormat('en-IN', { style: 'currency', currency: 'INR', maximumFractionDigits: 0 }).format(student.amountPaid);
 
-                const actionButton = (student.status === 'approved' || student.status === 'pending_upgrade') 
-                    ? `<button onclick="promptBlock('${student.email}')" class="text-red-500 bg-white hover:bg-red-50 px-3 py-1.5 rounded-lg border border-red-200 font-medium transition-colors text-xs shadow-sm flex items-center justify-center gap-1 ml-auto"><i class="fa-solid fa-user-lock"></i> Revoke</button>`
-                    : `<span class="text-slate-400 text-xs italic">N/A</span>`;
+                let actionButton = '';
+                if (student.status === 'blocked') {
+                    actionButton = `<button onclick="promptUnblock('${student.email}')" class="text-emerald-600 bg-white hover:bg-emerald-50 px-3 py-1.5 rounded-lg border border-emerald-200 font-medium transition-colors text-xs shadow-sm flex items-center justify-center gap-1.5 ml-auto w-full max-w-[150px]"><i class="fa-solid fa-unlock-keyhole"></i> Unblock</button>`;
+                } else if (student.status === 'approved' || student.status === 'expired' || student.status === 'pending_upgrade') {
+                    actionButton = `
+                    <div class="flex items-center justify-end gap-2">
+                        <button onclick="promptExtend('${student.email}', '${student.accessExpiresAt || ''}')" class="text-blue-600 bg-white hover:bg-blue-50 px-2.5 py-1.5 rounded-lg border border-blue-200 font-medium transition-colors text-xs shadow-sm flex items-center gap-1.5" title="Extend Duration">
+                            <i class="fa-solid fa-calendar-plus"></i> Extend
+                        </button>
+                        <button onclick="promptBlock('${student.email}')" class="text-red-500 bg-white hover:bg-red-50 px-2.5 py-1.5 rounded-lg border border-red-200 font-medium transition-colors text-xs shadow-sm flex items-center gap-1.5" title="Revoke Access">
+                            <i class="fa-solid fa-user-lock"></i> Revoke
+                        </button>
+                    </div>`;
+                } else {
+                    actionButton = `<span class="text-slate-400 text-xs italic pr-4">N/A</span>`;
+                }
 
                 tbody.innerHTML += `
                     <tr class="hover:bg-slate-50/80 transition duration-150">
@@ -308,6 +387,7 @@
             renderTable(filtered);
         }
 
+        // === Action: Block / Revoke ===
         function promptBlock(email) {
             studentToBlock = email;
             document.getElementById('block-target-email').innerText = email;
@@ -335,6 +415,102 @@
                 else { showToast('Failed to revoke access.', 'error'); closeBlockModal(); }
             } catch(e) { showToast('Network error while processing request.', 'error'); closeBlockModal(); } 
             finally { btn.innerHTML = originalText; btn.disabled = false; }
+        }
+
+        // === Action: Unblock / Restore ===
+        function promptUnblock(email) {
+            studentToUnblock = email;
+            document.getElementById('unblock-target-email').innerText = email;
+            document.getElementById('unblock-modal').classList.remove('hidden');
+            document.getElementById('confirm-unblock-btn').onclick = () => executeUnblock();
+        }
+
+        function closeUnblockModal() {
+            studentToUnblock = null;
+            document.getElementById('unblock-modal').classList.add('hidden');
+        }
+
+        async function executeUnblock() {
+            if(!studentToUnblock) return;
+            const email = studentToUnblock;
+            const btn = document.getElementById('confirm-unblock-btn');
+            
+            const originalText = btn.innerHTML;
+            btn.innerHTML = `<i class="fa-solid fa-circle-notch fa-spin gap-2"></i> Restoring...`;
+            btn.disabled = true;
+            
+            try {
+                const res = await fetch(`${API_BASE_URL}/admin/unblock-student`, { method: 'POST', headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` }, body: JSON.stringify({ email }) });
+                if(res.ok) { showToast('Student access successfully restored.'); closeUnblockModal(); loadDirectory(); } 
+                else { showToast('Failed to restore access.', 'error'); closeUnblockModal(); }
+            } catch(e) { showToast('Network error while processing request.', 'error'); closeUnblockModal(); } 
+            finally { btn.innerHTML = originalText; btn.disabled = false; }
+        }
+
+        // === Action: Extend Duration ===
+        function promptExtend(email, currentExpiry) {
+            studentToExtend = email;
+            document.getElementById('extend-target-email').innerText = email;
+            
+            const dateInput = document.getElementById('new-expiry-date');
+            
+            // Pre-fill the date input if they already have an expiry date
+            if (currentExpiry && currentExpiry !== 'undefined' && currentExpiry !== 'null') {
+                const d = new Date(currentExpiry);
+                const yyyy = d.getFullYear();
+                const mm = String(d.getMonth() + 1).padStart(2, '0');
+                const dd = String(d.getDate()).padStart(2, '0');
+                dateInput.value = `${yyyy}-${mm}-${dd}`;
+            } else {
+                dateInput.value = '';
+            }
+
+            document.getElementById('extend-modal').classList.remove('hidden');
+            document.getElementById('confirm-extend-btn').onclick = () => executeExtend();
+        }
+
+        function closeExtendModal() {
+            studentToExtend = null;
+            document.getElementById('extend-modal').classList.add('hidden');
+        }
+
+        async function executeExtend() {
+            if(!studentToExtend) return;
+            const email = studentToExtend;
+            const newDate = document.getElementById('new-expiry-date').value;
+            
+            if(!newDate) { 
+                showToast('Please select a valid new expiry date.', 'error'); 
+                return; 
+            }
+
+            const btn = document.getElementById('confirm-extend-btn');
+            const originalText = btn.innerHTML;
+            btn.innerHTML = `<i class="fa-solid fa-circle-notch fa-spin gap-2"></i> Extending...`;
+            btn.disabled = true;
+
+            try {
+                const res = await fetch(`${API_BASE_URL}/admin/extend-student`, { 
+                    method: 'POST', 
+                    headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` }, 
+                    body: JSON.stringify({ email, newExpiryDate: newDate }) 
+                });
+                
+                if(res.ok) { 
+                    showToast('Student duration extended successfully.'); 
+                    closeExtendModal(); 
+                    loadDirectory(); 
+                } else { 
+                    showToast('Failed to extend duration.', 'error'); 
+                    closeExtendModal(); 
+                }
+            } catch(e) { 
+                showToast('Network error while processing request.', 'error'); 
+                closeExtendModal(); 
+            } finally { 
+                btn.innerHTML = originalText; 
+                btn.disabled = false; 
+            }
         }
 
         function logout() { localStorage.clear(); window.location.href = '../login.html'; }

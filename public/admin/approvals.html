@@ -184,6 +184,40 @@
         </div>
     </div>
 
+    <!-- Extend Duration Modal -->
+    <div id="extend-modal" class="fixed inset-0 z-[60] hidden">
+        <div class="absolute inset-0 bg-slate-900/40 backdrop-blur-sm" onclick="closeExtendModal()"></div>
+        <div class="flex items-center justify-center min-h-screen px-4 pt-4 pb-20 text-center sm:p-0 pointer-events-none">
+            <div class="relative bg-white rounded-xl text-left overflow-hidden shadow-xl transform transition-all sm:my-8 sm:max-w-md w-full animate-fade-in pointer-events-auto">
+                <div class="bg-white px-6 pt-6 pb-6">
+                    <div class="sm:flex sm:items-start mb-4">
+                        <div class="mx-auto flex-shrink-0 flex items-center justify-center h-12 w-12 rounded-full bg-blue-100 sm:mx-0 sm:h-10 sm:w-10">
+                            <i class="fa-solid fa-calendar-plus text-blue-600"></i>
+                        </div>
+                        <div class="mt-3 text-center sm:mt-0 sm:ml-4 sm:text-left">
+                            <h3 class="text-lg leading-6 font-semibold text-slate-900">Extend & Approve</h3>
+                            <div class="mt-2">
+                                <p class="text-sm text-slate-500">Select an expiration date for <span id="extend-target-email" class="font-bold text-slate-700"></span>. This will automatically approve their access with the new date.</p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="mt-4 pl-0 sm:pl-14 w-full">
+                        <label class="block text-xs font-bold text-slate-700 mb-1">New Expiry Date</label>
+                        <input type="date" id="new-expiry-date" class="w-full text-sm border border-slate-300 rounded-lg bg-white focus:border-brand-500 focus:ring-2 focus:ring-brand-500 focus:outline-none transition-all px-3 py-2 cursor-pointer">
+                    </div>
+                </div>
+                <div class="bg-slate-50 px-4 py-3 sm:px-6 sm:flex sm:flex-row-reverse border-t border-slate-100 gap-2">
+                    <button type="button" id="confirm-extend-btn" class="w-full inline-flex justify-center rounded-lg border border-transparent shadow-sm px-4 py-2 bg-blue-600 text-base font-medium text-white hover:bg-blue-700 focus:outline-none sm:w-auto sm:text-sm transition-colors">
+                        Update Duration
+                    </button>
+                    <button type="button" onclick="closeExtendModal()" class="mt-3 w-full inline-flex justify-center rounded-lg border border-slate-300 shadow-sm px-4 py-2 bg-white text-base font-medium text-slate-700 hover:bg-slate-50 focus:outline-none sm:mt-0 sm:w-auto sm:text-sm transition-colors">
+                        Cancel
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
     <!-- Toast Notification Container -->
     <div id="toast-container" class="fixed top-4 right-4 z-[70] flex flex-col gap-2 pointer-events-none"></div>
 
@@ -200,8 +234,19 @@
 
         let studentToDecline = null;
         let declineBtnRef = null;
+        
+        let studentToExtend = null;
+        let extendBtnRef = null;
+        let allLevels = [];
 
-        document.addEventListener('DOMContentLoaded', loadApprovals);
+        document.addEventListener('DOMContentLoaded', async () => {
+            try {
+                // Fetch levels to calculate accurate tentative dates
+                const res = await fetch(`${API_BASE_URL}/admin/levels`, { headers: { 'Authorization': `Bearer ${token}` } });
+                if(res.ok) allLevels = await res.json();
+            } catch(e) { console.warn("Could not load levels for tentative dates."); }
+            loadApprovals();
+        });
 
         // --- UI Interactions ---
 
@@ -246,7 +291,6 @@
             document.getElementById('decline-target-email').innerText = email;
             document.getElementById('decline-modal').classList.remove('hidden');
             
-            // Attach specific event listener to confirm button
             const confirmBtn = document.getElementById('confirm-decline-btn');
             confirmBtn.onclick = () => executeDecline();
         }
@@ -255,6 +299,64 @@
             studentToDecline = null;
             declineBtnRef = null;
             document.getElementById('decline-modal').classList.add('hidden');
+        }
+
+        function promptExtend(email, btnElement) {
+            studentToExtend = email;
+            extendBtnRef = btnElement;
+            document.getElementById('extend-target-email').innerText = email;
+            document.getElementById('new-expiry-date').value = '';
+            document.getElementById('extend-modal').classList.remove('hidden');
+            
+            const confirmBtn = document.getElementById('confirm-extend-btn');
+            confirmBtn.onclick = () => executeExtend();
+        }
+
+        function closeExtendModal() {
+            studentToExtend = null;
+            extendBtnRef = null;
+            document.getElementById('extend-modal').classList.add('hidden');
+        }
+
+        async function executeExtend() {
+            if(!studentToExtend || !extendBtnRef) return;
+            
+            const email = studentToExtend;
+            const newDate = document.getElementById('new-expiry-date').value;
+            
+            if(!newDate) { 
+                showToast('Please select a valid new expiry date.', 'error'); 
+                return; 
+            }
+
+            const confirmBtn = document.getElementById('confirm-extend-btn');
+            const originalConfirmHtml = confirmBtn.innerHTML;
+            confirmBtn.disabled = true;
+            confirmBtn.innerHTML = `<i class="fa-solid fa-circle-notch fa-spin gap-2"></i> Extending...`;
+
+            try {
+                // We reuse the extend-student endpoint that was added previously
+                const res = await fetch(`${API_BASE_URL}/admin/extend-student`, { 
+                    method: 'POST', 
+                    headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` }, 
+                    body: JSON.stringify({ email, newExpiryDate: newDate }) 
+                });
+                
+                if(res.ok) { 
+                    showToast('Student duration extended & approved successfully.'); 
+                    closeExtendModal(); 
+                    loadApprovals(); // Refresh table since their status changed to approved
+                } else { 
+                    showToast('Failed to extend duration. Server error.', 'error'); 
+                    closeExtendModal(); 
+                }
+            } catch(e) { 
+                showToast('Network error while extending.', 'error'); 
+                closeExtendModal(); 
+            } finally { 
+                confirmBtn.disabled = false; 
+                confirmBtn.innerHTML = originalConfirmHtml; 
+            }
         }
 
         // --- Data Fetching & Processing (Dynamic) ---
@@ -296,24 +398,44 @@
                 document.getElementById('queue-count').innerText = data.length;
                 badge.classList.remove('hidden');
 
-                // Render rows
                 data.forEach(student => {
                     const isUpgrade = student.status === 'pending_upgrade';
                     const badgeClass = isUpgrade ? 'bg-indigo-50 text-indigo-700 border-indigo-200' : 'bg-emerald-50 text-emerald-700 border-emerald-200';
                     const iconClass = isUpgrade ? '<i class="fa-solid fa-arrow-up-right-dots mr-1"></i>' : '<i class="fa-solid fa-user-plus mr-1"></i>';
                     const typeText = isUpgrade ? 'Plan Upgrade (Pay Remaining)' : `New Registration (${student.paymentPlan || '100'}% Plan)`;
 
-                    const declineBtnHtml = !isUpgrade 
-                        ? `<button onclick="promptDecline('${student.email}', this)" class="bg-white border border-red-200 text-red-600 hover:bg-red-50 px-3 py-1.5 rounded-lg text-xs font-medium transition-colors shadow-sm focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-offset-1 flex items-center gap-1"><i class="fa-solid fa-xmark"></i> Decline</button>` 
-                        : '';
+                    let expiryText = '';
+                    if (student.accessExpiresAt) {
+                        expiryText = `Valid Till: <span class="font-semibold text-slate-800">${new Date(student.accessExpiresAt).toLocaleDateString()}</span>`;
+                    } else {
+                        // Calculate tentative date using backend math logic
+                        const levelObj = allLevels.find(l => l.levelName === student.level);
+                        const durationMonths = levelObj ? parseInt(levelObj.durationMonths) || 6 : 6;
+                        
+                        let planMultiplier = 1; let bufferDays = 0;
+                        const plan = student.paymentPlan ? student.paymentPlan.toString() : '100';
+                        if (plan === '50') { planMultiplier = 0.5; bufferDays = 5; } 
+                        else if (plan === '75') { planMultiplier = 0.75; bufferDays = 5; }
 
+                        const tentativeDate = new Date();
+                        const addedMonths = durationMonths * planMultiplier;
+                        tentativeDate.setMonth(tentativeDate.getMonth() + Math.floor(addedMonths));
+                        tentativeDate.setDate(tentativeDate.getDate() + Math.round((addedMonths - Math.floor(addedMonths)) * 30) + bufferDays);
+
+                        expiryText = `Valid Till: <span class="font-medium text-slate-500">~${tentativeDate.toLocaleDateString()} (Tentative)</span>`;
+                    }
+
+                    const declineBtnHtml = !isUpgrade 
+                        ? `<button onclick="promptDecline('${student.email}', this)" class="bg-white border border-red-200 text-red-600 hover:bg-red-50 px-3 py-1.5 rounded-lg text-xs font-medium transition-colors shadow-sm focus:outline-none focus:ring-2 focus:ring-red-500 flex items-center gap-1"><i class="fa-solid fa-xmark"></i> Decline</button>` : '';
+
+                    const extendBtnHtml = `<button onclick="promptExtend('${student.email}', this)" class="bg-white border border-blue-200 text-blue-600 hover:bg-blue-50 px-3 py-1.5 rounded-lg text-xs font-medium transition-colors shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 flex items-center gap-1"><i class="fa-solid fa-calendar-plus"></i> Extend</button>`;
+
+                    // Replaced sm:opacity-0 and sm:group-hover:opacity-100 logic so buttons are always visible
                     tbody.innerHTML += `
                         <tr class="hover:bg-slate-50/80 transition duration-150 group">
                             <td class="px-6 py-4">
                                 <div class="flex items-center gap-3">
-                                    <div class="w-10 h-10 rounded-full bg-slate-100 flex items-center justify-center text-slate-500 font-bold border border-slate-200 shrink-0">
-                                        ${student.name.charAt(0).toUpperCase()}
-                                    </div>
+                                    <div class="w-10 h-10 rounded-full bg-slate-100 flex items-center justify-center text-slate-500 font-bold border border-slate-200 shrink-0">${student.name.charAt(0).toUpperCase()}</div>
                                     <div>
                                         <div class="font-semibold text-slate-900">${student.name}</div>
                                         <div class="text-xs text-slate-500 mt-0.5">${student.email}</div>
@@ -323,16 +445,16 @@
                             </td>
                             <td class="px-6 py-4">
                                 <span class="font-medium text-slate-800 bg-slate-100 px-2.5 py-1 rounded text-xs border border-slate-200">${student.level}</span>
+                                <div class="text-[10px] text-slate-500 mt-1.5">${expiryText}</div>
                             </td>
                             <td class="px-6 py-4">
-                                <span class="${badgeClass} px-2.5 py-1.5 rounded-md text-xs font-semibold border inline-flex items-center">
-                                    ${iconClass} ${typeText}
-                                </span>
+                                <span class="${badgeClass} px-2.5 py-1.5 rounded-md text-xs font-semibold border inline-flex items-center">${iconClass} ${typeText}</span>
                             </td>
                             <td class="px-6 py-4 text-right">
-                                <div class="flex items-center justify-end gap-2 opacity-100 sm:opacity-0 sm:group-hover:opacity-100 transition-opacity">
+                                <div class="flex flex-wrap items-center justify-end gap-2">
                                     ${declineBtnHtml}
-                                    <button onclick="approveStudent('${student.email}', this)" class="bg-brand-600 border border-transparent text-white hover:bg-brand-700 px-3 py-1.5 rounded-lg text-xs font-medium transition-colors shadow-sm focus:outline-none focus:ring-2 focus:ring-brand-500 focus:ring-offset-1 flex items-center gap-1">
+                                    ${extendBtnHtml}
+                                    <button onclick="approveStudent('${student.email}', this)" class="bg-brand-600 border border-transparent text-white hover:bg-brand-700 px-3 py-1.5 rounded-lg text-xs font-medium transition-colors shadow-sm focus:outline-none focus:ring-2 focus:ring-brand-500 flex items-center gap-1">
                                         <i class="fa-solid fa-check"></i> Verify & Approve
                                     </button>
                                 </div>
@@ -341,7 +463,6 @@
                     `;
                 });
             } catch (err) { 
-                console.error(err);
                 tbody.innerHTML = `<tr><td colspan="4" class="text-center py-10 text-red-500 text-sm"><i class="fa-solid fa-triangle-exclamation mr-2"></i> Failed to connect to server.</td></tr>`; 
                 badge.classList.add('hidden');
             }
