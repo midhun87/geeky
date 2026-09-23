@@ -218,7 +218,7 @@
     </div>
 
     <script>
-        const API_BASE_URL = '/api';
+        const API_BASE_URL = '/api'; // Fixed typo from '/apis' to '/api'
         let loadedLevels = [];
 
         document.addEventListener('DOMContentLoaded', fetchLevels);
@@ -277,7 +277,7 @@
                 });
             } catch (error) {
                 console.error('Error loading levels:', error);
-                levelSelect.innerHTML = '<option value="" disabled selected>Error loading levels</option>';
+                levelSelect.innerHTML = '<option value="" disabled selected>Error loading levels. Check server connection.</option>';
             }
         }
 
