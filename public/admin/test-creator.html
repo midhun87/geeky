@@ -215,15 +215,11 @@
                         <h3 class="font-bold text-slate-800 text-sm mb-2 pb-2 border-b border-slate-100 flex items-center gap-2">
                             <div class="w-6 h-6 rounded bg-blue-50 text-blue-500 flex items-center justify-center"><i class="fa-solid fa-calendar-alt text-xs"></i></div> Availability
                         </h3>
-                        <p class="text-[11px] text-slate-500 mb-3">Leave blank for permanent access.</p>
+                        <p class="text-[11px] text-slate-500 mb-3 leading-relaxed">Leave blank to make available instantly. Test concludes automatically when the user's access duration expires.</p>
                         <div class="space-y-3">
                             <div>
-                                <label class="text-[10px] font-bold text-slate-500 uppercase tracking-wider">Commences</label>
+                                <label class="text-[10px] font-bold text-slate-500 uppercase tracking-wider">Commences (Starts)</label>
                                 <input type="datetime-local" id="testStartTime" class="admin-input !py-2 !text-xs mt-1">
-                            </div>
-                            <div>
-                                <label class="text-[10px] font-bold text-slate-500 uppercase tracking-wider">Concludes</label>
-                                <input type="datetime-local" id="testEndTime" class="admin-input !py-2 !text-xs mt-1">
                             </div>
                         </div>
                     </div>
@@ -410,8 +406,8 @@
                         type: aiQ.type, // 'mcq', 'msq', or 'fib'
                         options: aiQ.options || [],
                         correctOptions: aiQ.correctOptions || [], // Should be array of indices like ["0"] or ["Exact Answer"]
-                        positiveMarks: 3,
-                        negativeMarks: 1
+                        positiveMarks: 1,
+                        negativeMarks: 0.3
                     };
                     addQuestion(aiQ.type, formattedData);
                 });
@@ -658,7 +654,6 @@
                 populateEditorLevels([], {}); 
                 
                 document.getElementById('testStartTime').value = '';
-                document.getElementById('testEndTime').value = '';
                 document.getElementById('testTimeLimit').value = '60';
                 document.getElementById('testPassingScore').value = '50';
                 document.getElementById('testReleaseResults').checked = true;
@@ -696,7 +691,6 @@
             };
 
             document.getElementById('testStartTime').value = formatForInput(test.startTime);
-            document.getElementById('testEndTime').value = formatForInput(test.endTime);
             document.getElementById('testTimeLimit').value = test.timeLimit || 60;
             document.getElementById('testPassingScore').value = test.passingScore || 50;
             document.getElementById('testReleaseResults').checked = test.releaseResults !== false;
@@ -757,8 +751,8 @@
 
             const imgUrl = data && data.imageUrl ? data.imageUrl : '';
             const textVal = data && data.text ? data.text.replace(/"/g, '&quot;') : '';
-            const posMarksVal = data && data.positiveMarks !== undefined ? data.positiveMarks : 3;
-            const negMarksVal = data && data.negativeMarks !== undefined ? data.negativeMarks : 1;
+            const posMarksVal = data && data.positiveMarks !== undefined ? data.positiveMarks : 1;
+            const negMarksVal = data && data.negativeMarks !== undefined ? data.negativeMarks : 0.3;
 
             div.innerHTML = `
                 <div class="flex flex-col md:flex-row justify-between md:items-center gap-4 mb-4 border-b border-slate-100 pb-3">
@@ -769,10 +763,10 @@
                     <div class="flex items-center gap-4">
                         <div class="flex items-center gap-1.5 bg-slate-50 p-1.5 rounded-lg border border-slate-200">
                             <span class="text-[10px] font-bold text-emerald-600 uppercase tracking-widest pl-1">Pos:</span>
-                            <input type="number" class="q-pos-marks admin-input !w-14 !py-0.5 !px-1 text-center text-xs font-bold bg-white" value="${posMarksVal}" min="0" step="0.5" title="Positive Marks">
+                            <input type="number" class="q-pos-marks admin-input !w-14 !py-0.5 !px-1 text-center text-xs font-bold bg-white" value="${posMarksVal}" min="0" step="0.1" title="Positive Marks">
                             <span class="text-slate-300 mx-1">|</span>
                             <span class="text-[10px] font-bold text-red-500 uppercase tracking-widest">Neg:</span>
-                            <input type="number" class="q-neg-marks admin-input !w-14 !py-0.5 !px-1 text-center text-xs font-bold bg-white" value="${negMarksVal}" min="0" step="0.5" title="Negative Marks">
+                            <input type="number" class="q-neg-marks admin-input !w-14 !py-0.5 !px-1 text-center text-xs font-bold bg-white" value="${negMarksVal}" min="0" step="0.1" title="Negative Marks">
                         </div>
                         <button onclick="this.closest('.question-block').remove(); updateQuestionNumbers();" class="text-slate-400 hover:text-red-500 w-8 h-8 rounded-full hover:bg-red-50 flex items-center justify-center transition" title="Delete Question">
                             <i class="fa-solid fa-trash-can"></i>
@@ -903,7 +897,6 @@
             }
 
             let startTime = document.getElementById('testStartTime').value;
-            let endTime = document.getElementById('testEndTime').value;
             const timeLimit = document.getElementById('testTimeLimit').value;
             const passingScore = document.getElementById('testPassingScore').value;
             const releaseResults = document.getElementById('testReleaseResults').checked;
@@ -913,7 +906,6 @@
             if (levels.length === 0) return showToast('Select at least one Target Audience.', 'error');
             
             if (startTime) startTime = new Date(startTime).toISOString();
-            if (endTime) endTime = new Date(endTime).toISOString();
 
             const questions = [];
             let isValid = true;
@@ -922,8 +914,10 @@
                 const type = block.dataset.type; 
                 const text = block.querySelector('.q-text').value.trim(); 
                 const imageUrl = block.querySelector('.q-img-url').value;
-                const posMarks = parseFloat(block.querySelector('.q-pos-marks').value) || 3;
-                const negMarks = parseFloat(block.querySelector('.q-neg-marks').value) || 0;
+                const posVal = parseFloat(block.querySelector('.q-pos-marks').value);
+                const negVal = parseFloat(block.querySelector('.q-neg-marks').value);
+                const posMarks = isNaN(posVal) ? 1 : posVal;
+                const negMarks = isNaN(negVal) ? 0.3 : negVal;
                 
                 let options = [], correctOptions = [];
                 if(type === 'mcq' || type === 'msq') {
@@ -951,7 +945,7 @@
             try {
                 const payload = { 
                     id, title, levels, levelAttempts, status, questions, 
-                    startTime, endTime, timeLimit, passingScore, 
+                    startTime, timeLimit, passingScore, 
                     releaseResults, showAnswersImmediately 
                 };
                 
