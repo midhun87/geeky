@@ -55,7 +55,7 @@ app.use((req, res, next) => {
     next();
 });
 
-const authenticateToken = (req, res, next) => {
+const authenticateToken = async (req, res, next) => {
     const authHeader = req.headers['authorization'];
     const token = authHeader && authHeader.split(' ')[1];
     
@@ -63,6 +63,21 @@ const authenticateToken = (req, res, next) => {
 
     try {
         const decoded = jwt.decode(token, JWT_SECRET);
+        
+        // Single Device Login Check: Fetch user to verify active session
+        const userRes = await dynamoDB.get({ TableName: TABLE_USERS, Key: { email: decoded.email } }).promise();
+        const user = userRes.Item;
+
+        if (!user) return res.status(404).json({ error: 'User not found.' });
+
+        // If the DB has an active session ID but it doesn't match the one in the token, reject request
+        if (user.activeSessionId && user.activeSessionId !== decoded.sessionId) {
+            return res.status(401).json({ 
+                error: 'SESSION_CONFLICT', 
+                message: 'You have been logged out because your account was accessed from another device.' 
+            });
+        }
+
         req.user = decoded;
         next();
     } catch (err) {
@@ -406,7 +421,8 @@ app.post('/api/auth/register', async (req, res) => {
 });
 app.post('/api/auth/login', async (req, res) => {
     try {
-        const { email, password, role } = req.body;
+        // Now accepting deviceName and forceLogin
+        const { email, password, role, deviceName, forceLogin } = req.body;
         if(!email || !password) return res.status(400).json({ error: 'Email and password required.' });
 
         const result = await dynamoDB.get({ TableName: TABLE_USERS, Key: { email } }).promise();
@@ -431,7 +447,34 @@ app.post('/api/auth/login', async (req, res) => {
             }
         }
 
-        const tokenPayload = { email: user.email, name: user.name, role: user.role, level: user.level };
+        // --- SINGLE DEVICE LOGIN LOGIC ---
+        // If an active session exists and user hasn't explicitly clicked "logout other device"
+        if (user.activeSessionId && !forceLogin) {
+            return res.status(409).json({
+                error: 'ACTIVE_SESSION',
+                message: 'You are already logged in on another device.',
+                activeDeviceName: user.activeDeviceName || 'Unknown Device'
+            });
+        }
+
+        // Generate new session ID
+        const sessionId = uuidv4();
+        const currentDeviceName = deviceName || req.headers['user-agent'] || 'Unknown Device';
+
+        // Update DB with the new active session ID and device name
+        await dynamoDB.update({
+            TableName: TABLE_USERS,
+            Key: { email },
+            UpdateExpression: 'set activeSessionId = :sid, activeDeviceName = :dn',
+            ExpressionAttributeValues: {
+                ':sid': sessionId,
+                ':dn': currentDeviceName
+            }
+        }).promise();
+        // ---------------------------------
+
+        // Add sessionId to JWT Payload so the middleware can check it later
+        const tokenPayload = { email: user.email, name: user.name, role: user.role, level: user.level, sessionId };
         const token = jwt.encode(tokenPayload, JWT_SECRET);
 
         res.json({ 
@@ -461,6 +504,24 @@ app.get('/api/auth/status', async (req, res) => {
         res.json({ status: result.Item.status, plan: result.Item.paymentPlan });
     } catch (error) {
         res.status(500).json({ error: 'Status check failed.' });
+    }
+});
+
+app.post('/api/auth/logout', authenticateToken, async (req, res) => {
+    try {
+        const { email } = req.user;
+        
+        // Remove the active session from DynamoDB to free up the login
+        await dynamoDB.update({
+            TableName: TABLE_USERS,
+            Key: { email },
+            UpdateExpression: 'remove activeSessionId, activeDeviceName'
+        }).promise();
+        
+        res.json({ message: 'Logged out successfully' });
+    } catch (error) {
+        console.error("Logout Error:", error);
+        res.status(500).json({ error: 'Logout failed.' });
     }
 });
 
@@ -1003,6 +1064,9 @@ app.post('/api/admin/tests', authenticateToken, isAdmin, async (req, res) => {
         testData.updatedAt = new Date().toISOString();
         if (!Array.isArray(testData.levels)) { testData.levels = testData.levels ? [testData.levels] : []; }
 
+        // Remove endTime as it is now determined dynamically by student subscription expiry
+        delete testData.endTime;
+
         await dynamoDB.put({ TableName: TABLE_TESTS, Item: testData }).promise();
         res.status(201).json({ message: 'Test saved', testId: testData.id });
     } catch (error) { res.status(500).json({ error: 'Failed to save test' }); }
@@ -1177,10 +1241,16 @@ app.get('/api/student/tests', authenticateToken, async (req, res) => {
         }).promise();
         
         const studentScores = scoreData.Items || [];
+        const now = new Date();
 
         const accessibleTests = (testData.Items || []).filter(test => {
             const levels = test.levels || [];
-             return levels.includes(level) || levels.includes('All Levels');
+            const hasLevelAccess = levels.includes(level) || levels.includes('All Levels');
+            
+            // Filter: Test must have commenced (or have no start time set)
+            const hasCommenced = !test.startTime || new Date(test.startTime) <= now;
+            
+            return hasLevelAccess && hasCommenced;
         });
 
         const sanitizedTests = accessibleTests.map(test => {
@@ -1207,7 +1277,6 @@ app.get('/api/student/tests', authenticateToken, async (req, res) => {
         res.status(500).json({ error: 'Failed to fetch tests' }); 
     }
 });
-
 app.post('/api/student/tests/submit', authenticateToken, async (req, res) => {
     try {
         const { email, name, level } = req.user;
